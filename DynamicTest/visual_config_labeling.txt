@@ -1,0 +1,3 @@
+measurement_results.txt 255 0 0 2 1
+# marked_points.txt 2 2 255 8 0
+medical_blade_t.txt 0 255 0 1 0

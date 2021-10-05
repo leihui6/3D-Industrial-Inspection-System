@@ -1,0 +1,14 @@
+# input data which was scanned in real world.
+reading_data:data/medical_blade.txt
+
+# input data which will be used for labeling.
+reference_data:data/medical_blade_t.txt
+
+# output folder used for all stages
+output_folder:output
+
+measurement_pairs:data/measurement_pairs.txt
+
+icp_configuration:data/icp_configuration.yaml
+
+4pcs_configuration:data/4pcs_configuration.txt

@@ -1,0 +1,3 @@
+a:b:c -> use c to restrict the final result
+or
+a:b -> calculate the geometrical result directly
