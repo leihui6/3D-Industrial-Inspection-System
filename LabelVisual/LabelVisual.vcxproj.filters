@@ -15,11 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="medical_blade_t.txt" />
-    <Text Include="marked_points.txt" />
-    <Text Include="measurement_result.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="inc\header.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -47,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\timeViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

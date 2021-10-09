@@ -11,7 +11,7 @@
 int main()
 {
 #ifdef test_visual
-	HINSTANCE hDll = LoadLibrary("visualize_labelfile.dll");
+	HINSTANCE hDll = LoadLibrary("../LabelVisual/x64/Release/LabelVisual.dll");
 
 	if (!hDll)
 	{
@@ -40,7 +40,7 @@ int main()
 
 
 #ifdef test_backprocess
-	HINSTANCE hDll = LoadLibrary("test_osg.dll");
+	HINSTANCE hDll = LoadLibrary("../MMS/x64/Release/CloudProcess.dll");
 
 	if (!hDll)
 	{

@@ -72,6 +72,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.dll</TargetExt>
     <IncludePath>$(MS3D)\OSG 3.6.4\include;$(ProjectDir)\inc;$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -120,11 +121,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="marked_points.txt" />
-    <Text Include="measurement_result.txt" />
-    <Text Include="medical_blade_t.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="inc\header.h" />
     <ClInclude Include="inc\LabelVisual.h" />
     <ClInclude Include="inc\LabelVisualCom.h" />
@@ -132,6 +128,7 @@
     <ClInclude Include="inc\timeViewer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LocalTest.cpp" />
     <ClCompile Include="src\header.cpp" />
     <ClCompile Include="src\LabelVisual.cpp" />
     <ClCompile Include="src\LabelVisualExp.cpp" />

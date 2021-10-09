@@ -19,7 +19,7 @@ public:
 	virtual void visual_label();
 
 private:
-	std::vector<std::vector<point_3d>> points_vec;
+	std::vector<std::vector<point_3d>> step_points_vec;
 
 	void cal_centroid_point(std::vector<point_3d> & points, point_3d & centroid_point);
 
@@ -38,6 +38,10 @@ private:
 	float str2int(std::string num);
 
 	void read_config(const std::string config_filename);
+
+	float distance(point_3d & p1, point_3d & p2);
+
+	void make_order(std::vector<std::vector<point_3d>> & step_points_vec);
 
 private:
 	osg::ref_ptr<osg::Group> root;

@@ -8,6 +8,7 @@ public:
 	timeViewer();
 	~timeViewer();
 
+	// will be called every frame
 	virtual void advance(double simulationTime = USE_REFERENCE_TIME);
 
 public:

@@ -18,7 +18,9 @@ void LabelVisual::initial_label_info(const std::string & config_filename)
 	for (size_t i = 0; i < filename_vec.size(); i++)
 	{
 		std::vector<point_3d> point_cloud; std::map<std::string, point_3d > label_points_map;
+		
 		read_labelfile(filename_vec[i], point_cloud, label_points_map, ((display_step_vec[i] == 1) ? true : false));
+
 		std::cout << "point cloud:" << i << " size:" << point_cloud.size() << std::endl;
 
 		point_render_parameters parameters;
@@ -58,7 +60,7 @@ void LabelVisual::visual_label()
 	//dynamic_cast<Derived*>
 	window_initilization(viewer, root);
 
-	viewer->initial(points_vec);
+	viewer->initial(step_points_vec);
 
 	viewer->realize();
 	
@@ -90,8 +92,9 @@ void LabelVisual::read_labelfile(const std::string & filename, std::vector<point
 	}
 	std::string line;
 
-	std::vector<point_3d> points;
 	point_3d centroid_point;
+	std::vector<point_3d> points;
+	std::vector<std::vector<point_3d>> step_points_unorder;
 
 	bool skip = false;
 
@@ -128,8 +131,7 @@ void LabelVisual::read_labelfile(const std::string & filename, std::vector<point
 
 			if (step_subpoints)
 			{
-				// add point cloud required to show by steps
-				points_vec.push_back(points);
+				step_points_unorder.push_back(points);
 			}
 
 			points.clear();
@@ -156,12 +158,15 @@ void LabelVisual::read_labelfile(const std::string & filename, std::vector<point
 		all_points.insert(all_points.end(), points.begin(), points.end());
 
 		if (step_subpoints)
-			points_vec.push_back(points);
+		{
+			step_points_unorder.push_back(points);
+		}
 
 		points.clear();
 	}
 
 	ifile.close();
+	make_order(step_points_unorder);
 }
 
 void LabelVisual::window_initilization(osg::ref_ptr<timeViewer> & viewer, osg::ref_ptr<osg::Group> & root)
@@ -285,4 +290,85 @@ void LabelVisual::read_config(const std::string config_filename)
 		}
 	}
 	ifile.close();
+}
+
+float LabelVisual::distance(point_3d & p1, point_3d & p2)
+{
+	return sqrtf(
+		(p1.x - p2.x) * (p1.x - p2.x) +
+		(p1.y - p2.y) * (p1.y - p2.y) +
+		(p1.z - p2.z) * (p1.z - p2.z));
+}
+
+void LabelVisual::make_order(std::vector<std::vector<point_3d>>& step_points_unorder)
+{
+	if (step_points_unorder.empty()) return;
+
+	std::vector<point_3d> beg_end_vec;
+	for (auto & v : step_points_unorder)
+	{
+		beg_end_vec.push_back(v.front());
+		beg_end_vec.push_back(v.back());
+	}
+
+	// add the first one
+	step_points_vec.push_back(step_points_unorder.front());
+
+	std::vector<bool> step_used_vec(step_points_unorder.size(), 0);
+	step_used_vec[0] = 1;
+
+	for (size_t k = 0; k < step_points_vec.size(); k++)
+	{
+		point_3d fix_p;
+		fix_p = step_points_vec[k].back();
+
+		float d_1 = 0, d_2 = 0, min_distance = FLT_MAX;
+		point_3d s_beg_p, s_end_p;
+		size_t min_index = 0;
+
+		// find the min distance one
+		for (size_t i = 0; i < beg_end_vec.size(); i += 2)
+		{
+			if (step_used_vec[i / 2] == 0)
+			{
+				s_beg_p = beg_end_vec[i]; s_end_p = beg_end_vec[i + 1];
+
+				d_1 = distance(fix_p, s_beg_p); d_2 = distance(fix_p, s_end_p);
+
+				if (d_1 < min_distance)
+				{
+					min_distance = d_1;
+					min_index = i;
+				}
+				else if (d_2 < min_distance)
+				{
+					min_distance = d_2;
+					min_index = i + 1;
+				}
+			}
+		}// end for find
+
+		size_t main_i = min_index / 2;
+		if (step_used_vec[main_i] == 0)
+		{
+			if (min_index % 2 == 1)
+			{
+				std::vector<point_3d> tmp(step_points_unorder[main_i].rbegin(), step_points_unorder[main_i].rend());
+				step_points_vec.push_back(tmp);
+			}
+			else
+			{
+				step_points_vec.push_back(step_points_unorder[main_i]);
+			}
+
+			step_used_vec[main_i] = 1;
+		}// end if
+	}// end for
+
+	std::vector<point_3d> step_vec;
+	for (auto &v : step_points_vec)
+		for (auto &p : v)
+			step_vec.push_back(p);
+	step_points_vec.clear();
+	step_points_vec.push_back(step_vec);
 }

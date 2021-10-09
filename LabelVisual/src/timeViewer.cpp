@@ -2,7 +2,7 @@
 
 timeViewer::timeViewer()
 {
-	m_trigger_interval = 150;
+	m_trigger_interval = 30;
 	m_tstart = clock();
 }
 
