@@ -12,7 +12,16 @@
 
 #include "cloud_measurement.h"
 
+struct LocalFile
+{
+	LocalFile() : m_fileobject(), m_filename() {}
+	std::fstream m_fileobject;
+	std::string m_filename;
+};
+
 class cloud_viewer;
+
+extern bool check_file(const std::string filename, std::ios_base::openmode mode, LocalFile & local_file);
 
 // write one matrix(4x4) to file
 extern void save_matrix(Eigen::Matrix4f & matrix, const std::string & file_name);
@@ -46,11 +55,7 @@ extern void string_split(std::string &str, char character, std::vector<std::stri
 // 2) you can use # to comment but only be one line that different from other normal information
 extern void read_file_as_map(const std::string & file_name, std::map<std::string, std::string> & str_flt_map);
 extern void read_file_as_map(const std::string & file_name, std::multimap<std::string, std::string> & str_flt_map);
-extern void read_file_as_map(const std::string & file_name, 
-	std::multimap<std::string, std::string> & str_flt_map, 
-	std::multimap<std::string, std::string> & reference_map);
-
-extern bool open_file(const std::string & file_name, std::fstream *f, bool clear = false);
+extern void read_file_as_map(const std::string & file_name, std::multimap<std::string, std::string> & str_flt_map, std::multimap<std::string, std::string> & reference_map);
 
 // convert string represeting te vector4 to a float-vec4
 extern osg::Vec4 str_to_vec4(const std::string & s);

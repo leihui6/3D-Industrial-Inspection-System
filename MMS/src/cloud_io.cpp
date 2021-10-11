@@ -6,14 +6,14 @@
 */
 bool load_point_cloud_txt(const std::string & filename, std::vector<point_3d>& points, bool fill_normals)
 {
+	LocalFile local_file;
+
+	if (!check_file(filename, std::ios::in, local_file)) return false;
+
+	std::fstream & ifile = local_file.m_fileobject;
+
 	points.clear();
 
-	std::ifstream ifile(filename, std::ios::in);
-
-	if (!ifile.is_open())
-	{
-		return false;
-	}
 	std::string line;
 
 	point_3d point;
@@ -66,14 +66,14 @@ bool load_point_cloud_txt(const std::string & filename, std::vector<point_3d>& p
 
 bool load_point_cloud_vtk(const std::string & filename, std::vector<point_3d>& points)
 {
+	LocalFile local_file;
+
+	if (!check_file(filename, std::ios::in, local_file)) return false;
+
+	std::fstream & ifile = local_file.m_fileobject;
+	
 	points.clear();
 
-	std::ifstream ifile(filename, std::ios::in);
-
-	if (!ifile.is_open())
-	{
-		return false;
-	}
 	std::string line;
 
 	point_3d point;

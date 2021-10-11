@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 
+#include "common_use.h"
 #include "cloud_geometry.h"
 #include "cloud_processing.h"
 

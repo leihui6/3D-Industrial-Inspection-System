@@ -58,12 +58,11 @@ void display_point_cloud_from_transformation_vec(cloud_viewer & cv, std::vector<
 
 void read_points(std::map<std::string, std::vector<point_3d>> & points_map, const std::string & file_name)
 {
-	std::ifstream ifile(file_name);
-	if (!ifile.is_open())
-	{
-		std::cerr << "Opening " << file_name << "failed" << std::endl;
-		return;
-	}
+	LocalFile local_file;
+
+	if (!check_file(file_name, std::ios::in, local_file)) return;
+
+	std::fstream & ifile = local_file.m_fileobject;
 
 	std::string line;
 	std::vector<point_3d> points;
@@ -99,24 +98,26 @@ void read_points(std::map<std::string, std::vector<point_3d>> & points_map, cons
 
 void export_marked_points(std::map<std::string, std::vector<point_3d>>& marked_points, const std::string & export_file_name)
 {
+	LocalFile local_file;
+
+	if (!check_file(export_file_name, std::ios::out, local_file)) return;
+
+	std::fstream & point_file = local_file.m_fileobject;
+
 	std::map <std::string, std::vector<point_3d>>::iterator it;
 
-	std::ofstream point_file(export_file_name);
-
-	if (point_file.is_open())
+	for (it = marked_points.begin(); it != marked_points.end(); it++)
 	{
-		for (it = marked_points.begin(); it != marked_points.end(); it++)
-		{
-			std::vector<point_3d> &ps = it->second;
+		std::vector<point_3d> &ps = it->second;
 
-			for (size_t j = 0; j < ps.size(); j++)
-			{
-				point_file << ps[j].x << " " << ps[j].y << " " << ps[j].z << "\n";
-			}
-			point_file << "#" << it->first << "\n";
+		for (size_t j = 0; j < ps.size(); j++)
+		{
+			point_file << ps[j].x << " " << ps[j].y << " " << ps[j].z << "\n";
 		}
-		point_file.close();
+		point_file << "#" << it->first << "\n";
 	}
+
+	point_file.close();
 }
 
 void export_measured_data(std::multimap<std::string, std::string>& measurement_pairs_map, std::vector<measurement_content>& mc_vec, const std::string & output_file_name)
@@ -125,9 +126,11 @@ void export_measured_data(std::multimap<std::string, std::string>& measurement_p
 
 	if (mc_vec.size() != measurement_pairs_map.size()) return;
 
-	std::ofstream  ofile(output_file_name);
+	LocalFile local_file;
 
-	if (!ofile.is_open()) return;
+	if (!check_file(output_file_name, std::ios::out, local_file)) return;
+
+	std::fstream & ofile = local_file.m_fileobject;
 
 	std::multimap<std::string, std::string>::iterator it;
 
@@ -209,9 +212,11 @@ void string_split(std::string & str, char character, std::vector<std::string>& r
 
 void read_file_as_map(const std::string & file_name, std::map<std::string, std::string> & str_flt_map)
 {
-	std::fstream ifile;
+	LocalFile local_file;
 
-	if (!open_file(file_name, &ifile)) return;
+	if (!check_file(file_name, std::ios::in, local_file)) return;
+
+	std::fstream & ifile = local_file.m_fileobject;
 
 	std::string line;
 
@@ -238,9 +243,11 @@ void read_file_as_map(const std::string & file_name, std::map<std::string, std::
 
 void read_file_as_map(const std::string & file_name, std::multimap<std::string, std::string> & str_flt_map)
 {
-	std::fstream ifile(file_name);
+	LocalFile local_file;
 
-	if (!ifile.is_open()) return;
+	if (!check_file(file_name, std::ios::in, local_file)) return;
+
+	std::fstream & ifile = local_file.m_fileobject;
 
 	std::string line;
 
@@ -268,13 +275,11 @@ void read_file_as_map(const std::string & file_name,
 	std::multimap<std::string, std::string>& str_flt_map, 
 	std::multimap<std::string, std::string> & reference_map)
 {
-	std::fstream ifile(file_name, std::ios::in);
+	LocalFile local_file;
 
-	if (!ifile.is_open())
-	{
-		std::cerr << "Opening " << file_name << "failed" << std::endl;
-		return;
-	}
+	if (!check_file(file_name, std::ios::in, local_file)) return;
+
+	std::fstream & ifile = local_file.m_fileobject;
 
 	str_flt_map.clear(); reference_map.clear();
 
@@ -310,56 +315,56 @@ void read_file_as_map(const std::string & file_name,
 	}
 }
 
-bool open_file(const std::string & file_name, std::fstream * f, bool clear)
-{
-	try
-	{
-		if (clear)
-			f->open(file_name, std::fstream::in | std::fstream::out);
-		else
-			f->open(file_name, std::fstream::in | std::fstream::out | std::fstream::app);
-	}
-	catch (const std::exception&)
-	{
-		std::cerr << "[error]" << "file path:\"" << file_name << "\" does not exist.\n";
-
-		f = nullptr;
-		return false;
-	}
-	return true;
-}
-
 osg::Vec4 str_to_vec4(const std::string & s)
 {
 	std::stringstream ss(s);
+	
 	osg::Vec4 vec4;
+	
 	float tmp; size_t i = 0;
+	
 	while (ss >> tmp) vec4[i++] = tmp;
-	if (i != 4)	return osg::Vec4();
-	else	return vec4;
+	
+	if (i != 4)	
+		return osg::Vec4();
+	else	
+		return vec4;
+}
+
+bool check_file(const std::string filename, std::ios_base::openmode mode, LocalFile & local_file)
+{
+	local_file.m_fileobject.open(filename, mode);
+
+	if (!local_file.m_fileobject.is_open())
+	{
+		std::cerr << "file (" << filename << ") doesn't exist\n";
+		return false;
+	}
+
+	return true;
 }
 
 void save_matrix(Eigen::Matrix4f & matrix, const std::string & file_name)
 {
-	std::ofstream file(file_name);
+	LocalFile local_file;
 
-	if (file.is_open())
-	{
-		file << matrix << "\n#\n";
-	}
+	if (!check_file(file_name, std::ios::out, local_file)) return;
 
-	file.close();
+	std::fstream & of = local_file.m_fileobject;
+
+	of << matrix << "\n#\n";
+
+	of.close();
 }
 
 void read_matrix(const std::string & file_name, std::vector<Eigen::Matrix4f> & m_v)
 {
-	std::ifstream ifile(file_name);
+	LocalFile local_file;
 
-	if (!ifile.is_open())
-	{
-		std::cerr << "file (" << file_name << ") doesn't exist\n";
-		return;
-	}
+	if (!check_file(file_name, std::ios::in, local_file)) return;
+
+	std::fstream & ifile = local_file.m_fileobject;
+
 	std::string line;
 
 	std::vector<float> matrix_value;
