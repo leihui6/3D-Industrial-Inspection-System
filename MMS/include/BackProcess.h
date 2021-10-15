@@ -26,6 +26,10 @@ public:
 
 private:
 
+	void transform_measured_results(std::vector<measurement_content> & mc_vec);
+
+private:
+
 	// Registration
 	// filename
 	std::string

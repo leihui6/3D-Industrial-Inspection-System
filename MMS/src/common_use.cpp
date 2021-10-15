@@ -161,7 +161,9 @@ void export_measured_data(std::multimap<std::string, std::string>& measurement_p
 		{
 			ofile << ">points" << "\n";
 			for (auto & p : mc_vec[i].drawable_points)
+			{
 				ofile << p.x << " " << p.y << " " << p.z << "\n";
+			}
 		}
 
 		std::string label = "#" + it->first + "-" + it->second;
