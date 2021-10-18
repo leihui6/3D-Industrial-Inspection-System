@@ -333,6 +333,34 @@ osg::Vec4 str_to_vec4(const std::string & s)
 		return vec4;
 }
 
+std::string current_date_time(bool need_date, bool need_time)
+{
+	time_t ttime = time(0);
+	tm *local_time = localtime(&ttime);
+
+	std::string
+		year = std::to_string(1900 + local_time->tm_year),
+		month = std::to_string(1 + local_time->tm_mon),
+		day = std::to_string(local_time->tm_mday),
+		hour = std::to_string(1 + local_time->tm_hour),
+		minute = std::to_string(1 + local_time->tm_min),
+		second = std::to_string(1 + local_time->tm_sec);
+
+	std::string current_time;
+
+	if (need_date)
+	{
+		current_time = year + '-' + month + '-' + day + ' ';
+	}
+
+	if (need_time)
+	{
+		current_time += (hour + ':' + minute + ':' + second + ' ');
+	}
+
+	return current_time;
+}
+
 bool check_file(const std::string filename, std::ios_base::openmode mode, LocalFile & local_file)
 {
 	local_file.m_fileobject.open(filename, mode);

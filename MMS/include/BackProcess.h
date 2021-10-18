@@ -8,6 +8,7 @@
 #include "cloud_search.h"
 #include "cloud_registration.h"
 #include "cloud_measurement.h"
+#include "cloud_evaluation.h"
 
 class BackProcess : public BackProcessCom
 {
@@ -24,6 +25,8 @@ public:
 
 	virtual int measurement();
 
+	virtual int evaluation();
+
 private:
 
 	void transform_measured_results(std::vector<measurement_content> & mc_vec);
@@ -37,7 +40,11 @@ private:
 		m_icp_configuration_filename, m_coarse_configuration;
 
 	// standard and scaned point cloud object
-	std::vector<point_3d> m_reading_point_cloud, m_reference_point_cloud;
+	std::vector<point_3d>
+		m_reading_point_cloud,
+		m_reference_point_cloud,
+		m_coarse_transformed_point_cloud; // coarse -> fine
+
 	// matrix generated during registration
 	Eigen::Matrix4f m_coarse_ret_mat, m_fine_ret_mat, m_final_mat;
 

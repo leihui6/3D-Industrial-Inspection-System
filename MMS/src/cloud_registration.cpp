@@ -37,6 +37,7 @@ void cloud_registration::coarse_registration(std::vector<point_3d>& readning_poi
 	options.max_color_distance		= std::stof(str2str_map["max_color_distance"]);
 	options.max_time_seconds		= std::stof(str2str_map["max_time_seconds"]);
 
+	/*
 	std::cout
 		<< "getOverlapEstimation:" << options.getOverlapEstimation() << "\n"
 		// delta, used to compute the Largest Common Pointset (LCP) between the two models
@@ -49,7 +50,7 @@ void cloud_registration::coarse_registration(std::vector<point_3d>& readning_poi
 		<< "options.max_color_distance:" << options.max_color_distance << "\n"
 		// maximum computation time in seconds
 		<< "options.max_time_seconds:" << options.max_time_seconds << "\n";
-
+	*/
 	constexpr gr::Utils::LogLevel loglvl = gr::Utils::Verbose;
 
 	gr::Utils::Logger logger(loglvl);
@@ -64,7 +65,7 @@ void cloud_registration::coarse_registration(std::vector<point_3d>& readning_poi
 
 	score = matcher.ComputeTransformation(reference_point_cloud_gr, reading_point_cloud_gr, ret_mat, sampler, visitor);
 
-	logger.Log<gr::Utils::Verbose>("Score: ", score);
+	//logger.Log<gr::Utils::Verbose>("Score: ", score);
 
 	//ret_mat.transposeInPlace();
 }

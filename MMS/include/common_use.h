@@ -3,6 +3,8 @@
 
 #include <Eigen/Dense>
 
+#include <chrono>
+#include <ctime>
 #include <filesystem>
 #include <map>
 
@@ -59,5 +61,7 @@ extern void read_file_as_map(const std::string & file_name, std::multimap<std::s
 
 // convert string represeting te vector4 to a float-vec4
 extern osg::Vec4 str_to_vec4(const std::string & s);
+
+extern std::string current_date_time(bool need_date = false, bool need_time = true);
 
 #endif // COMMON_USE

@@ -1,5 +1,5 @@
-#ifndef CLOUD_POINT_H
-#define CLOUD_POINT_H
+#ifndef CLOUD_GEOMETRY_H
+#define CLOUD_GEOMETRY_H
 
 #include <windows.h>
 
@@ -302,4 +302,4 @@ void radian_two_vector_2d_022PI(const Eigen::Vector3f & v1, const Eigen::Vector3
 // get rotation transformation, from v1 to v2
 void rotation_transformation(const Eigen::Vector3f & v1, const Eigen::Vector3f & v2, Eigen::Matrix3f & t);
 
-#endif // !CLOUD_POINT_H
+#endif // CLOUD_GEOMETRY_H

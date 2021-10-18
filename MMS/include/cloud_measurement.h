@@ -1,5 +1,5 @@
-#ifndef CLOUD_MEASUREMENT
-#define CLOUD_MEASUREMENT
+#ifndef CLOUD_MEASUREMENT_H
+#define CLOUD_MEASUREMENT_H
 
 #include "cloud_fitting.h"
 #include "cloud_search.h"
@@ -112,6 +112,6 @@ private:
 	kd_tree m_point_cloud_tree;
 };
 
-#endif // !CLOUD_MEASUREMENT
+#endif // !CLOUD_MEASUREMENT_H
 
 

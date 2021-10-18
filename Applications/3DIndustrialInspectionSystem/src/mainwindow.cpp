@@ -60,8 +60,9 @@ size_t MainWindow::write_log(std::string log)
     if(log[0] >= 97 && log[0] <= 97+26)
         log[0] = log[0]-32;
 
-    //ui->textEdit->moveCursor(QTextCursor::End);
+    ui->textEdit->moveCursor(QTextCursor::End);
     ui->textEdit->insertPlainText(QString::fromStdString(before_log + log + postfix));
+    ui->textEdit->moveCursor(QTextCursor::End);
 
     return size_t(ui->textEdit->toPlainText().size());
 }
@@ -563,6 +564,12 @@ int MainWindow::all_process_thread()
     write_log("measurement done! time elapsed:"+ std::to_string(this_time).substr(0,6) + "s");
 
     write_log("total time elapsed:"+ std::to_string(total_time).substr(0,6) + "s");
+
+    // Evaluation
+    write_log("starting evaluation...");
+    back_process_p->evaluation();
+    write_log("evaluation done!");
+
 
     delete back_process_p;
 

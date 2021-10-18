@@ -42,9 +42,6 @@
     <ClInclude Include="include\common_use.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\cloud_measurement.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\cloud_pickhandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -55,6 +52,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\BackProcessExp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cloud_evaluation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cloud_evaluation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -114,6 +117,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\main_search_points.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cloud_evaluation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

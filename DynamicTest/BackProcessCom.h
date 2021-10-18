@@ -18,6 +18,8 @@ public:
 
 	virtual int measurement() = 0;
 
+	virtual int evaluation() = 0;
+
 };
 
 #endif // !BACKPROCESSCOM_H

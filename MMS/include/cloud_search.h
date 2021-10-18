@@ -40,6 +40,10 @@ public:
 
 	point_3d get_point(size_t i);
 
+	size_t get_point_number();
+
+	const std::vector<point_3d> & get_this_point_cloud();
+
 private:
 
 	point_cloud m_pc;

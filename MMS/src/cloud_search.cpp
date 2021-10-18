@@ -167,6 +167,16 @@ point_3d kd_tree::get_point(size_t i)
 	return this->m_kd_tree_t->dataset.pts[i];
 }
 
+size_t kd_tree::get_point_number()
+{
+	return m_pc.pts.size();
+}
+
+const std::vector<point_3d>& kd_tree::get_this_point_cloud()
+{
+	return m_pc.pts;
+}
+
 void kd_tree::points_to_poincloud(std::vector<point_3d>& points, point_cloud & m_point_cloud)
 {
 	m_point_cloud.pts = points;
