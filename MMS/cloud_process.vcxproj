@@ -27,6 +27,7 @@
     <ClInclude Include="include\cloud_fitting.h" />
     <ClInclude Include="include\cloud_geometry.h" />
     <ClInclude Include="include\cloud_io.h" />
+    <ClInclude Include="include\cloud_measurement.h" />
     <ClInclude Include="include\cloud_pickhandler.h" />
     <ClInclude Include="include\cloud_processing.h" />
     <ClInclude Include="include\cloud_registration.h" />
@@ -34,6 +35,7 @@
     <ClInclude Include="include\cloud_viewer.h" />
     <ClInclude Include="include\common_use.h" />
     <ClInclude Include="include\interface_command.h" />
+    <ClInclude Include="include\process_report.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BackProcess.cpp" />
@@ -56,6 +58,7 @@
     <ClCompile Include="src\main_labeling_points.cpp" />
     <ClCompile Include="src\main_measurement.cpp" />
     <ClCompile Include="src\main_search_points.cpp" />
+    <ClCompile Include="src\process_report.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -114,7 +117,7 @@
     <LibraryPath>$(OSG)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(MS3D)\OSG 3.6.4\include;$(MS3D)\nanoflann\include;$(MS3D)\Eigen;$(MS3D)\CGAL\include;$(MS3D)\OPENGR;$(MS3D)\Boost_1_72_0\include\boost-1_72;$(MS3D)\libpointmatcher\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)\include</IncludePath>
+    <IncludePath>$(MS3D)\OSG 3.6.4\include;$(MS3D)\nanoflann\include;$(MS3D)\Eigen;$(MS3D)\CGAL\include;$(MS3D)\OPENGR;$(MS3D)\Boost_1_72_0\include;$(MS3D)\libpointmatcher\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)\include</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
     <ExtensionsToDeleteOnClean>*.obj;*.iobj;*.log;*.tlog;*.pdb;*.ipdb;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
   </PropertyGroup>

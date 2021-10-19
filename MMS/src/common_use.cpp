@@ -335,30 +335,31 @@ osg::Vec4 str_to_vec4(const std::string & s)
 
 std::string current_date_time(bool need_date, bool need_time)
 {
-	time_t ttime = time(0);
-	tm *local_time = localtime(&ttime);
+	std::time_t now =
+		std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
-	std::string
-		year = std::to_string(1900 + local_time->tm_year),
-		month = std::to_string(1 + local_time->tm_mon),
-		day = std::to_string(local_time->tm_mday),
-		hour = std::to_string(1 + local_time->tm_hour),
-		minute = std::to_string(1 + local_time->tm_min),
-		second = std::to_string(1 + local_time->tm_sec);
+	std::string s(30, '\0');
 
-	std::string current_time;
+	std::strftime(&s[0], s.size(), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
 
-	if (need_date)
+	if (need_date && !need_time)
 	{
-		current_time = year + '-' + month + '-' + day + ' ';
+		std::strftime(&s[0], s.size(), "%Y-%m-%d", std::localtime(&now));
+	}
+	else if (!need_date && need_time)
+	{
+		std::strftime(&s[0], s.size(), "%H:%M:%S", std::localtime(&now));
+	}
+	else if (need_date && need_time)
+	{
+		std::strftime(&s[0], s.size(), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
+	}
+	else
+	{
+		// ... 
 	}
 
-	if (need_time)
-	{
-		current_time += (hour + ':' + minute + ':' + second + ' ');
-	}
-
-	return current_time;
+	return s.substr(0, s.find('\0'));
 }
 
 bool check_file(const std::string filename, std::ios_base::openmode mode, LocalFile & local_file)

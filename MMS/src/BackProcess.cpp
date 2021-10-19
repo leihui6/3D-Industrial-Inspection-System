@@ -18,37 +18,45 @@ BackProcess::~BackProcess()
 
 int BackProcess::initial_parameter(const std::string & config_filename)
 {
-	std::map<std::string, std::string> parameters;
-	read_file_as_map(config_filename, parameters);
+	read_file_as_map(config_filename, m_parameters);
 
 	// point cloud files
-	m_reading_point_cloud_filename = parameters["reading_data"];
-	m_reference_point_cloud_filename = parameters["reference_data"];
+	m_reading_point_cloud_filename = m_parameters["input_folder"] + m_parameters["reading_data"];
+	m_reference_point_cloud_filename = m_parameters["input_folder"] + m_parameters["reference_data"];
 
 	// measurement files
-	m_measurement_pairs = parameters["measurement_pairs"];
+	m_measurement_pairs = m_parameters["input_folder"] + m_parameters["measurement_pairs"];
 
 	// registration files
-	m_icp_configuration_filename = parameters["icp_configuration"];
-m_coarse_configuration = parameters["4pcs_configuration"];
+	m_icp_configuration_filename = m_parameters["input_folder"] + m_parameters["icp_configuration"];
+	m_coarse_configuration = m_parameters["input_folder"] + m_parameters["4pcs_configuration"];
 
-m_output_folder = parameters["output_folder"];
+	//m_output_folder = m_parameters["output_folder"];
 
-// load data
-load_point_cloud_txt(m_reading_point_cloud_filename, m_reading_point_cloud, false);
+	load_data();
 
-load_point_cloud_txt(m_reference_point_cloud_filename, m_reference_point_cloud, false);
+	return 0;
+}
 
-read_points(m_marked_points_map, m_output_folder + "/marked_points.txt");
+void BackProcess::load_data()
+{
+	// load data
+	load_point_cloud_txt(m_reading_point_cloud_filename, m_reading_point_cloud, false);
 
-read_file_as_map(m_measurement_pairs, m_measurement_pairs_map, m_reference_map);
+	load_point_cloud_txt(m_reference_point_cloud_filename, m_reference_point_cloud, false);
 
-return 0;
+	read_points(m_marked_points_map, m_parameters["output_folder"] + m_parameters["marked_points_result"]);
+
+	read_file_as_map(m_measurement_pairs, m_measurement_pairs_map, m_reference_map);
 }
 
 int BackProcess::registration()
 {
+	if (m_reading_point_cloud.empty() || m_reference_point_cloud.empty()) return 1;
+
 	cloud_registration cloud_registration;
+
+	clock_t begin = clock();
 
 	// Coarse registration
 	// final transformation for fine(icp) registration
@@ -63,8 +71,9 @@ int BackProcess::registration()
 	// matrix transforming reading point cloud to reference point cloud
 	//std::cout << "coarse registration matrix is:\n" << coarse_ret_mat << "\n";
 
-	// save matrix to file
-	save_matrix(m_coarse_ret_mat, m_output_folder + "/coarse_matrix.txt");
+	m_rd.registration_coarse_time = double((clock() - begin)) / CLOCKS_PER_SEC;
+	begin = clock();
+	//save_matrix(m_coarse_ret_mat, m_parameters["output_folder"] + m_parameters["coarse_registration_result"]);
 
 	transform_points(m_reading_point_cloud, m_coarse_ret_mat, m_coarse_transformed_point_cloud);
 
@@ -81,11 +90,12 @@ int BackProcess::registration()
 	//std::cout << "fine registration matrix is:\n" << fine_ret_mat << "\n";
 
 	// save matrix to file
-	save_matrix(m_fine_ret_mat, m_output_folder + "/fine_matrix.txt");
+	//save_matrix(m_fine_ret_mat, m_parameters["output_folder"] + m_parameters["fine_registration_result"]);
+	m_rd.registration_fine_time = double((clock() - begin)) / CLOCKS_PER_SEC;
 
 	m_final_mat = m_fine_ret_mat * m_coarse_ret_mat;
 
-	save_matrix(m_final_mat, m_output_folder + "/final_matrix.txt");
+	//save_matrix(m_final_mat, m_parameters["output_folder"] + m_parameters["final_registration_result"]);
 
 	return 0;
 }
@@ -108,7 +118,7 @@ int BackProcess::searching()
 		m_new_mark_points_map.insert(std::pair< std::string, std::vector<point_3d>>(it->first, correspondence));
 	}
 
-	export_marked_points(m_new_mark_points_map, m_output_folder + "/marked_points_searched.txt");
+	export_marked_points(m_new_mark_points_map, m_parameters["output_folder"] + m_parameters["marked_points_searched_result"]);
 
 	return 0;
 }
@@ -123,7 +133,7 @@ int BackProcess::measurement()
 
 	transform_measured_results(mc_vec);
 
-	export_measured_data(m_measurement_pairs_map, mc_vec, m_output_folder + "/measurement_results.txt");
+	export_measured_data(m_measurement_pairs_map, mc_vec, m_parameters["output_folder"] + m_parameters["measurement_result"]);
 
 	return 0;
 }
@@ -132,17 +142,15 @@ int BackProcess::evaluation()
 {
 	cloud_evaluation ce;
 
-	evaluation_results registration_er, searching_er;
-
 	// evaluate the registration result
 	std::vector<point_3d> reading_to_standard_point_cloud;
 
 	transform_points(m_reading_point_cloud, m_final_mat, reading_to_standard_point_cloud);
 
 	int evaluation_results =
-		ce.mean_distance_point_clouds(reading_to_standard_point_cloud, m_reference_point_cloud, registration_er);
+		ce.mean_distance_point_clouds(reading_to_standard_point_cloud, m_reference_point_cloud, m_registration_er);
 	
-	ce.export_result(m_output_folder + "/evaluation_report.txt", registration_er);
+	//ce.export_result(m_parameters["output_folder"] + m_parameters["evaluation_result"], m_registration_er);
 
 
 	// evaluate the searching result
@@ -154,9 +162,11 @@ int BackProcess::evaluation()
 		new_points.insert(new_points.end(), m_new_mark_points_map[item.first].begin(), m_new_mark_points_map[item.first].end());
 	}
 	evaluation_results =
-		ce.mean_distance_points(original_points, new_points, searching_er);
+		ce.mean_distance_points(original_points, new_points, m_searching_er);
 
-	ce.export_result(m_output_folder + "/evaluation_report.txt",searching_er);
+	//ce.export_result(m_parameters["output_folder"] + m_parameters["evaluation_result"], m_searching_er);
+
+	export_report();
 
 	return 0;
 }
@@ -168,3 +178,26 @@ void BackProcess::transform_measured_results(std::vector<measurement_content> & 
 		for (auto &p : pv.drawable_points)
 			p.do_transform(m_final_mat.inverse());
 }
+
+void BackProcess::export_report()
+{
+	m_rd.reading_filename = m_reading_point_cloud_filename;
+	m_rd.reference_filename = m_reference_point_cloud_filename;
+
+	m_rd.reading_data = &m_reading_point_cloud;
+	m_rd.reference_data = &m_reference_point_cloud;
+
+	// registration elapsed time was add in registration function
+	// ... 
+
+	m_rd.registration_matrix.push_back(m_coarse_ret_mat);
+	m_rd.registration_matrix.push_back(m_fine_ret_mat);
+	m_rd.registration_matrix.push_back(m_final_mat);
+
+	m_rd.RMS_registration = m_registration_er.rms_val;
+	m_rd.RMS_searching = m_searching_er.rms_val;
+
+	process_report pr;
+	pr.export_report(m_parameters["output_folder"] + m_parameters["export_report"], m_rd);
+}
+

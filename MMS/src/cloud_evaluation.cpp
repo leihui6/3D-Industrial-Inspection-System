@@ -90,7 +90,7 @@ int cloud_evaluation::export_result(const std::string filename, evaluation_resul
 
 	std::string ctime = current_date_time(true, true);
 
-	op_file << ctime << ":RootMeamSquare:" << er.rms_val << std::endl;
+	op_file << "RootMeamSquare:" << er.rms_val << std::endl;
 
 	op_file.close();
 

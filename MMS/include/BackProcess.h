@@ -9,6 +9,7 @@
 #include "cloud_registration.h"
 #include "cloud_measurement.h"
 #include "cloud_evaluation.h"
+#include "process_report.h"
 
 class BackProcess : public BackProcessCom
 {
@@ -29,7 +30,11 @@ public:
 
 private:
 
+	void load_data();
+
 	void transform_measured_results(std::vector<measurement_content> & mc_vec);
+
+	void export_report();
 
 private:
 
@@ -60,8 +65,9 @@ private:
 
 
 	// Common object
-	std::string m_output_folder;
-
+	report_data m_rd;
+	evaluation_results m_registration_er, m_searching_er;
+	std::map<std::string, std::string> m_parameters;
 };
 #endif // BACKPROCESS_H
 

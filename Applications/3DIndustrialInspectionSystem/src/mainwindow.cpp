@@ -166,8 +166,7 @@ void MainWindow::quit()
 
 void MainWindow::initialize_folder()
 {
-    m_export_folder = "output/";
-    m_export_labeled_info_path = m_export_folder + "marked_points.txt";
+    m_export_labeled_info_path = QString((m_str_str_map["output_folder"] + m_str_str_map["marked_points_result"]).data());
 
 
     if (!QDir(m_export_folder).exists(m_export_folder))
@@ -359,15 +358,15 @@ void MainWindow::on_pushButton_load_data_clicked()
         return ;
     }
 
-    std::string reference_data = m_str_str_map["reference_data"];
+    std::string reference_data_path =m_str_str_map["input_folder"]+ m_str_str_map["reference_data"];
 
-    if (ci.load_point_cloud_txt(reference_data, m_target_cloud_point))
+    if (ci.load_point_cloud_txt(reference_data_path, m_target_cloud_point))
     {
-        write_log("Reading " + reference_data + " (size: " + std::to_string(m_target_cloud_point.size()) + ")");
+        write_log("Reading " + reference_data_path + " (size: " + std::to_string(m_target_cloud_point.size()) + ")");
     }
     else
     {
-        write_log("Reading " + reference_data + " failed");
+        write_log("Reading " + reference_data_path + " failed");
         return ;
     }
     m_viewer_widget->add_point_cloud(m_target_cloud_point, POINT_CLOUD, 1.0);
@@ -531,8 +530,6 @@ int MainWindow::all_process_thread()
 
     BackProcessComfunc dllFunc = (BackProcessComfunc)GetProcAddress(hDll, "getBackProcessCom");
 
-    //const std::string filename = "visual_config_labeling.txt";
-
     BackProcessCom * back_process_p;
     back_process_p = (BackProcessCom*)dllFunc();
     back_process_p->initial_parameter(m_configuration_file);
@@ -570,7 +567,6 @@ int MainWindow::all_process_thread()
     back_process_p->evaluation();
     write_log("evaluation done!");
 
-
     delete back_process_p;
 
     return 1;
@@ -578,7 +574,7 @@ int MainWindow::all_process_thread()
 
 void MainWindow::on_btn_measurement_read_clicked()
 {
-    std::string measurement_pairs_filename = m_str_str_map["measurement_pairs"];
+    std::string measurement_pairs_filename = m_str_str_map["input_folder"]+m_str_str_map["measurement_pairs"];
 
     write_log("reading "+measurement_pairs_filename);
 
@@ -629,7 +625,7 @@ void MainWindow::on_btn_measurement_write_clicked()
 
 
     // write into the local file
-    std::string measurement_pairs_filename = m_str_str_map["measurement_pairs"];
+    std::string measurement_pairs_filename = m_str_str_map["output_folder"] + m_str_str_map["measurement_pairs"];
 
     std::ofstream ofile(measurement_pairs_filename);
     if(!ofile.is_open())
@@ -667,6 +663,7 @@ void MainWindow::on_btn_measurement_check_clicked()
     }
 
     // read the local file, collecting all items
+    qDebug() << m_export_labeled_info_path;
     std::ifstream ifile(m_export_labeled_info_path.toStdString());
     if(!ifile.is_open())
     {

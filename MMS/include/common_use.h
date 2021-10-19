@@ -23,6 +23,11 @@ struct LocalFile
 
 class cloud_viewer;
 
+/*
+LocalFile local_file;
+if (!check_file(file_name, std::ios::in, local_file)) return;
+std::fstream & ifile = local_file.m_fileobject;
+*/
 extern bool check_file(const std::string filename, std::ios_base::openmode mode, LocalFile & local_file);
 
 // write one matrix(4x4) to file

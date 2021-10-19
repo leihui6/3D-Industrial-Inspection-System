@@ -1,15 +1,22 @@
-# input data which was scanned in real world.
-reading_data:data/medical_blade.txt
-
+# data folder
+input_folder:data
+# input data which was scanned
+reading_data:/01-downsample.txt
 # input data which will be used for labeling.
-reference_data:data/medical_blade_t.txt
+reference_data:/medical_blade_t.txt
+measurement_pairs:/measurement_pairs.txt
+icp_configuration:/icp_configuration.yaml
+4pcs_configuration:/4pcs_configuration.txt
+
+#--------------------------------------------
+#--------------------------------------------
 
 # output folder used for all stages
 output_folder:output
-
-measurement_pairs:data/measurement_pairs.txt
-
-icp_configuration:data/icp_configuration.yaml
-
-4pcs_configuration:data/4pcs_configuration.txt
-
+## labeling result
+marked_points_result:/marked_points.txt
+marked_points_searched_result:/marked_points_searched.txt
+## measurement result
+measurement_result:/measurement_result.txt
+## Export report
+export_report:/report.txt
