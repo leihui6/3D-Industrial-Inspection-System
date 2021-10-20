@@ -40,14 +40,21 @@ int BackProcess::initial_parameter(const std::string & config_filename)
 
 void BackProcess::load_data()
 {
+	clock_t beg_t = clock();
 	// load data
-	load_point_cloud_txt(m_reading_point_cloud_filename, m_reading_point_cloud, false);
+	load_point_cloud_txt(m_reading_point_cloud_filename, m_reading_point_cloud_ori, false);
+	load_point_cloud_txt(m_reference_point_cloud_filename, m_reference_point_cloud_ori, false);
+	m_rd.reading_data_ori = &m_reading_point_cloud_ori;
+	m_rd.reference_data_ori = &m_reference_point_cloud_ori;
 
-	load_point_cloud_txt(m_reference_point_cloud_filename, m_reference_point_cloud, false);
+	// filter point cloud
+	cloud_processing cp;
+	m_reading_point_cloud = m_reading_point_cloud_ori;
+	m_reference_point_cloud = m_reference_point_cloud_ori;
+	cp.filter_simplify_grid(m_reading_point_cloud, 0.5);
+	cp.filter_simplify_grid(m_reference_point_cloud, 0.5);
 
-	read_points(m_marked_points_map, m_parameters["output_folder"] + m_parameters["marked_points_result"]);
-
-	read_file_as_map(m_measurement_pairs, m_measurement_pairs_map, m_reference_map);
+	m_rd.data_load_time = double(clock() - beg_t) / CLOCKS_PER_SEC;
 }
 
 int BackProcess::registration()
@@ -102,6 +109,12 @@ int BackProcess::registration()
 
 int BackProcess::searching()
 {
+	clock_t beg_t = clock();
+	
+	read_points(m_marked_points_map, m_parameters["output_folder"] + m_parameters["marked_points_result"]);
+
+	if (m_marked_points_map.empty()) return 1;
+
 	transform_points(m_reading_point_cloud, m_final_mat, m_transformed_point_cloud);
 
 	kd_tree kt(m_transformed_point_cloud);
@@ -120,11 +133,19 @@ int BackProcess::searching()
 
 	export_marked_points(m_new_mark_points_map, m_parameters["output_folder"] + m_parameters["marked_points_searched_result"]);
 
+	m_rd.searching_time = double(clock() - beg_t) / CLOCKS_PER_SEC;
+
 	return 0;
 }
 
 int BackProcess::measurement()
 {
+	clock_t beg_t = clock();
+
+	read_file_as_map(m_measurement_pairs, m_measurement_pairs_map, m_reference_map);
+
+	if (m_measurement_pairs.empty()) return 1;
+
 	cloud_measurement cm(m_transformed_point_cloud);
 
 	std::vector<measurement_content> mc_vec;
@@ -134,6 +155,8 @@ int BackProcess::measurement()
 	transform_measured_results(mc_vec);
 
 	export_measured_data(m_measurement_pairs_map, mc_vec, m_parameters["output_folder"] + m_parameters["measurement_result"]);
+	
+	m_rd.measurement_time = double(clock() - beg_t) / CLOCKS_PER_SEC;
 
 	return 0;
 }
@@ -196,6 +219,10 @@ void BackProcess::export_report()
 
 	m_rd.RMS_registration = m_registration_er.rms_val;
 	m_rd.RMS_searching = m_searching_er.rms_val;
+
+	m_rd.total_time =
+		m_rd.data_load_time + m_rd.registration_coarse_time +
+		m_rd.registration_fine_time + m_rd.searching_time + m_rd.measurement_time;
 
 	process_report pr;
 	pr.export_report(m_parameters["output_folder"] + m_parameters["export_report"], m_rd);

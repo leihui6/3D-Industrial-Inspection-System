@@ -7,9 +7,15 @@ struct report_data
 {
 	std::string reading_filename, reference_filename;
 
-	std::vector<point_3d> *reading_data, *reference_data;
+	std::vector<point_3d>
+		*reading_data_ori, *reference_data_ori,
+		*reading_data, *reference_data;
 
-	float registration_coarse_time, registration_fine_time;
+	float
+		data_load_time,
+		registration_coarse_time, registration_fine_time,
+		searching_time, measurement_time,
+		total_time;
 
 	// coarse, coarse->fine, fine*coarse
 	std::vector<Eigen::Matrix4f> registration_matrix;

@@ -130,13 +130,11 @@ void cloud_processing::filter_simplify_grid(std::vector<point_3d>& points, float
 
 	cgal_points.erase(first_to_remove, cgal_points.end());
 
-	// test
-	std::cout << "original point size=" << points.size() << " " << " after filter, point size=" << cgal_points.size() << std::endl;
+	//std::cout << "original point size=" << points.size() << " " << " after filter, point size=" << cgal_points.size() << std::endl;
 
 	convert_to_original_points(cgal_points, points);
 
-	// test
-	save_points(points, "data/filter_grid_simplify.txt");
+	//save_points(points, "data/filter_grid_simplify.txt");
 }
 
 void cloud_processing::filter_simplify_wlop(std::vector<point_3d>& points, float retain_percentage, float neighbor_radius)

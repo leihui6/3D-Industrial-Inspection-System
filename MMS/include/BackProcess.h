@@ -46,8 +46,8 @@ private:
 
 	// standard and scaned point cloud object
 	std::vector<point_3d>
-		m_reading_point_cloud,
-		m_reference_point_cloud,
+		m_reading_point_cloud_ori, m_reading_point_cloud, // original and filtered data
+		m_reference_point_cloud_ori, m_reference_point_cloud, // standard and filtered data
 		m_coarse_transformed_point_cloud; // coarse -> fine
 
 	// matrix generated during registration
