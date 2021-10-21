@@ -23,13 +23,16 @@ int process_report::export_report(const std::string & filename, const report_dat
 
 	// add date
 	content.push_back(">Date\n");
+	content.push_back("\t");
 	content.push_back(current_date_time(true, true) + "\n");
 
 	// add filename
 	content.push_back(">Data\n");
+	content.push_back("\t");
 	content.push_back(rd.reading_filename + " " + std::to_string(rd.reading_data_ori->size()) + "->" + std::to_string(rd.reading_data->size()) + " -");
 	content.push_back(std::to_string(1 - double(rd.reading_data->size()) / rd.reading_data_ori->size()).substr(0, 6) + "%\n");
 
+	content.push_back("\t");
 	content.push_back(rd.reference_filename + " " + std::to_string(rd.reference_data_ori->size()) + "->" + std::to_string(rd.reference_data->size()) + " -");
 	content.push_back(std::to_string(1 - double(rd.reference_data->size()) / rd.reference_data_ori->size()).substr(0, 6) + "%\n");
 
@@ -38,14 +41,15 @@ int process_report::export_report(const std::string & filename, const report_dat
 
 	content.push_back(">Time Elapsed\n");
 	content.push_back(
-		"Data Loading     :\t" + std::to_string(rd.data_load_time).substr(0, 6) + "s\n" +
-		"Registration(1/2):\t" + std::to_string(rd.registration_coarse_time).substr(0, 6) + "s\n" +
-		"Registration(2/2):\t" + std::to_string(rd.registration_fine_time).substr(0, 6) + "s\n" +
-		"Searching        :\t" + std::to_string(rd.searching_time).substr(0, 6) + "s\n" +
-		"Measurement      :\t" + std::to_string(rd.measurement_time).substr(0, 6) + "s\n" +
-		"Total Time       :\t" + std::to_string(rd.total_time).substr(0, 6) + "s\n");
+		"\tData Loading     :\t" + std::to_string(rd.data_load_time).substr(0, 6) + "s\n" +
+		"\tRegistration(1/2):\t" + std::to_string(rd.registration_coarse_time).substr(0, 6) + "s\n" +
+		"\tRegistration(2/2):\t" + std::to_string(rd.registration_fine_time).substr(0, 6) + "s\n" +
+		"\tSearching        :\t" + std::to_string(rd.searching_time).substr(0, 6) + "s\n" +
+		"\tMeasurement      :\t" + std::to_string(rd.measurement_time).substr(0, 6) + "s\n" +
+		"\tTotal Time       :\t" + std::to_string(rd.total_time).substr(0, 6) + "s\n");
 
 	content.push_back(">Root Mean Square(Registration and Searching)\n");
+	content.push_back("\t");
 	content.push_back(
 		std::to_string(rd.RMS_registration).substr(0, 6) + " " +
 		std::to_string(rd.RMS_searching).substr(0, 6) + "\n");
