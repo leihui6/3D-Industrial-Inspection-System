@@ -302,4 +302,6 @@ void radian_two_vector_2d_022PI(const Eigen::Vector3f & v1, const Eigen::Vector3
 // get rotation transformation, from v1 to v2
 void rotation_transformation(const Eigen::Vector3f & v1, const Eigen::Vector3f & v2, Eigen::Matrix3f & t);
 
+void subset_of_point_cloud(std::vector<size_t> &index_vec, std::vector<point_3d> & point_cloud, std::vector<point_3d> & subset);
+
 #endif // CLOUD_GEOMETRY_H

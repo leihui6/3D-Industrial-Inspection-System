@@ -1,6 +1,7 @@
 #ifndef CLOUD_MEASUREMENT_H
 #define CLOUD_MEASUREMENT_H
 
+#include "common_use.h"
 #include "cloud_fitting.h"
 #include "cloud_search.h"
 
@@ -32,30 +33,51 @@ struct measurement_content
 
 	// 3. measurement method
 	measurement_methods m_method;
+
+};
+
+struct pair_content
+{
+	std::string source_object;
+	std::string target_object;
+	std::string reference_object;
 };
 
 class cloud_measurement
 {
 public:
-	cloud_measurement(std::vector<point_3d> & point_cloud);
+	cloud_measurement(std::vector<point_3d> & point_cloud, std::map<std::string, std::vector<point_3d>> & searched_mark_points_map);
 
 	~cloud_measurement();
 
-	void measure(
-		std::multimap<std::string, std::string> & measurement_pairs_map, 
-		std::map<std::string, std::vector<point_3d>>& _m, 
-		std::multimap<std::string, std::string> & reference_map, 
-		std::vector<measurement_content> & mc_vec);
+	void measure();
 
-	void analyse_defect(std::vector<point_3d>& scanned_points, std::vector<point_3d>& standard_model, std::vector<point_3d> & defect_points);
+	size_t read_pair_file(const std::string & filename);
+
+	int post_process(Eigen::Matrix4f & matrix);
+
+	size_t export_measured_data(const std::string & output_filename);
+
+	std::vector<measurement_content> & get_measurement_result();
 
 private:
-	void measure(std::string & points_1_label, std::string & points_2_label, std::string & reference_label,
-		std::map<std::string, std::vector<point_3d>>& _m, measurement_content & mc);
+	void analyse_defect(std::vector<point_3d>& scanned_points, std::vector<point_3d>& standard_model, std::vector<point_3d> & defect_points);
+	
+	void fill_available_vector(point_3d & p, std::vector<point_3d> & points);
 
-	void analyze_points(std::vector<size_t> & order_1, std::vector<size_t> & order_2, 
-		std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, std::vector<point_3d>& reference_points,
-		measurement_content & mc);
+	std::vector<measurement_content> m_mc_vec;
+	std::vector<pair_content> m_pair_vec;
+
+	std::map<std::string, std::vector<point_3d>> &m_searched_mark_points_map;
+	std::vector<point_3d> & m_point_cloud;
+	kd_tree m_point_cloud_tree;
+
+private:
+	void decide_objects(const std::string & label_1, const std::string & label_2, std::vector<size_t> &upper, std::vector<size_t> & lower);
+
+	void analyze_points(
+		std::vector<size_t> & order_1, std::vector<size_t> & order_2, 
+		pair_content & pc, measurement_content & mc);
 
 	cloud_fitting cf;
 
@@ -106,10 +128,6 @@ private:
 	void plane_to_cylinder_points(plane_func_3d & plane_func, cylinder_func & _cylinder_func, std::vector<point_3d>& reference_points, measurement_content & mc);
 
 
-
-private:
-	std::vector<point_3d> m_point_cloud;
-	kd_tree m_point_cloud_tree;
 };
 
 #endif // !CLOUD_MEASUREMENT_H

@@ -1,77 +1,119 @@
 #include "cloud_measurement.h"
 
-cloud_measurement::cloud_measurement(std::vector<point_3d> & point_cloud)
-	:m_point_cloud_tree(point_cloud)
+cloud_measurement::cloud_measurement(
+	std::vector<point_3d> & point_cloud,
+	std::map<std::string, std::vector<point_3d>> & searched_mark_points_map)
+	:
+	m_point_cloud_tree(point_cloud),
+	m_point_cloud(point_cloud),
+	m_searched_mark_points_map(searched_mark_points_map)
 {
-	this->m_point_cloud = point_cloud;
+
 }
 
 cloud_measurement::~cloud_measurement()
 {
+
 }
 
-void cloud_measurement::measure(
-	std::multimap<std::string, std::string> & measurement_pairs_map,
-	std::map<std::string, std::vector<point_3d>>& _m,
-	std::multimap<std::string, std::string> & reference_map,
-	std::vector<measurement_content> & mc_vec)
+size_t cloud_measurement::read_pair_file(const std::string & filename)
 {
-	//if (measurement_pairs_map.size() != reference_map.size())
-	//{
-	//	std::cerr << "error: please check the measurement pairs and its reference labels" << std::endl;;
-	//	return;
-	//}
+	LocalFile local_file;
 
-	std::multimap<std::string, std::string> reference_map_tmp = reference_map;
+	if (!check_file(filename, std::ios::in, local_file)) return 1;
 
-	for (std::map<std::string, std::string>::iterator 
-		it = measurement_pairs_map.begin(); it != measurement_pairs_map.end(); ++it)
+	std::fstream & ifile = local_file.m_fileobject;
+
+	m_pair_vec.clear();
+
+	std::string line;
+
+	size_t line_index = 0;
+	while (std::getline(ifile, line))
+	{
+		if (line.empty()) break;
+
+		if (line[0] == '#') continue;
+
+		std::vector<std::string> split_str;
+
+		string_split(line, ':', split_str);
+
+		pair_content pc;
+
+		pc.source_object = split_str[0];
+		pc.target_object = split_str[1];
+
+		if (split_str.size() == 3)
+		{
+			pc.reference_object = split_str[2];
+		}
+		else if (split_str.size() == 2)
+		{
+			pc.reference_object.clear();
+		}
+		else
+		{
+			std::cerr << "error: the number of measurement pair should be 3 or 2" << std::endl;
+			continue;
+		}
+
+		m_pair_vec.push_back(pc);
+	}
+
+	return m_pair_vec.size();
+}
+
+int cloud_measurement::post_process(Eigen::Matrix4f & matrix)
+{
+	// calculate the available vector as normals for every draw-point
+	for (auto & pv : m_mc_vec)
+	{
+		for (auto &p : pv.drawable_points)
+		{
+			std::vector<size_t> ret_index;  std::vector<float> out_dist_sqr;
+			if (m_point_cloud_tree.search_neighbors_knn(20, p, ret_index, out_dist_sqr))
+			{
+				std::vector<point_3d> subset_points;
+				subset_of_point_cloud(ret_index, m_point_cloud, subset_points);
+				fill_available_vector(p, subset_points);
+			}
+		}
+	}
+
+	// transform points back to the original coordinate
+	//for (auto & pv : m_mc_vec)
+	//	for (auto &p : pv.drawable_points)
+	//		p.do_transform(matrix.inverse());
+
+	return 0;
+}
+
+void cloud_measurement::measure()
+{
+	m_mc_vec.clear();
+
+	for (auto & pair: m_pair_vec)
 	{
 		measurement_content mc;
 
-		std::string
-			points_1_label = it->first,
-			points_2_label = it->second;
-
-		// check this item whether is in _m -> std::map<std::string, std::vector<point_3d>>
-		if (_m.find(points_1_label) == std::end(_m) || _m.find(points_2_label) == std::end(_m)) 
-			continue;
-
-		// please refer to 'read_file_as_map()' to check the style of 'reference_key'
-		std::string reference_key = points_1_label + '-' + points_2_label, reference_label;
-		bool reference_key_found = false;
-
-		//for (auto & k : reference_map_tmp)
-		//{
-		//	std::cout << k.first << std::endl;
-		//}
-
-		for (std::multimap<std::string, std::string>::iterator
-			ref_it = reference_map_tmp.begin(); ref_it != reference_map_tmp.end(); ref_it++)
-		{
-			if (ref_it->first == reference_key)
-			{
-				reference_label = ref_it->second;
-				ref_it = reference_map_tmp.erase(ref_it);
-				// skip
-				reference_key_found = true;
-				mc.m_method = MM_POINTS;
-				break;
-			}
-		}
-		if (reference_key_found == false)
+		if (pair.reference_object.empty())
 		{
 			mc.m_method = MM_VALUES;
 		}
-			
-		measure(points_1_label, points_2_label, reference_label, _m, mc);
+		else
+		{
+			mc.m_method = MM_POINTS;
+		}
 
-		mc_vec.push_back(mc);
+		std::vector<size_t> upper(4, 0), lower(4, 0);
+
+		decide_objects(pair.source_object, pair.target_object, upper, lower);
+
+		analyze_points(upper, lower, pair, mc);
+
+		m_mc_vec.push_back(mc);
 	}
-
-	// load the entire point cloud
-	//this->m_point_cloud = point_cloud;
-	//m_point_cloud_tree.load_points(this->m_point_cloud);
 }
 
 void cloud_measurement::analyse_defect(std::vector<point_3d>& scanned_points, std::vector<point_3d>& standard_model, std::vector<point_3d> & defect_points)
@@ -88,40 +130,55 @@ void cloud_measurement::analyse_defect(std::vector<point_3d>& scanned_points, st
 	}
 }
 
-void cloud_measurement::measure(
-	std::string & points_1_label, std::string & points_2_label, std::string & reference_label,
-	std::map<std::string, std::vector<point_3d>>& _m, measurement_content & mc)
+void cloud_measurement::fill_available_vector(point_3d & p, std::vector<point_3d>& points)
 {
-	if (_m.find(points_1_label) == std::end(_m) || _m.find(points_2_label) == std::end(_m)) 
-		return;
+	float total_x = 0.0, total_y = 0.0, total_z = 0.0;
 
-	std::vector<size_t> upper(4, 0), lower(4, 0);
+	for (auto & p_t : points)
+	{
+		float this_x, this_y, this_z;
+		this_x = p_t.x - p.x;
+		this_y = p_t.y - p.y;
+		this_z = p_t.z - p.z;
 
-	if (points_1_label.find("point") != std::string::npos)
+		total_x += this_x;
+		total_y += this_y;
+		total_z += this_z;
+	}
+	Eigen::Vector3f vec;
+	vec[0] = total_x / points.size();
+	vec[1] = total_y / points.size();
+	vec[2] = total_z / points.size();
+	vec.normalize();
+	p.set_nxyz(vec[0], vec[1], vec[2]);
+}
+
+void cloud_measurement::decide_objects(
+	const std::string & label_1, const std::string & label_2, 
+	std::vector<size_t> &upper, std::vector<size_t> & lower)
+{
+	if (label_1.find("point") != std::string::npos)
 		upper[0] = 1;
-	else if (points_1_label.find("line") != std::string::npos)
+	else if (label_1.find("line") != std::string::npos)
 		upper[1] = 1;
-	else if (points_1_label.find("plane") != std::string::npos)
+	else if (label_1.find("plane") != std::string::npos)
 		upper[2] = 1;
-	else if (points_1_label.find("cylinder") != std::string::npos)
+	else if (label_1.find("cylinder") != std::string::npos)
 		upper[3] = 1;
 
-	if (points_2_label.find("point") != std::string::npos)
+	if (label_2.find("point") != std::string::npos)
 		lower[0] = 1;
-	else if (points_2_label.find("line") != std::string::npos)
+	else if (label_2.find("line") != std::string::npos)
 		lower[1] = 1;
-	else if (points_2_label.find("plane") != std::string::npos)
+	else if (label_2.find("plane") != std::string::npos)
 		lower[2] = 1;
-	else if (points_2_label.find("cylinder") != std::string::npos)
+	else if (label_2.find("cylinder") != std::string::npos)
 		lower[3] = 1;
-
-	analyze_points(upper, lower, _m[points_1_label], _m[points_2_label], _m[reference_label], mc);
 }
 
 void cloud_measurement::analyze_points(
 	std::vector<size_t>& order_1, std::vector<size_t>& order_2, 
-	std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, std::vector<point_3d>& reference_points,
-	measurement_content & mc)
+	pair_content & pc, measurement_content & mc)
 {
 	size_t first_type, second_type;
 
@@ -133,6 +190,25 @@ void cloud_measurement::analyze_points(
 		if (order_2[i] != 0)
 			second_type = i;
 	}
+
+	std::vector<point_3d> &
+		points_1 = m_searched_mark_points_map[pc.source_object],
+		points_2 = m_searched_mark_points_map[pc.target_object];
+	
+	std::vector<point_3d> empty_vec;
+	empty_vec.clear();
+
+	std::vector<point_3d> * reference_points = nullptr;
+	if (pc.reference_object.empty())
+	{
+		reference_points = &empty_vec;
+	}
+	else
+	{
+		reference_points = & m_searched_mark_points_map[pc.reference_object];
+	}
+
+
 	// point
 	if (first_type == 0 && second_type == 0)
 	{
@@ -181,11 +257,11 @@ void cloud_measurement::analyze_points(
 	}
 	else if (first_type == 2 && second_type == 2)
 	{
-		plane_to_plane(points_1, points_2, reference_points, mc);
+		plane_to_plane(points_1, points_2, *reference_points, mc);
 	}
 	else if (first_type == 2 && second_type == 3)
 	{
-		plane_to_cylinder(points_1, points_2, reference_points, mc);
+		plane_to_cylinder(points_1, points_2, *reference_points, mc);
 	}
 	// cylinder
 	// same as the 0->3, but exchange the parameters
@@ -201,12 +277,74 @@ void cloud_measurement::analyze_points(
 	// same as the 2->3, but exchange the parameters
 	else if (first_type == 3 && second_type == 2)
 	{
-		plane_to_cylinder(points_2, points_1, reference_points, mc);
+		plane_to_cylinder(points_2, points_1, *reference_points, mc);
 	}
 	else if (first_type == 3 && second_type == 3)
 	{
 		cylinder_to_cylinder(points_1, points_2, mc);
 	}
+}
+
+std::vector<measurement_content> & cloud_measurement::get_measurement_result()
+{
+	return m_mc_vec;
+}
+
+size_t cloud_measurement::export_measured_data(const std::string & output_filename)
+{
+	if (m_mc_vec.empty() || m_pair_vec.empty()) return 1;
+
+	if (m_mc_vec.size() != m_pair_vec.size()) return 2;
+
+	LocalFile local_file;
+
+	if (!check_file(output_filename, std::ios::out, local_file)) return 1;
+
+	std::fstream & ofile = local_file.m_fileobject;
+
+	size_t i = 0;
+	for (auto & mc : m_mc_vec)
+	{
+		if (mc.m_method == MM_VALUES)
+		{
+			ofile << ">values" << "\n";
+			if (mc.distance_geometrical == INVALIDVALUE)
+				ofile << INVALIDVALUE << " ";
+			else
+				ofile << mc.distance_geometrical << " ";
+
+			if (mc.distance_scattered == INVALIDVALUE)
+				ofile << INVALIDVALUE << " ";
+			else
+				ofile << mc.distance_scattered << " ";
+
+			if (mc.angle == INVALIDVALUE)
+				ofile << INVALIDVALUE << " ";
+			else
+				ofile << mc.angle << " ";
+
+			ofile << "\n";
+		}
+		else if (mc.m_method == MM_POINTS)
+		{
+			ofile << ">points" << "\n";
+			for (auto & p : mc.drawable_points)
+			{
+				ofile
+					<< p.x << " " << p.y << " " << p.z << " "
+					<< p.nx << " " << p.ny << " " << p.nz
+					<< "\n";
+			}
+		}
+
+		std::string label = "#" + m_pair_vec[i].source_object + "-" + m_pair_vec[i].target_object + "-" + m_pair_vec[i].reference_object;
+		ofile << label << "\n";
+
+		++i;
+	}
+	ofile.close();
+
+	return 0;
 }
 
 void cloud_measurement::point_to_point(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, measurement_content & mc)

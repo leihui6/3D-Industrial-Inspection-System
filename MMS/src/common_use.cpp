@@ -120,60 +120,6 @@ void export_marked_points(std::map<std::string, std::vector<point_3d>>& marked_p
 	point_file.close();
 }
 
-void export_measured_data(std::multimap<std::string, std::string>& measurement_pairs_map, std::vector<measurement_content>& mc_vec, const std::string & output_file_name)
-{
-	if (mc_vec.empty() || measurement_pairs_map.empty()) return;
-
-	if (mc_vec.size() != measurement_pairs_map.size()) return;
-
-	LocalFile local_file;
-
-	if (!check_file(output_file_name, std::ios::out, local_file)) return;
-
-	std::fstream & ofile = local_file.m_fileobject;
-
-	std::multimap<std::string, std::string>::iterator it;
-
-	size_t i = 0;
-	for (it = measurement_pairs_map.begin(); it != measurement_pairs_map.end(); ++it)
-	{
-		if (mc_vec[i].m_method == MM_VALUES)
-		{
-			ofile << ">values" << "\n";
-			if (mc_vec[i].distance_geometrical == INVALIDVALUE)
-				ofile << INVALIDVALUE << " ";
-			else
-				ofile << mc_vec[i].distance_geometrical << " ";
-
-			if (mc_vec[i].distance_scattered == INVALIDVALUE)
-				ofile << INVALIDVALUE << " ";
-			else
-				ofile << mc_vec[i].distance_scattered << " ";
-
-			if (mc_vec[i].angle == INVALIDVALUE)
-				ofile << INVALIDVALUE << " ";
-			else
-				ofile << mc_vec[i].angle << " ";
-
-			ofile << "\n";
-		}
-		else if (mc_vec[i].m_method == MM_POINTS)
-		{
-			ofile << ">points" << "\n";
-			for (auto & p : mc_vec[i].drawable_points)
-			{
-				ofile << p.x << " " << p.y << " " << p.z << "\n";
-			}
-		}
-
-		std::string label = "#" + it->first + "-" + it->second;
-		ofile << label << "\n";
-
-		++i;
-	}
-	ofile.close();
-}
-
 void transform_marked_points(std::map<std::string, std::vector<point_3d>>& marked_points, Eigen::Matrix4f & m)
 {
 	std::map<std::string, std::vector<point_3d>>::iterator it;
@@ -270,50 +216,6 @@ void read_file_as_map(const std::string & file_name, std::multimap<std::string, 
 			value_ = line.substr(divided_flag, line.size() - divided_flag);
 
 		str_flt_map.insert(std::pair<std::string, std::string>(key_, value_));
-	}
-}
-
-void read_file_as_map(const std::string & file_name, 
-	std::multimap<std::string, std::string>& str_flt_map, 
-	std::multimap<std::string, std::string> & reference_map)
-{
-	LocalFile local_file;
-
-	if (!check_file(file_name, std::ios::in, local_file)) return;
-
-	std::fstream & ifile = local_file.m_fileobject;
-
-	str_flt_map.clear(); reference_map.clear();
-
-	std::string line;
-
-	std::vector<std::string> split_str;
-
-	while (std::getline(ifile, line))
-	{
-		if (line.empty()) break;
-
-		if (line[0] == '#') continue;
-
-		string_split(line, ':', split_str);
-
-		if (split_str.size() == 3)
-		{
-			str_flt_map.insert(std::pair<std::string, std::string>(split_str[0], split_str[1]));
-			
-			std::string measurement_pair = split_str[0] + "-" + split_str[1];
-			reference_map.insert(std::pair<std::string, std::string>(measurement_pair, split_str.back()));
-		}
-		else if (split_str.size() == 2)
-		{
-			str_flt_map.insert(std::pair<std::string, std::string>(split_str[0], split_str[1]));
-		}
-		else
-		{
-			std::cerr << "error: the number of measurement pair should be 3 or 2" << std::endl;
-			continue;
-		}
-		split_str.clear();
 	}
 }
 

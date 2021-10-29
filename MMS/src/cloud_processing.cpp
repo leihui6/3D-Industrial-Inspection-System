@@ -73,17 +73,9 @@ void cloud_processing::estimate_normals_with_k(std::vector<point_3d>& points, si
 			({ points[i].x, points[i].y, points[i].z }, {}));
 	}
 
-	CGAL::pca_estimate_normals<Concurrency_tag>(points_with_nxyz, k, 
-		CGAL::parameters::point_map(CGAL::First_of_pair_property_map<PointVectorPair>()).
-		normal_map(CGAL::Second_of_pair_property_map<PointVectorPair>()));
-
-	std::list<PointVectorPair>::iterator unoriented_points_begin =
-		CGAL::mst_orient_normals(points_with_nxyz, k,
-			CGAL::parameters::point_map(CGAL::First_of_pair_property_map<PointVectorPair>()).
-			normal_map(CGAL::Second_of_pair_property_map<PointVectorPair>()));
-
-	// optional
-	//points_with_nxyz.erase(unoriented_points_begin, points_with_nxyz.end());
+	CGAL::pca_estimate_normals<Concurrency_tag>(points_with_nxyz, k,
+		CGAL::parameters::point_map(CGAL::First_of_pair_property_map<PointVectorPair>())
+		.normal_map(CGAL::Second_of_pair_property_map<PointVectorPair>()));
 
 	size_t i = 0;
 

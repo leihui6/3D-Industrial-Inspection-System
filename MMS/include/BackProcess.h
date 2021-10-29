@@ -7,6 +7,7 @@
 #include "cloud_io.h"
 #include "cloud_search.h"
 #include "cloud_registration.h"
+#include "cloud_processing.h"
 #include "cloud_measurement.h"
 #include "cloud_evaluation.h"
 #include "process_report.h"
@@ -32,8 +33,6 @@ private:
 
 	void load_data();
 
-	void transform_measured_results(std::vector<measurement_content> & mc_vec);
-
 	void export_report();
 
 private:
@@ -42,7 +41,7 @@ private:
 	// filename
 	std::string
 		m_reading_point_cloud_filename, m_reference_point_cloud_filename,
-		m_icp_configuration_filename, m_coarse_configuration;
+		m_icp_configuration_filename, m_coarse_configuration_filename;
 
 	// standard and scaned point cloud object
 	std::vector<point_3d>
@@ -56,12 +55,13 @@ private:
 
 	// Searching
 	std::vector<point_3d> m_transformed_point_cloud;
-	std::map<std::string, std::vector<point_3d>> m_marked_points_map, m_new_mark_points_map;
+	std::map<std::string, std::vector<point_3d>>
+		m_marked_points_map, m_searched_mark_points_map;
 
 
 	// Measurement
-	std::multimap<std::string, std::string> m_measurement_pairs_map, m_reference_map;
-	std::string m_measurement_pairs;
+	std::vector<std::string> m_pair_order;
+	std::string m_measurement_pairs_filename;
 
 
 	// Common object

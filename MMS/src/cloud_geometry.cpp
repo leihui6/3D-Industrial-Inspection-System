@@ -1380,6 +1380,15 @@ void rotation_transformation(const Eigen::Vector3f & v1, const Eigen::Vector3f &
 	t = Eigen::AngleAxisf(radian, rotation_axis).toRotationMatrix();
 }
 
+void subset_of_point_cloud(std::vector<size_t>& index_vec, std::vector<point_3d>& point_cloud, std::vector<point_3d>& subset)
+{
+	subset.resize(index_vec.size());
+	for (auto i : index_vec)
+	{
+		subset.push_back(point_cloud[i]);
+	}
+}
+
 
 void radian_two_vector_2d_022PI(const Eigen::Vector3f & v1, const Eigen::Vector3f &v2, float & radian)
 {

@@ -9,6 +9,7 @@
 #include <CGAL/remove_outliers.h>
 #include <CGAL/grid_simplify_point_set.h>
 #include <CGAL/wlop_simplify_and_regularize_point_set.h>
+#include <CGAL/tags.h>
 
 #include "cloud_geometry.h"
 

@@ -25,11 +25,11 @@ int BackProcess::initial_parameter(const std::string & config_filename)
 	m_reference_point_cloud_filename = m_parameters["input_folder"] + m_parameters["reference_data"];
 
 	// measurement files
-	m_measurement_pairs = m_parameters["input_folder"] + m_parameters["measurement_pairs"];
+	m_measurement_pairs_filename = m_parameters["input_folder"] + m_parameters["measurement_pairs"];
 
 	// registration files
 	m_icp_configuration_filename = m_parameters["input_folder"] + m_parameters["icp_configuration"];
-	m_coarse_configuration = m_parameters["input_folder"] + m_parameters["4pcs_configuration"];
+	m_coarse_configuration_filename = m_parameters["input_folder"] + m_parameters["4pcs_configuration"];
 
 	//m_output_folder = m_parameters["output_folder"];
 
@@ -73,7 +73,7 @@ int BackProcess::registration()
 	//std::vector<point_3d> coarse_transformed_point_cloud;
 
 	// implement 4pcs algorithm that align reading point cloud to reference point cloud
-	cloud_registration.coarse_registration(m_reading_point_cloud, m_reference_point_cloud, m_coarse_ret_mat, m_coarse_configuration);
+	cloud_registration.coarse_registration(m_reading_point_cloud, m_reference_point_cloud, m_coarse_ret_mat, m_coarse_configuration_filename);
 
 	// matrix transforming reading point cloud to reference point cloud
 	//std::cout << "coarse registration matrix is:\n" << coarse_ret_mat << "\n";
@@ -123,15 +123,22 @@ int BackProcess::searching()
 
 	for (it = m_marked_points_map.begin(); it != m_marked_points_map.end(); it++)
 	{
+		//skip the reference points
+		if (it->first.find("reference"))
+		{
+			m_searched_mark_points_map.insert(*it);
+			continue;
+		}
+
 		std::vector<point_3d> correspondence;
 
 		kt.search_points_correspondence(it->second, correspondence);
 
 		//it->second = correspondence;
-		m_new_mark_points_map.insert(std::pair< std::string, std::vector<point_3d>>(it->first, correspondence));
+		m_searched_mark_points_map.insert(std::pair< std::string, std::vector<point_3d>>(it->first, correspondence));
 	}
 
-	export_marked_points(m_new_mark_points_map, m_parameters["output_folder"] + m_parameters["marked_points_searched_result"]);
+	export_marked_points(m_searched_mark_points_map, m_parameters["output_folder"] + m_parameters["marked_points_searched_result"]);
 
 	m_rd.searching_time = double(clock() - beg_t) / CLOCKS_PER_SEC;
 
@@ -142,19 +149,15 @@ int BackProcess::measurement()
 {
 	clock_t beg_t = clock();
 
-	read_file_as_map(m_measurement_pairs, m_measurement_pairs_map, m_reference_map);
+	cloud_measurement cm(m_transformed_point_cloud, m_searched_mark_points_map);
+	
+	cm.read_pair_file(m_measurement_pairs_filename);
 
-	if (m_measurement_pairs.empty()) return 1;
+	cm.measure();
 
-	cloud_measurement cm(m_transformed_point_cloud);
+	cm.post_process(m_final_mat);
 
-	std::vector<measurement_content> mc_vec;
-
-	cm.measure(m_measurement_pairs_map, m_new_mark_points_map, m_reference_map, mc_vec);
-
-	transform_measured_results(mc_vec);
-
-	export_measured_data(m_measurement_pairs_map, mc_vec, m_parameters["output_folder"] + m_parameters["measurement_result"]);
+	cm.export_measured_data(m_parameters["output_folder"] + m_parameters["measurement_result"]);
 	
 	m_rd.measurement_time = double(clock() - beg_t) / CLOCKS_PER_SEC;
 
@@ -182,7 +185,7 @@ int BackProcess::evaluation()
 	{
 		original_points.insert(original_points.end(), item.second.begin(), item.second.end());
 
-		new_points.insert(new_points.end(), m_new_mark_points_map[item.first].begin(), m_new_mark_points_map[item.first].end());
+		new_points.insert(new_points.end(), m_searched_mark_points_map[item.first].begin(), m_searched_mark_points_map[item.first].end());
 	}
 	evaluation_results =
 		ce.mean_distance_points(original_points, new_points, m_searching_er);
@@ -192,14 +195,6 @@ int BackProcess::evaluation()
 	export_report();
 
 	return 0;
-}
-
-
-void BackProcess::transform_measured_results(std::vector<measurement_content> & mc_vec)
-{
-	for (auto & pv : mc_vec)
-		for (auto &p : pv.drawable_points)
-			p.do_transform(m_final_mat.inverse());
 }
 
 void BackProcess::export_report()

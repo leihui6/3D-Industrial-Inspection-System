@@ -51,8 +51,6 @@ extern void read_points(std::map<std::string, std::vector<point_3d>> & points_ma
 // export marked points which is a map
 extern void export_marked_points(std::map <std::string, std::vector<point_3d>> & marked_points, const std::string & export_file_name);
 
-extern void export_measured_data(std::multimap<std::string, std::string> & measurement_pairs_map, std::vector<measurement_content> &mc_vec, const std::string & output_file_name);
-
 extern void transform_marked_points(std::map <std::string, std::vector<point_3d>> & marked_points, Eigen::Matrix4f & m);
 
 extern void string_split(std::string &str, char character, std::vector<std::string> & res);
@@ -62,7 +60,6 @@ extern void string_split(std::string &str, char character, std::vector<std::stri
 // 2) you can use # to comment but only be one line that different from other normal information
 extern void read_file_as_map(const std::string & file_name, std::map<std::string, std::string> & str_flt_map);
 extern void read_file_as_map(const std::string & file_name, std::multimap<std::string, std::string> & str_flt_map);
-extern void read_file_as_map(const std::string & file_name, std::multimap<std::string, std::string> & str_flt_map, std::multimap<std::string, std::string> & reference_map);
 
 // convert string represeting te vector4 to a float-vec4
 extern osg::Vec4 str_to_vec4(const std::string & s);
