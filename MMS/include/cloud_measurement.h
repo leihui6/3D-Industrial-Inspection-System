@@ -63,12 +63,13 @@ public:
 private:
 	void analyse_defect(std::vector<point_3d>& scanned_points, std::vector<point_3d>& standard_model, std::vector<point_3d> & defect_points);
 	
-	void fill_available_vector(point_3d & p, std::vector<point_3d> & points);
+	void fill_available_vector(std::vector<measurement_content> & mc_vec);
 
 	std::vector<measurement_content> m_mc_vec;
 	std::vector<pair_content> m_pair_vec;
 
-	std::map<std::string, std::vector<point_3d>> &m_searched_mark_points_map;
+	std::map<std::string, std::vector<point_3d>> & m_searched_mark_points_map;
+	// transformed point cloud
 	std::vector<point_3d> & m_point_cloud;
 	kd_tree m_point_cloud_tree;
 

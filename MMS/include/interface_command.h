@@ -55,7 +55,7 @@ private:
 
 	void print_menu();
 
-	// [0] means beginning [1] means ending
+	// flag: [0] means beginning [1] means ending
 	void print_menu_in_steps(detected_type dt, int flag);
 
 	void clear_picked_points();
@@ -68,7 +68,14 @@ private:
 
 	void input_marked_name(std::string & marked_name, const std::string  & default_name);
 
+	// begin to process and wait for the next operation
 	void process_specific_type(detected_type _dt);
+	
+	/*
+	plane:
+		[0]: change the direction of normal
+	*/
+	void change_shape_property(detected_type dt, int flag);
 
 };
  

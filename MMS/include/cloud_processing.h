@@ -30,7 +30,7 @@ public:
 
 	//void estimating_normals_with_radius(std::vector<point_3d>& points, float radius);
 
-	void estimate_normals_with_k(std::vector<point_3d>& points, size_t k);
+	void estimate_normals_with_k(std::vector<point_3d>& points, size_t k, std::vector<size_t> * indices = nullptr);
 
 	void filter_remove_outliers(std::vector<point_3d>& points, size_t k, float threshold_distance);
 

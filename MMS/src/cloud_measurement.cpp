@@ -66,25 +66,12 @@ size_t cloud_measurement::read_pair_file(const std::string & filename)
 
 int cloud_measurement::post_process(Eigen::Matrix4f & matrix)
 {
-	// calculate the available vector as normals for every draw-point
-	for (auto & pv : m_mc_vec)
-	{
-		for (auto &p : pv.drawable_points)
-		{
-			std::vector<size_t> ret_index;  std::vector<float> out_dist_sqr;
-			if (m_point_cloud_tree.search_neighbors_knn(20, p, ret_index, out_dist_sqr))
-			{
-				std::vector<point_3d> subset_points;
-				subset_of_point_cloud(ret_index, m_point_cloud, subset_points);
-				fill_available_vector(p, subset_points);
-			}
-		}
-	}
-
+	fill_available_vector(m_mc_vec);
+	
 	// transform points back to the original coordinate
-	//for (auto & pv : m_mc_vec)
-	//	for (auto &p : pv.drawable_points)
-	//		p.do_transform(matrix.inverse());
+	for (auto & pv : m_mc_vec)
+		for (auto &p : pv.drawable_points)
+			p.do_transform(matrix.inverse());
 
 	return 0;
 }
@@ -130,27 +117,52 @@ void cloud_measurement::analyse_defect(std::vector<point_3d>& scanned_points, st
 	}
 }
 
-void cloud_measurement::fill_available_vector(point_3d & p, std::vector<point_3d>& points)
+void cloud_measurement::fill_available_vector(std::vector<measurement_content> & mc_vec)
 {
-	float total_x = 0.0, total_y = 0.0, total_z = 0.0;
-
-	for (auto & p_t : points)
+	std::vector<point_3d> point_cloud = m_point_cloud;
+	size_t original_num = point_cloud.size();
+	
+	std::vector<size_t> num_vec(mc_vec.size());
+	size_t mc_total_num = 0;
+	for (size_t i = 0; i < num_vec.size(); i++)
 	{
-		float this_x, this_y, this_z;
-		this_x = p_t.x - p.x;
-		this_y = p_t.y - p.y;
-		this_z = p_t.z - p.z;
-
-		total_x += this_x;
-		total_y += this_y;
-		total_z += this_z;
+		num_vec[i] = mc_vec[i].drawable_points.size();
+		mc_total_num += num_vec[i];
 	}
-	Eigen::Vector3f vec;
-	vec[0] = total_x / points.size();
-	vec[1] = total_y / points.size();
-	vec[2] = total_z / points.size();
-	vec.normalize();
-	p.set_nxyz(vec[0], vec[1], vec[2]);
+
+	// avoid allocating new memory
+	point_cloud.reserve(original_num + mc_total_num);
+	//point_cloud.resize(original_num + mc_total_num);
+	for (auto & item: mc_vec)
+		for (auto & p: item.drawable_points)
+			point_cloud.push_back(p);
+
+	// create index for computing normals
+	std::vector<size_t> normals_indices;
+	for (size_t i = 0; i < mc_total_num; ++i)
+		normals_indices.push_back(original_num + i);
+
+	// normal computation
+	cloud_processing cp;
+	cp.estimate_normals_with_k(point_cloud, 18, &normals_indices);
+
+	// back the result to every drawable_points
+	size_t current_num = 0;
+	// number of measurement result
+	for (size_t i = 0; i < num_vec.size(); i++)
+	{
+		// number of drawable_points
+		for (size_t j = 0; j < num_vec[i]; j++)
+		{
+			mc_vec[i].drawable_points[j].set_nxyz(
+				point_cloud[original_num + current_num].nx,
+				point_cloud[original_num + current_num].ny,
+				point_cloud[original_num + current_num].nz
+			);
+		}
+		current_num += num_vec[i];
+	}
+
 }
 
 void cloud_measurement::decide_objects(

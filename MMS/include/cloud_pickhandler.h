@@ -4,6 +4,7 @@
 #include "cloud_viewer.h"
 
 class cloud_viewer;
+enum detected_type;
 
 //! pick point on point cloud
 class PickHandler : public osgGA::GUIEventHandler
@@ -32,21 +33,17 @@ private:
 
 	void update_shapes();
 
-	void process_line();
+	void process_line(line_func_3d & line_func);
 
 	void process_plane(plane_func_3d & plane_func);
 
-	void process_cylinder();
+	void process_cylinder(cylinder_func & cylinder_func);
 
 	void process_point();
 
 	void process_reference_point();
-
-public:
-
-	point_3d m_centriod_point_on_bottom;
-
-	cylinder_func m_cylinder_func;
+	
+	//point_3d m_centriod_point_on_bottom;
 
 private:
 
@@ -57,6 +54,7 @@ private:
 	void add_points_to_picked_vector(std::vector< point_3d > & vec);
 
 	bool remove_point_from_picked_vector(const point_3d & p);
+
 };
 
 #endif CLOUD_PICKHANDLER

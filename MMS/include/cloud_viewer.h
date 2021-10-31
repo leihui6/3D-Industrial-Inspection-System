@@ -97,6 +97,8 @@ public:
 
 	//void add_lines(std::vector<point_3d> & points, float line_width = 3.0, float r = 0, float g = 0, float b = 0);
 
+	void update_arrow(std::vector<point_3d> & arrow_points, float r = 0, float g = 0, float b = 0, float arrow_radius = 0.5, float arrow_height = 0.5);
+
 	void update_line(std::vector<point_3d> & line_segment, float r = 0, float g = 0, float b = 0, float line_width = 4.0);
 
 	void update_plane(std::vector<point_3d> & plane_square, float r = 0, float g = 0, float b = 0);
@@ -135,13 +137,17 @@ public:
 
 	void clear_shapes();
 
-	void save_points_to_vec(std::vector<point_3d> & points, const std::string & marked_name, std::map < std::string, std::vector<point_3d>> & _m);
+	//void save_points_to_vec(std::vector<point_3d> & points, const std::string & marked_name, std::map < std::string, point_shape> & _m);
 
 	void print_marked_info();
 
 	void set_export_file_name(const std::string & efn);
 
 public:
+	point_shape m_point, m_line, m_plane, m_cylinder, m_reference_point;
+
+	int m_plane_property_flag;
+
 	// interface command pointer, TODO: to be shared pointer
 	interface_command * m_ic_ptr;
 
@@ -150,21 +156,23 @@ public:
 	std::string m_export_file_name;
 
 	// update once picking, this is current points
-	std::vector<point_3d> m_points;
+	//std::vector<point_3d> m_points;
 
-	std::vector<point_3d> m_line_points;
+	//std::vector<point_3d> m_line_points;
 
-	std::vector<point_3d> m_plane_points;
+	//std::vector<point_3d> m_plane_points;
 
-	std::vector<point_3d> m_cylinder_points;
+	//std::vector<point_3d> m_cylinder_points;
 
-	std::vector<point_3d> m_reference_points;
+	//std::vector<point_3d> m_reference_points;
 
-	std::map <std::string, std::vector<point_3d>> m_marked_points_vec;
+	std::map <std::string, point_shape> m_marked_points_map;
 
 	std::vector<point_3d> m_picked_points;
 
-	void export_points();
+	osg::ref_ptr<PickHandler> get_pick_handler();
+
+	void export_data();
 
 private:
 	osg::ref_ptr<PickHandler> m_selector;
@@ -179,6 +187,9 @@ private:
 
 	// only one geometry, which used to show fitted line points, hooked on this geode.
 	osg::ref_ptr<osg::Geode> m_geode_fitted_line;
+
+	// after picking a plane shape, update with an normal arrow
+	osg::ref_ptr<osg::Geode> m_geode_arrow_plane;
 
 	// after picking, update on screen in real time
 	osg::ref_ptr<osg::Geode> m_geode_fitted_plane;
@@ -199,6 +210,8 @@ private:
 	// below could be deleted after releasing
 	// for testing
 	osg::ref_ptr<osg::Geode> m_geode_testing;
+
+	void initialize_parameters();
 
 	void initialize_geode();
 

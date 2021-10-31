@@ -56,13 +56,16 @@ void point_3d::do_transform(const Eigen::Matrix4f & t, point_3d & p)
 	p.set_xyz(tmp(0, 0), tmp(1, 0), tmp(2, 0));
 }
 
-void point_3d::do_transform(const Eigen::Matrix4f & t)
+void point_3d::do_transform(const Eigen::Matrix4f & m)
 {
-	Eigen::Vector4f tmp(x, y, z, 1);
+	Eigen::Vector4f p(x, y, z, 1);
+	Eigen::Vector3f n(nx, ny, nz);
 
-	tmp = t * tmp;
+	p = m * p;
+	n = m.block<3, 3>(0, 0).inverse().transpose() * n;
 
-	this->set_xyz(tmp(0, 0), tmp(1, 0), tmp(2, 0));
+	this->set_xyz(p[0], p[1], p[2]);
+	this->set_nxyz(n[0], n[1], n[2]);
 }
 
 point_3d & point_3d::operator=(const point_3d & p)
@@ -105,7 +108,7 @@ bool point_3d::operator==(const point_3d & rp)
 
 std::ostream & operator << (std::ostream & os, const point_3d & p)
 {
-	std::cout
+	os
 		<< "(x,y,z,nx,ny,nz,r,g,b)="
 		<< p.x << " " << p.y << " " << p.z << " "
 		<< p.nx << " " << p.ny << " " << p.nz << " "
@@ -179,6 +182,11 @@ void plane_func_3d::set_abcd(float _a, float _b, float _c, point_3d & p)
 	b = _b;
 	c = _c;
 	d = -(a*p.x + b * p.y + c * p.z);
+}
+
+void plane_func_3d::reverse()
+{
+	set_abcd(-1 * a, -1 * b, -1 * c, -1 * d);
 }
 
 

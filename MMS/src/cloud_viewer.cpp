@@ -18,6 +18,8 @@ cloud_viewer::cloud_viewer(const std::string & window_name, std::map<std::string
 	// set the handler that controls the selection operation
 	//m_selector = new PickHandler(this);
 
+	initialize_parameters();
+
 	initialize_geode();
 }
 
@@ -33,6 +35,8 @@ cloud_viewer::cloud_viewer(const std::string & window_name)
 
 	// set the handler that controls the selection operation
 	m_selector->set_viewer_ptr(this);
+
+	initialize_parameters();
 
 	initialize_geode();
 }
@@ -209,6 +213,50 @@ void cloud_viewer::create_display_window(const std::string & window_name)
 //
 //	m_root->addChild(geode.get());
 //}
+
+void cloud_viewer::update_arrow(std::vector<point_3d> & arrow_points, float r, float g, float b, float arrow_radius, float arrow_height)
+{
+	if (arrow_points.empty())
+	{
+		osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry();
+		m_geode_arrow_plane->setChild(0, geometry);
+		return;
+	}
+
+	if (arrow_points.size() != 2) return;
+
+	point_3d & beg_point = arrow_points[0], end_point = arrow_points[1];
+
+	osg::ref_ptr<osg::Geode> geode = new osg::Geode();
+
+	// line
+	osg::ref_ptr<osg::Geometry> g_line = new osg::Geometry();
+	points_to_geometry_node(arrow_points, g_line, r, g, b);
+	g_line->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP, 0, arrow_points.size()));
+	osg::ref_ptr<osg::LineWidth> lw = new osg::LineWidth(2);
+	g_line->getOrCreateStateSet()->setAttribute(lw, osg::StateAttribute::ON);
+
+	//cone 
+	osg::ref_ptr<osg::ShapeDrawable> sc = new osg::ShapeDrawable; 
+	sc->setShape(new osg::Cone(osg::Vec3(0.0f, 0.0f, 0.0), arrow_radius, arrow_height));
+	sc->setColor(osg::Vec4(r, g, b, 1.0f));
+
+	osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform(osg::Matrix::identity());
+	osg::Matrix mRotate(osg::Matrix::identity()), mTrans(osg::Matrix::identity());
+	mTrans.makeTranslate(osg::Vec3f(end_point.x, end_point.y, end_point.z));
+	mRotate.makeRotate(
+		osg::Vec3f(osg::Z_AXIS),
+		osg::Vec3f(end_point.x - beg_point.x, end_point.y - beg_point.y, end_point.z - beg_point.z));
+
+	mt->setMatrix(mRotate*mTrans);
+
+	mt->addChild(sc);
+
+	geode->addChild(mt);
+	geode->addChild(g_line);
+
+	m_geode_arrow_plane->setChild(0, geode);
+}
 
 void cloud_viewer::update_line(std::vector<point_3d> & line_segment, float r, float g, float b, float line_width)
 {
@@ -428,6 +476,8 @@ void cloud_viewer::clear_shapes()
 
 	update_line(empty_points);
 
+	update_arrow(empty_points);
+
 	update_plane(empty_points);
 
 	update_cylinder(empty_points);
@@ -435,38 +485,38 @@ void cloud_viewer::clear_shapes()
 	update_cylinder_centriod_point_on_bottom(empty_points);
 }
 
-void cloud_viewer::save_points_to_vec(std::vector<point_3d> & points, const std::string & marked_name, std::map < std::string, std::vector<point_3d>> & _m)
-{
-	if (points.empty()) return;
-
-	_m[marked_name] = points;
-}
+//void cloud_viewer::save_points_to_vec(std::vector<point_3d> & points, const std::string & marked_name, std::map < std::string, point_shape> & _m)
+//{
+//	if (points.empty()) return;
+//
+//	_m[marked_name].points = points;
+//}
 
 void cloud_viewer::print_marked_info()
 {
 	size_t point_count = 0, line_count = 0, plane_count = 0, cylinder_count = 0, reference_count = 0;
 
-	std::map <std::string, std::vector<point_3d>>::iterator it;
+	std::map <std::string, point_shape>::iterator it;
 
-	for (it = m_marked_points_vec.begin(); it != m_marked_points_vec.end(); it++)
+	for (auto &item: m_marked_points_map)
 	{
-		if (it->first.find("point") != std::string::npos)
+		if (item.first.find("point") != std::string::npos)
 		{
 			point_count++;
 		}
-		else if (it->first.find("line") != std::string::npos)
+		else if (item.first.find("line") != std::string::npos)
 		{
 			line_count++;
 		}
-		else if (it->first.find("plane") != std::string::npos)
+		else if (item.first.find("plane") != std::string::npos)
 		{
 			plane_count++;
 		}
-		else if (it->first.find("cylinder") != std::string::npos)
+		else if (item.first.find("cylinder") != std::string::npos)
 		{
 			cylinder_count++;
 		}
-		else if (it->first.find("reference") != std::string::npos)
+		else if (item.first.find("reference") != std::string::npos)
 		{
 			reference_count++;
 		}
@@ -487,9 +537,46 @@ void cloud_viewer::set_export_file_name(const std::string & efn)
 	this->m_export_file_name = efn;
 }
 
-void cloud_viewer::export_points()
+osg::ref_ptr<PickHandler> cloud_viewer::get_pick_handler()
 {
-	export_marked_points(m_marked_points_vec, m_export_file_name + "/marked_points.txt");
+	return this->m_selector;
+}
+
+void cloud_viewer::export_data()
+{
+	LocalFile local_file;
+
+	if (!check_file(m_export_file_name + "/marked_points.txt", std::ios::out, local_file)) return;
+
+	std::fstream & ofile = local_file.m_fileobject;
+
+	std::map <std::string, point_shape>::iterator it;
+
+	for (it = m_marked_points_map.begin(); it != m_marked_points_map.end(); it++)
+	{
+		ofile << ">property\n";
+		for (auto &v : it->second.shape_property)
+		{
+			ofile << v[0] << " " << v[1] << " " << v[2] << "\n";
+		}
+		
+		ofile << ">points\n";
+		std::vector<point_3d> &ps = it->second.points;
+
+		for (size_t j = 0; j < ps.size(); j++)
+		{
+			ofile << ps[j].x << " " << ps[j].y << " " << ps[j].z << "\n";
+		}
+		// # label-name
+		ofile << "#" << it->first << "\n";
+	}
+
+	ofile.close();
+}
+
+void cloud_viewer::initialize_parameters()
+{
+	m_plane_property_flag = -1;
 }
 
 void cloud_viewer::initialize_geode()
@@ -500,6 +587,9 @@ void cloud_viewer::initialize_geode()
 
 	// add a empty fitted line points
 	m_geode_fitted_line = add_point_cloud(empty_point_cloud);
+
+	// add a empty arrow for plane
+	m_geode_arrow_plane = add_point_cloud(empty_point_cloud);
 
 	// add a empty fitted plane points
 	m_geode_fitted_plane = add_point_cloud(empty_point_cloud);
@@ -559,6 +649,7 @@ osg::ref_ptr<osg::Node> cloud_viewer::cretate_bounding_box(osg::Node * node)
 void cloud_viewer::load_parameters(std::map<std::string, std::string>& parameters)
 {
 	if (parameters.empty()) return;
+
 	m_viewer_parameters.picking_range = std::stof(parameters["marking_picking_range"]);
 	m_viewer_parameters.set_background_color(str_to_vec4(parameters["marking_background_color"]));
 	m_viewer_parameters.point_size = std::stof(parameters["marking_point_size"]);

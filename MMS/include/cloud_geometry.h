@@ -7,6 +7,7 @@
 #include <vector>
 #include <fstream>
 #include <math.h>
+#include <memory>
 #define _USE_MATH_DEFINES
 
 // Eigen
@@ -30,7 +31,9 @@ typedef CGAL::Exact_predicates_inexact_constructions_kernel  Kernel;
 #include <osg/Geometry>
 #include <osg/Geode>
 
-struct point_3d
+struct basic_shape {};
+
+struct point_3d : public basic_shape
 {
 	point_3d(const point_3d & p);
 
@@ -68,7 +71,7 @@ struct point_3d
 
 typedef point_3d point_3d;
 
-struct line_func_3d
+struct line_func_3d : public basic_shape
 {
 	line_func_3d();
 	
@@ -87,7 +90,7 @@ struct line_func_3d
 	Eigen::Vector3f direction;
 };
 
-struct plane_func_3d
+struct plane_func_3d : public basic_shape
 {
 	plane_func_3d();
 
@@ -97,6 +100,8 @@ struct plane_func_3d
 
 	void set_abcd(float _a, float _b, float _c, point_3d & p);
 
+	void reverse();
+
 	Eigen::Vector3f direction()
 	{
 		return Eigen::Vector3f(this->a, this->b, this->c);
@@ -105,7 +110,7 @@ struct plane_func_3d
 	float a, b, c, d;
 };
 
-struct cylinder_func
+struct cylinder_func : public basic_shape
 {
 	cylinder_func();
 
@@ -165,6 +170,16 @@ struct point_cloud
 	}
 
 	void load_points(std::vector<point_3d> & points);
+};
+
+// used in measurement
+struct point_shape {
+	point_shape() :
+		points(), func(new basic_shape), shape_property() {}
+
+	std::vector<point_3d> points;
+	std::shared_ptr<basic_shape> func;
+	std::vector<Eigen::Vector3f> shape_property;
 };
 
 point_3d to_point_3d(osg::Vec3d & p);

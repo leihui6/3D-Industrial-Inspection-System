@@ -96,6 +96,46 @@ void read_points(std::map<std::string, std::vector<point_3d>> & points_map, cons
 	ifile.close();
 }
 
+void read_points(std::map<std::string, point_shape> & point_shape_map, const std::string & file_name)
+{
+	LocalFile local_file;
+
+	if (!check_file(file_name, std::ios::in, local_file)) return;
+
+	std::fstream & ifile = local_file.m_fileobject;
+
+	std::string line;
+	std::vector<point_3d> points;
+
+	point_shape_map.clear();
+
+	while (std::getline(ifile, line))
+	{
+		if (line.size() < 1)
+			continue;
+
+		if (line[0] == '#' && line.size() > 2)
+		{
+			point_shape_map[line.substr(1, line.size() - 1)].points = points;
+
+			points.clear();
+
+			continue;
+		}
+
+		std::stringstream s(line);
+
+		float value[3] = { 0,0,0 };
+
+		for (size_t i = 0; i < 3; i++)
+			s >> value[i];
+
+		points.push_back(point_3d(value[0], value[1], value[2]));
+	}
+
+	ifile.close();
+}
+
 void export_marked_points(std::map<std::string, std::vector<point_3d>>& marked_points, const std::string & export_file_name)
 {
 	LocalFile local_file;

@@ -85,7 +85,7 @@ void interface_command::run_itself()
 		}
 		else if (i_c == 'e')
 		{
-			m_cloud_view_ptr->export_points();
+			m_cloud_view_ptr->export_data();
 
 			std::cout << "exported done!\n";
 		}
@@ -247,34 +247,63 @@ void interface_command::process_specific_type(detected_type _dt)
 			{
 				input_marked_name(marked_name, "point_" + std::to_string(marked_points_count[0]++));
 
-				m_cloud_view_ptr->save_points_to_vec(m_cloud_view_ptr->m_points, marked_name, m_cloud_view_ptr->m_marked_points_vec);
+				m_cloud_view_ptr->m_marked_points_map[marked_name] = m_cloud_view_ptr->m_point;
+
+				//m_cloud_view_ptr->save_points_to_vec(marked_name, m_cloud_view_ptr->m_points);
 			}
 			else if (_dt == DT_LINE)
 			{
 				input_marked_name(marked_name, "line_" + std::to_string(marked_points_count[1]++));
 
-				m_cloud_view_ptr->save_points_to_vec(m_cloud_view_ptr->m_line_points, marked_name, m_cloud_view_ptr->m_marked_points_vec);
+				m_cloud_view_ptr->m_marked_points_map[marked_name] = m_cloud_view_ptr->m_line;
+
+				//m_cloud_view_ptr->save_points_to_vec(marked_name, m_cloud_view_ptr->m_marked_points_vec);
 			}
 			else if (_dt == DT_PLANE)
 			{
 				input_marked_name(marked_name, "plane_" + std::to_string(marked_points_count[2]++));
 
-				m_cloud_view_ptr->save_points_to_vec(m_cloud_view_ptr->m_plane_points, marked_name, m_cloud_view_ptr->m_marked_points_vec);
+				m_cloud_view_ptr->m_marked_points_map[marked_name] = m_cloud_view_ptr->m_plane;
+
+				//m_cloud_view_ptr->save_points_to_vec(m_cloud_view_ptr->m_plane.points, marked_name, m_cloud_view_ptr->m_marked_points_vec);
 			}
 			else if (_dt == DT_CYLINDER)
 			{
 				input_marked_name(marked_name, "cylinder_" + std::to_string(marked_points_count[3]++));
 
-				m_cloud_view_ptr->save_points_to_vec(m_cloud_view_ptr->m_cylinder_points, marked_name, m_cloud_view_ptr->m_marked_points_vec);
+				m_cloud_view_ptr->m_marked_points_map[marked_name] = m_cloud_view_ptr->m_cylinder;
+
+				//m_cloud_view_ptr->save_points_to_vec(m_cloud_view_ptr->m_cylinder.points, marked_name, m_cloud_view_ptr->m_marked_points_vec);
 			}
 			else if (_dt == DT_REFER)
 			{
 				input_marked_name(marked_name, "reference_" + std::to_string(marked_points_count[4]++));
 
-				m_cloud_view_ptr->save_points_to_vec(m_cloud_view_ptr->m_reference_points, marked_name, m_cloud_view_ptr->m_marked_points_vec);
+				m_cloud_view_ptr->m_marked_points_map[marked_name] = m_cloud_view_ptr->m_reference_point;
+
+				//m_cloud_view_ptr->save_points_to_vec(m_cloud_view_ptr->m_reference_points.points, marked_name, m_cloud_view_ptr->m_marked_points_vec);
 			}
 
 			break;
 		}
+		else if (i_c == 'c')
+		{
+			change_shape_property(_dt, 0);
+		}
+
+		else
+		{
+			// do nothing
+		}
+	}
+}
+
+void interface_command::change_shape_property(detected_type dt, int flag)
+{
+	if (dt = DT_PLANE)
+	{
+		std::cout << "Change plane property: the direction of normal" << std::endl;
+
+		m_cloud_view_ptr->m_plane_property_flag = flag;
 	}
 }

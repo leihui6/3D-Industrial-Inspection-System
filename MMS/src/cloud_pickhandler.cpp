@@ -13,7 +13,7 @@ void PickHandler::set_viewer_ptr(cloud_viewer * _cloud_viewer)
 
 bool PickHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
 {
-	// 0: do nothing
+	// 0: do nothing but show hover
 	// 1: click the current point
 	// 2: cancel the current point
 	int pick_status = 0;
@@ -40,7 +40,7 @@ bool PickHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapt
 
 	point_3d pp;
 
-	// do nothing 
+	// do nothing but show hover
 	if (pick_status == 0)
 	{
 		if (viewer && m_cloud_viewer->get_target_points())
@@ -244,7 +244,12 @@ void PickHandler::update_shapes()
 	{
 		//std::cout << "updating the line model ... " << std::endl;
 
-		process_line();
+		line_func_3d line_func;
+
+		m_cloud_viewer->m_line.points = m_cloud_viewer->m_picked_points;
+		
+		process_line(line_func);
+		m_cloud_viewer->m_line.func = std::make_shared<line_func_3d>(line_func);
 
 		//std::cout << "line model updated done " << std::endl;
 	}
@@ -252,9 +257,22 @@ void PickHandler::update_shapes()
 	{
 		//std::cout << "updating the plane model ... " << std::endl;
 
+		if (m_cloud_viewer->m_picked_points.size() < 3) return;
+
 		plane_func_3d plane_func;
 
+		m_cloud_viewer->m_plane.points = m_cloud_viewer->m_picked_points;
+
 		process_plane(plane_func);
+		m_cloud_viewer->m_plane.func = std::make_shared<plane_func_3d>(plane_func);
+
+		//std::cout << plane_func.direction() << std::endl;
+
+		// only contain one vector
+		m_cloud_viewer->m_plane.shape_property.resize(1);
+
+		m_cloud_viewer->m_plane.shape_property[0] =
+			plane_func.direction().normalized();
 
 		//std::cout << "plane model updated done " << std::endl;
 	}
@@ -262,7 +280,12 @@ void PickHandler::update_shapes()
 	{
 		//std::cout << "updating the cylinder model ... " << std::endl;
 
-		process_cylinder();
+		cylinder_func cf;
+
+		m_cloud_viewer->m_cylinder.points = m_cloud_viewer->m_picked_points;
+		
+		process_cylinder(cf);
+		m_cloud_viewer->m_cylinder.func = std::make_shared<cylinder_func>(cf);
 
 		//std::cout << "cylinder model updated done " << std::endl;
 	}
@@ -281,13 +304,11 @@ void PickHandler::update_shapes()
 
 }
 
-void PickHandler::process_line()
+void PickHandler::process_line(line_func_3d & line_func)
 {
 	if (m_cloud_viewer->m_picked_points.size() < 2) return;
 
 	// calculate the fitting function
-	m_cloud_viewer->m_line_points = m_cloud_viewer->m_picked_points;
-	line_func_3d line_func;
 	m_cloud_viewer->m_cf.fitting_line_3d_linear_least_squares(m_cloud_viewer->m_picked_points, line_func);
 
 	// search points with respect to the fitted plane function
@@ -317,44 +338,63 @@ void PickHandler::process_plane(plane_func_3d & plane_func)
 {
 	if (m_cloud_viewer->m_picked_points.size() < 3) return;
 
-	m_cloud_viewer->m_plane_points = m_cloud_viewer->m_picked_points;
-
 	m_cloud_viewer->m_cf.fitting_plane_3d_linear_least_squares(m_cloud_viewer->m_picked_points, plane_func);
 
-	point_3d min_p, max_p;
-
-	max_min_point_3d_vec(m_cloud_viewer->m_picked_points, min_p, max_p);
-
-	pedalpoint_point_to_plane(min_p, plane_func, min_p);
-
-	pedalpoint_point_to_plane(max_p, plane_func, max_p);
-
-	// using four points to draw a biggest rectangle
-	Eigen::Vector3f diagonal, line_direction;
-	diagonal = Eigen::Vector3f(max_p.x - min_p.x, max_p.y - min_p.y, max_p.z - min_p.z);
-	line_direction = diagonal.cross(Eigen::Vector3f(plane_func.a, plane_func.b, plane_func.c));
-
-	point_3d mid_point, corner_p1, corner_p2;
-	mid_point = point_3d((min_p.x + max_p.x) / 2, (min_p.y + max_p.y) / 2, (min_p.z + max_p.z) / 2);
-	float half_dis = diagonal.norm() / 2;
-
-	point_along_with_vector_within_dis(mid_point, line_direction, corner_p1, corner_p2, half_dis);
-
-	// auto update plane with more points
-	if (m_cloud_viewer->m_viewer_parameters.is_auto_pick)
+	if (m_cloud_viewer->m_plane_property_flag == 0)
 	{
-		//std::vector<point_3d> points_in_sphere, _points_on_plane;
-		//m_cloud_viewer->m_kdtree.search_neighbors_radius(half_dis, mid_point, points_in_sphere);
-		//points_on_plane(points_in_sphere, _points_on_plane, plane_func, m_cloud_viewer->m_viewer_parameters.auto_pick_plane_threshold);
-		//add_points_to_picked_vector(_points_on_plane);
+		plane_func.reverse();
+	
+		m_cloud_viewer->m_plane_property_flag = -1;
 	}
 
-	std::vector<point_3d> biggest_rectangle{ min_p,max_p,corner_p1,corner_p2 }, drawable_points_ordered;
-	make_points_ordered_by_distance(biggest_rectangle, drawable_points_ordered);
-	m_cloud_viewer->update_plane(drawable_points_ordered, 0, 255, 0);
+	// for drawing an arrow
+	{
+		point_3d beg_point, end_point;
+
+		Eigen::Vector3f direction = plane_func.direction();
+		centroid_from_points(m_cloud_viewer->m_picked_points, beg_point);
+		point_along_with_vector_within_dis(beg_point, direction, end_point, 2.0);
+		std::vector<point_3d> arrow_points{ beg_point, end_point };
+		m_cloud_viewer->update_arrow(arrow_points, 255, 0, 0, 0.2);
+	}
+
+	{
+		// for drawing a plane
+		point_3d min_p, max_p;
+
+		max_min_point_3d_vec(m_cloud_viewer->m_picked_points, min_p, max_p);
+
+		pedalpoint_point_to_plane(min_p, plane_func, min_p);
+
+		pedalpoint_point_to_plane(max_p, plane_func, max_p);
+
+		// using four points to draw a biggest rectangle
+		Eigen::Vector3f diagonal, line_direction;
+		diagonal = Eigen::Vector3f(max_p.x - min_p.x, max_p.y - min_p.y, max_p.z - min_p.z);
+		line_direction = diagonal.cross(Eigen::Vector3f(plane_func.a, plane_func.b, plane_func.c));
+
+		point_3d mid_point, corner_p1, corner_p2;
+		mid_point = point_3d((min_p.x + max_p.x) / 2, (min_p.y + max_p.y) / 2, (min_p.z + max_p.z) / 2);
+		float half_dis = diagonal.norm() / 2;
+
+		point_along_with_vector_within_dis(mid_point, line_direction, corner_p1, corner_p2, half_dis);
+
+		// auto update plane with more points
+		if (m_cloud_viewer->m_viewer_parameters.is_auto_pick)
+		{
+			//std::vector<point_3d> points_in_sphere, _points_on_plane;
+			//m_cloud_viewer->m_kdtree.search_neighbors_radius(half_dis, mid_point, points_in_sphere);
+			//points_on_plane(points_in_sphere, _points_on_plane, plane_func, m_cloud_viewer->m_viewer_parameters.auto_pick_plane_threshold);
+			//add_points_to_picked_vector(_points_on_plane);
+		}
+
+		std::vector<point_3d> biggest_rectangle{ min_p,max_p,corner_p1,corner_p2 }, drawable_points_ordered;
+		make_points_ordered_by_distance(biggest_rectangle, drawable_points_ordered);
+		m_cloud_viewer->update_plane(drawable_points_ordered, 0, 255, 0);
+	}
 }
 
-void PickHandler::process_cylinder()
+void PickHandler::process_cylinder(cylinder_func & cylinder_func)
 {
 	if (m_cloud_viewer->m_picked_points.size() < 6)
 	{
@@ -367,7 +407,7 @@ void PickHandler::process_cylinder()
 
 		//m_cloud_viewer->m_picked_points = *m_cloud_viewer->get_target_points();
 
-	m_cloud_viewer->m_cf.fitting_cylinder_linear_least_squares(m_cloud_viewer->m_picked_points, m_cylinder_func);
+	m_cloud_viewer->m_cf.fitting_cylinder_linear_least_squares(m_cloud_viewer->m_picked_points, cylinder_func);
 
 	//std::cout << m_cylinder_func.height << " radius=" << m_cylinder_func.radius << std::endl;
 
@@ -408,17 +448,17 @@ void PickHandler::process_cylinder()
 	//// 4) However, we cannot use this cylinder function to show a cylinder on screen
 	Eigen::Vector3f z_axis(0, 0, 1);
 
-	Eigen::Vector3f  rotated_axis = z_axis.cross(m_cylinder_func.axis.direction);
+	Eigen::Vector3f  rotated_axis = z_axis.cross(cylinder_func.axis.direction);
 
 	float rotated_angle = 0.0;
-	angle_between_two_vector_3d(z_axis, m_cylinder_func.axis.direction, rotated_angle);
+	angle_between_two_vector_3d(z_axis, cylinder_func.axis.direction, rotated_angle);
 
 	//std::cout << "rotated_angle=" << rotated_angle << std::endl;
 
-	m_cloud_viewer->m_cylinder_points = m_cloud_viewer->m_picked_points;
+	//m_cloud_viewer->m_cylinder_points = m_cloud_viewer->m_picked_points;
 
 	m_cloud_viewer->update_cylinder(
-		m_cylinder_func,
+		cylinder_func,
 		rotated_axis,
 		rotated_angle,
 		0, 255, 0, 0.5);
@@ -493,12 +533,12 @@ void PickHandler::process_cylinder()
 
 void PickHandler::process_point()
 {
-	m_cloud_viewer->m_points = m_cloud_viewer->m_picked_points;
+	m_cloud_viewer->m_point.points = m_cloud_viewer->m_picked_points;
 }
 
 void PickHandler::process_reference_point()
 {
-	m_cloud_viewer->m_reference_points = m_cloud_viewer->m_picked_points;
+	m_cloud_viewer->m_reference_point.points = m_cloud_viewer->m_picked_points;
 }
 
 bool PickHandler::add_point_to_picked_vector(const point_3d & p)
