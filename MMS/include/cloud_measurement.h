@@ -46,7 +46,7 @@ struct pair_content
 class cloud_measurement
 {
 public:
-	cloud_measurement(std::vector<point_3d> & point_cloud, std::map<std::string, std::vector<point_3d>> & searched_mark_points_map);
+	cloud_measurement(std::vector<point_3d> & point_cloud, std::map<std::string, point_shape> & searched_mark_points_map);
 
 	~cloud_measurement();
 
@@ -63,12 +63,10 @@ public:
 private:
 	void analyse_defect(std::vector<point_3d>& scanned_points, std::vector<point_3d>& standard_model, std::vector<point_3d> & defect_points);
 	
-	void fill_available_vector(std::vector<measurement_content> & mc_vec);
-
 	std::vector<measurement_content> m_mc_vec;
 	std::vector<pair_content> m_pair_vec;
 
-	std::map<std::string, std::vector<point_3d>> & m_searched_mark_points_map;
+	std::map<std::string, point_shape> & m_searched_mark_points_map;
 	// transformed point cloud
 	std::vector<point_3d> & m_point_cloud;
 	kd_tree m_point_cloud_tree;
@@ -80,26 +78,28 @@ private:
 		std::vector<size_t> & order_1, std::vector<size_t> & order_2, 
 		pair_content & pc, measurement_content & mc);
 
+	void correct_normals(std::vector<point_3d> & points, const Eigen::Vector3f * v1 = nullptr, const Eigen::Vector3f * v2 = nullptr);
+
 	cloud_fitting cf;
 
 private:
 	// the first points belongs to the type of point
-	void point_to_point(std::vector<point_3d> & points_1, std::vector<point_3d> & points_2, measurement_content & mc);
-	void point_to_line(std::vector<point_3d> & points_1, std::vector<point_3d> & points_2, measurement_content & mc);
-	void point_to_plane(std::vector<point_3d> & points_1, std::vector<point_3d> & points_2, measurement_content & mc);
-	void point_to_cylinder(std::vector<point_3d> & points_1, std::vector<point_3d> & points_2, measurement_content & mc);
+	void point_to_point(point_shape & shape_1, point_shape & shape_2, measurement_content & mc);
+	void point_to_line(point_shape & shape_1, point_shape & shape_2, measurement_content & mc);
+	void point_to_plane(point_shape & shape_1, point_shape & shape_2, measurement_content & mc);
+	void point_to_cylinder(point_shape & shape_1, point_shape & shape_2, measurement_content & mc);
 
 	// the first points belongs to the type of line
-	void line_to_line(std::vector<point_3d> & points_1, std::vector<point_3d> & points_2, measurement_content & mc);
-	void line_to_plane(std::vector<point_3d> & points_1, std::vector<point_3d> & points_2, measurement_content & mc);
-	void line_to_cylinder(std::vector<point_3d> & points_1, std::vector<point_3d> & points_2, measurement_content & mc);
+	void line_to_line(point_shape & shape_1, point_shape & shape_2, measurement_content & mc);
+	void line_to_plane(point_shape & shape_1, point_shape & shape_2, measurement_content & mc);
+	void line_to_cylinder(point_shape & shape_1, point_shape & shape_2, measurement_content & mc);
 
 	// the first points belongs to the type of plane
-	void plane_to_plane(std::vector<point_3d> & points_1, std::vector<point_3d> & points_2, std::vector<point_3d>& reference_points, measurement_content & mc);
-	void plane_to_cylinder(std::vector<point_3d> & points_1, std::vector<point_3d> & points_2, std::vector<point_3d>& reference_points, measurement_content & mc);
+	void plane_to_plane(point_shape & shape_1, point_shape & shape_2, std::vector<point_3d>& reference_points, measurement_content & mc);
+	void plane_to_cylinder(point_shape & shape_1, point_shape & shape_2, std::vector<point_3d>& reference_points, measurement_content & mc);
 
 	// the first points belongs to the type of cylinder
-	void cylinder_to_cylinder(std::vector<point_3d> & points_1, std::vector<point_3d> & points_2, measurement_content & mc);
+	void cylinder_to_cylinder(point_shape & shape_1, point_shape & shape_2, measurement_content & mc);
 
 private:
 	void distance_scattered_points(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, float & distance);

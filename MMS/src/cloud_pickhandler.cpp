@@ -244,6 +244,8 @@ void PickHandler::update_shapes()
 	{
 		//std::cout << "updating the line model ... " << std::endl;
 
+		if (m_cloud_viewer->m_picked_points.size() < 2) return;
+
 		line_func_3d line_func;
 
 		m_cloud_viewer->m_line.points = m_cloud_viewer->m_picked_points;
@@ -279,6 +281,8 @@ void PickHandler::update_shapes()
 	else if (this->m_cloud_viewer->m_ic_ptr->m_dt == DT_CYLINDER)
 	{
 		//std::cout << "updating the cylinder model ... " << std::endl;
+
+		//if (m_cloud_viewer->m_picked_points.size() < ) return;
 
 		cylinder_func cf;
 

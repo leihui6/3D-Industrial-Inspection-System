@@ -47,10 +47,11 @@ extern void display_point_cloud_from_transformation_vec(cloud_viewer & cv, std::
 
 // read points from file that containing many points and spilted by '#'
 extern void read_points(std::map<std::string, std::vector<point_3d>> & points_map, const std::string & file_name);
-extern void read_points(std::map<std::string, point_shape> & point_shape_map, const std::string & file_name);
+
+extern void read_marked_points(std::map<std::string, point_shape> & point_shape_map, const std::string & filename);
 
 // export marked points which is a map
-extern void export_marked_points(std::map <std::string, std::vector<point_3d>> & marked_points, const std::string & export_file_name);
+extern void export_marked_points(std::map<std::string, point_shape>& marked_points, const std::string & export_file_name);
 
 extern void transform_marked_points(std::map <std::string, std::vector<point_3d>> & marked_points, Eigen::Matrix4f & m);
 

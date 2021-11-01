@@ -2,7 +2,7 @@
 
 cloud_measurement::cloud_measurement(
 	std::vector<point_3d> & point_cloud,
-	std::map<std::string, std::vector<point_3d>> & searched_mark_points_map)
+	std::map<std::string, point_shape> & searched_mark_points_map)
 	:
 	m_point_cloud_tree(point_cloud),
 	m_point_cloud(point_cloud),
@@ -66,8 +66,6 @@ size_t cloud_measurement::read_pair_file(const std::string & filename)
 
 int cloud_measurement::post_process(Eigen::Matrix4f & matrix)
 {
-	fill_available_vector(m_mc_vec);
-	
 	// transform points back to the original coordinate
 	for (auto & pv : m_mc_vec)
 		for (auto &p : pv.drawable_points)
@@ -117,54 +115,6 @@ void cloud_measurement::analyse_defect(std::vector<point_3d>& scanned_points, st
 	}
 }
 
-void cloud_measurement::fill_available_vector(std::vector<measurement_content> & mc_vec)
-{
-	std::vector<point_3d> point_cloud = m_point_cloud;
-	size_t original_num = point_cloud.size();
-	
-	std::vector<size_t> num_vec(mc_vec.size());
-	size_t mc_total_num = 0;
-	for (size_t i = 0; i < num_vec.size(); i++)
-	{
-		num_vec[i] = mc_vec[i].drawable_points.size();
-		mc_total_num += num_vec[i];
-	}
-
-	// avoid allocating new memory
-	point_cloud.reserve(original_num + mc_total_num);
-	//point_cloud.resize(original_num + mc_total_num);
-	for (auto & item: mc_vec)
-		for (auto & p: item.drawable_points)
-			point_cloud.push_back(p);
-
-	// create index for computing normals
-	std::vector<size_t> normals_indices;
-	for (size_t i = 0; i < mc_total_num; ++i)
-		normals_indices.push_back(original_num + i);
-
-	// normal computation
-	cloud_processing cp;
-	cp.estimate_normals_with_k(point_cloud, 18, &normals_indices);
-
-	// back the result to every drawable_points
-	size_t current_num = 0;
-	// number of measurement result
-	for (size_t i = 0; i < num_vec.size(); i++)
-	{
-		// number of drawable_points
-		for (size_t j = 0; j < num_vec[i]; j++)
-		{
-			mc_vec[i].drawable_points[j].set_nxyz(
-				point_cloud[original_num + current_num].nx,
-				point_cloud[original_num + current_num].ny,
-				point_cloud[original_num + current_num].nz
-			);
-		}
-		current_num += num_vec[i];
-	}
-
-}
-
 void cloud_measurement::decide_objects(
 	const std::string & label_1, const std::string & label_2, 
 	std::vector<size_t> &upper, std::vector<size_t> & lower)
@@ -203,10 +153,10 @@ void cloud_measurement::analyze_points(
 			second_type = i;
 	}
 
-	std::vector<point_3d> &
-		points_1 = m_searched_mark_points_map[pc.source_object],
-		points_2 = m_searched_mark_points_map[pc.target_object];
-	
+	point_shape 
+		&shape_1 = m_searched_mark_points_map[pc.source_object],
+		&shape_2 = m_searched_mark_points_map[pc.target_object];
+
 	std::vector<point_3d> empty_vec;
 	empty_vec.clear();
 
@@ -217,83 +167,95 @@ void cloud_measurement::analyze_points(
 	}
 	else
 	{
-		reference_points = & m_searched_mark_points_map[pc.reference_object];
+		reference_points = & m_searched_mark_points_map[pc.reference_object].points;
 	}
 
 
 	// point
 	if (first_type == 0 && second_type == 0)
 	{
-		point_to_point(points_1, points_2, mc);
+		point_to_point(shape_1, shape_2, mc);
 	}
 	else if (first_type == 0 && second_type == 1)
 	{
-		point_to_line(points_1, points_2, mc);
+		point_to_line(shape_1, shape_2, mc);
 	}
 	else if (first_type == 0 && second_type == 2)
 	{
-		point_to_plane(points_1, points_2, mc);
+		point_to_plane(shape_1, shape_2, mc);
 	}
 	else if (first_type == 0 && second_type == 3)
 	{
-		point_to_cylinder(points_1, points_2, mc);
+		point_to_cylinder(shape_1, shape_2, mc);
 	}
 	// line
 	// same as the 0->1, but exchange the parameters
 	else if (first_type == 1 && second_type == 0)
 	{
-		point_to_line(points_2, points_1, mc);
+		point_to_line(shape_1, shape_2, mc);
 	}
 	else if (first_type == 1 && second_type == 1)
 	{
-		line_to_line(points_1, points_2, mc);
+		line_to_line(shape_1, shape_2, mc);
 	}
 	else if (first_type == 1 && second_type == 2)
 	{
-		line_to_plane(points_1, points_2, mc);
+		line_to_plane(shape_1, shape_2, mc);
 	}
 	else if (first_type == 1 && second_type == 3)
 	{
-		line_to_cylinder(points_1, points_2, mc);
+		line_to_cylinder(shape_1, shape_2, mc);
 	}
 	// plane
 	// same as the 0->2, but exchange the parameters
 	else if (first_type == 2 && second_type == 0)
 	{
-		point_to_plane(points_2, points_1, mc);
+		point_to_plane(shape_1, shape_2, mc);
 	}
 	// same as the 1->2, but exchange the parameters
 	else if (first_type == 2 && second_type == 1)
 	{
-		line_to_plane(points_2, points_1, mc);
+		line_to_plane(shape_1, shape_2, mc);
 	}
 	else if (first_type == 2 && second_type == 2)
 	{
-		plane_to_plane(points_1, points_2, *reference_points, mc);
+		plane_to_plane(shape_1, shape_2, *reference_points, mc);
 	}
 	else if (first_type == 2 && second_type == 3)
 	{
-		plane_to_cylinder(points_1, points_2, *reference_points, mc);
+		plane_to_cylinder(shape_1, shape_2, *reference_points, mc);
 	}
 	// cylinder
 	// same as the 0->3, but exchange the parameters
 	else if (first_type == 3 && second_type == 0)
 	{
-		point_to_cylinder(points_2, points_1, mc);
+		point_to_cylinder(shape_1, shape_2, mc);
 	}
 	// same as the 1->3, but exchange the parameters
 	else if (first_type == 3 && second_type == 1)
 	{
-		line_to_cylinder(points_2, points_1, mc);
+		line_to_cylinder(shape_1, shape_2, mc);
 	}
 	// same as the 2->3, but exchange the parameters
 	else if (first_type == 3 && second_type == 2)
 	{
-		plane_to_cylinder(points_2, points_1, *reference_points, mc);
+		plane_to_cylinder(shape_1, shape_2, *reference_points, mc);
 	}
 	else if (first_type == 3 && second_type == 3)
 	{
-		cylinder_to_cylinder(points_1, points_2, mc);
+		cylinder_to_cylinder(shape_1, shape_2, mc);
+	}
+}
+
+void cloud_measurement::correct_normals(std::vector<point_3d>& points, const Eigen::Vector3f * v1, const Eigen::Vector3f * v2)
+{
+	if (v1 && v2)
+	{
+		Eigen::Vector3f c_v((*v1 + *v2) / 2);
+		for (auto & p : points)
+		{
+			p.set_nxyz(c_v[0], c_v[1], c_v[2]);
+		}
 	}
 }
 
@@ -359,77 +321,80 @@ size_t cloud_measurement::export_measured_data(const std::string & output_filena
 	return 0;
 }
 
-void cloud_measurement::point_to_point(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, measurement_content & mc)
+void cloud_measurement::point_to_point(point_shape & shape_1, point_shape & shape_2, measurement_content & mc)
 {
 	std::cout << "point_to_point\n";
 
 	point_3d centroid_point_1, centroid_point_2;
-	centroid_from_points(points_1, centroid_point_1);
-	centroid_from_points(points_2, centroid_point_2);
+	centroid_from_points(shape_1.points, centroid_point_1);
+	centroid_from_points(shape_2.points, centroid_point_2);
 
 	// geometrical distance
 	distance_point_to_point(centroid_point_1, centroid_point_2, mc.distance_geometrical);
 	
 	// scattered distance
-	distance_scattered_points(points_1, points_2, mc.distance_scattered);
+	distance_scattered_points(shape_2.points, shape_2.points, mc.distance_scattered);
 }
 
-void cloud_measurement::point_to_line(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, measurement_content & mc)
+void cloud_measurement::point_to_line(point_shape & shape_1, point_shape & shape_2, measurement_content & mc)
 {
 	std::cout << "point_to_line\n";
 
 	// calculate the geometrical distance.
 	point_3d centroid_point_1;
-	centroid_from_points(points_1, centroid_point_1);
+	centroid_from_points(shape_1.points, centroid_point_1);
 
 	line_func_3d line_func;
-	cf.fitting_line_3d_linear_least_squares(points_2, line_func);
+	cf.fitting_line_3d_linear_least_squares(shape_2.points, line_func);
 
 	// geometrical distance
 	distance_point_to_line(centroid_point_1, line_func, mc.distance_geometrical);
 
 	// scattered distance
-	distance_scattered_points(points_1, points_2, line_func, mc.distance_scattered);
+	distance_scattered_points(shape_1.points, shape_2.points, line_func, mc.distance_scattered);
 }
 
-void cloud_measurement::point_to_plane(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, measurement_content & mc)
+void cloud_measurement::point_to_plane(point_shape & shape_1, point_shape & shape_2, measurement_content & mc)
 {
 	std::cout << "point_to_plane\n";
 
 	point_3d centroid_point;
-	centroid_from_points(points_1, centroid_point);
+	centroid_from_points(shape_1.points, centroid_point);
 
 	plane_func_3d plane_func;
-	cf.fitting_plane_3d_linear_least_squares(points_2, plane_func);
+	cf.fitting_plane_3d_linear_least_squares(shape_2.points, plane_func);
+	
+	if (plane_func.direction().dot(shape_2.shape_property.at(0)) <= 0)
+		plane_func.reverse();
 
 	// geometrical distance
 	distance_point_to_plane(centroid_point, plane_func, mc.distance_geometrical);
 
 	// scattered distance
-	distance_scattered_points(points_1, points_2, plane_func, mc.distance_scattered);
+	distance_scattered_points(shape_1.points, shape_2.points, plane_func, mc.distance_scattered);
 }
 
-void cloud_measurement::point_to_cylinder(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, measurement_content & mc)
+void cloud_measurement::point_to_cylinder(point_shape & shape_1, point_shape & shape_2, measurement_content & mc)
 {
 	std::cout << "point_to_cylinder\n";
 
 	point_3d centroid_point;
-	centroid_from_points(points_1, centroid_point);
+	centroid_from_points(shape_1.points, centroid_point);
 
 	cylinder_func _cylinder_func;
-	cf.fitting_cylinder_linear_least_squares(points_2, _cylinder_func);
+	cf.fitting_cylinder_linear_least_squares(shape_2.points, _cylinder_func);
 
 	// geometrical distance
 	distance_point_to_line(centroid_point, _cylinder_func.axis, mc.distance_geometrical);
 }
 
-void cloud_measurement::line_to_line(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, measurement_content & mc)
+void cloud_measurement::line_to_line(point_shape & shape_1, point_shape & shape_2, measurement_content & mc)
 {
 	std::cout << "line_to_line\n";
 
 	line_func_3d line_func_1, line_func_2;
-	cf.fitting_line_3d_linear_least_squares(points_1, line_func_1);
-	cf.fitting_line_3d_linear_least_squares(points_2, line_func_2);
+	cf.fitting_line_3d_linear_least_squares(shape_1.points, line_func_1);
+	cf.fitting_line_3d_linear_least_squares(shape_1.points, line_func_2);
 
 	// angle
 	angle_between_two_vector_3d(line_func_1.direction, line_func_2.direction, mc.angle);
@@ -437,18 +402,21 @@ void cloud_measurement::line_to_line(std::vector<point_3d>& points_1, std::vecto
 		mc.angle = 180 - mc.angle;
 
 	// scattered distance
-	distance_scattered_points(points_1, line_func_1, points_2, line_func_2, mc.distance_scattered);
+	distance_scattered_points(shape_1.points, line_func_1, shape_2.points, line_func_2, mc.distance_scattered);
 }
 
-void cloud_measurement::line_to_plane(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, measurement_content & mc)
+void cloud_measurement::line_to_plane(point_shape & shape_1, point_shape & shape_2, measurement_content & mc)
 {
 	std::cout << "line_to_plane\n";
 
 	line_func_3d line_func;
-	cf.fitting_line_3d_linear_least_squares(points_1, line_func);
+	cf.fitting_line_3d_linear_least_squares(shape_1.points, line_func);
 
 	plane_func_3d plane_func;
-	cf.fitting_plane_3d_linear_least_squares(points_2, plane_func);
+	cf.fitting_plane_3d_linear_least_squares(shape_2.points, plane_func);
+	
+	if (plane_func.direction().dot(shape_2.shape_property.at(0)) <= 0)
+		plane_func.reverse();
 
 	// angle
 	float radian = 0.0;
@@ -461,18 +429,18 @@ void cloud_measurement::line_to_plane(std::vector<point_3d>& points_1, std::vect
 	mc.angle = 90 - mc.angle;
 
 	// scattered distance
-	distance_scattered_points(points_1, line_func, points_2, plane_func, mc.distance_scattered);
+	distance_scattered_points(shape_1.points, line_func, shape_2.points, plane_func, mc.distance_scattered);
 }
 
-void cloud_measurement::line_to_cylinder(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, measurement_content & mc)
+void cloud_measurement::line_to_cylinder(point_shape & shape_1, point_shape & shape_2, measurement_content & mc)
 {
 	std::cout << "line_to_cylinder\n";
 
 	line_func_3d line_func;
-	cf.fitting_line_3d_linear_least_squares(points_1, line_func);
+	cf.fitting_line_3d_linear_least_squares(shape_1.points, line_func);
 
 	cylinder_func _cylinder_func;
-	cf.fitting_cylinder_linear_least_squares(points_2, _cylinder_func);
+	cf.fitting_cylinder_linear_least_squares(shape_2.points, _cylinder_func);
 
 	// angle
 	angle_between_two_vector_3d(line_func.get_direction_point_3d(), _cylinder_func.axis.get_direction_point_3d(), mc.angle);
@@ -515,21 +483,33 @@ void cloud_measurement::plane_to_plane_points(plane_func_3d & plane_func_1, plan
 
 	// 3. create a line using begin and end point
 	produce_line_points(intersection_lf, endpoint_a, endpoint_b, mc.drawable_points, 100);
+
+	// 4. add normals
+	correct_normals(mc.drawable_points, &plane_func_1.direction(), &plane_func_2.direction());
 }
 
-void cloud_measurement::plane_to_plane(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, std::vector<point_3d>& reference_points, measurement_content & mc)
+void cloud_measurement::plane_to_plane(point_shape & shape_1, point_shape & shape_2, std::vector<point_3d>& reference_points, measurement_content & mc)
 {
 	plane_func_3d plane_func_1, plane_func_2;
-	cf.fitting_plane_3d_linear_least_squares(points_1, plane_func_1);
-	cf.fitting_plane_3d_linear_least_squares(points_2, plane_func_2);
+	cf.fitting_plane_3d_linear_least_squares(shape_1.points, plane_func_1);
+	cf.fitting_plane_3d_linear_least_squares(shape_2.points, plane_func_2);
+
+	// correct the normal of plane
+	if (plane_func_1.direction().dot(shape_1.shape_property.at(0)) <= 0)
+		plane_func_1.reverse();
+	
+	if (plane_func_2.direction().dot(shape_2.shape_property.at(0)) <= 0)
+		plane_func_2.reverse();
 
 	if (mc.m_method == MM_VALUES)
 	{
-		plane_to_plane_values(points_1, points_2, plane_func_1, plane_func_2, mc);
+		plane_to_plane_values(shape_1.points, shape_1.points, 
+			plane_func_1, plane_func_2, mc);
 	}
 	else if (mc.m_method == MM_POINTS)
 	{
-		plane_to_plane_points(plane_func_1, plane_func_2, reference_points, mc);
+		plane_to_plane_points(plane_func_1, plane_func_2, 
+			reference_points, mc);
 	}
 }
 
@@ -636,13 +616,38 @@ void cloud_measurement::plane_to_cylinder_points(plane_func_3d & plane_func, cyl
 
 	// 3.2 create virtual points near the origin
 	std::vector<point_3d> ineter_points, ineter_points_;
+	Eigen::Vector3f 
+		v1 = new_plane_direction,
+		v2, v3;
+
+	point_3d
+		inter_p_1, // plane and cylinder
+		inter_p_2; // plane and the axis of cylinder
+
+	line_func_3d unit_z;
+	unit_z.origin = Eigen::Vector3f(0, 0, 0);
+	unit_z.direction = Eigen::Vector3f(0, 0, 1);
+	intersection_line_to_plane(unit_z, new_plane_func, inter_p_2);
+
 	for (float r/*radian*/ = min_rad; r < max_rad; r += inc_radian)
 	{
 		float x, y, z;
 		x = R * cosf(r);
 		y = R * sinf(r);
 		z = (A * x + B * y + D) / (-C);
-		ineter_points.push_back(point_3d(x, y, z));
+
+		inter_p_1.set_xyz(x, y, z);
+
+		// compute the normals
+		v2 = Eigen::Vector3f(inter_p_1.x - inter_p_2.x, inter_p_1.y - inter_p_2.y, inter_p_1.z - inter_p_2.z);
+		v1.normalize(), v2.normalize();
+
+		v3 = (v1 + v2) / 2;
+		v3.normalize();
+
+		inter_p_1.set_nxyz(v3[0], v3[1], v3[2]);
+
+		ineter_points.push_back(inter_p_1);
 	}
 
 	// 4. back these virtual points to the position of original point cloud
@@ -652,15 +657,18 @@ void cloud_measurement::plane_to_cylinder_points(plane_func_3d & plane_func, cyl
 }
 
 
-void cloud_measurement::plane_to_cylinder(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, std::vector<point_3d>& reference_points, measurement_content & mc)
+void cloud_measurement::plane_to_cylinder(point_shape & shape_1, point_shape & shape_2, std::vector<point_3d>& reference_points, measurement_content & mc)
 {
 	std::cout << "plane_to_cylinder\n";
 
 	plane_func_3d plane_func;
-	cf.fitting_plane_3d_linear_least_squares(points_1, plane_func);
+	cf.fitting_plane_3d_linear_least_squares(shape_1.points, plane_func);
+	
+	if (plane_func.direction().dot(shape_1.shape_property.at(0)) <= 0)
+		plane_func.reverse();
 
 	cylinder_func _cylinder_func;
-	cf.fitting_cylinder_linear_least_squares(points_2, _cylinder_func);
+	cf.fitting_cylinder_linear_least_squares(shape_2.points, _cylinder_func);
 
 	if (mc.m_method == MM_VALUES)
 	{
@@ -673,13 +681,13 @@ void cloud_measurement::plane_to_cylinder(std::vector<point_3d>& points_1, std::
 }
 
 
-void cloud_measurement::cylinder_to_cylinder(std::vector<point_3d>& points_1, std::vector<point_3d>& points_2, measurement_content & mc)
+void cloud_measurement::cylinder_to_cylinder(point_shape & shape_1, point_shape & shape_2, measurement_content & mc)
 {
 	std::cout << "cylinder_to_cylinder\n";
 
 	cylinder_func _cylinder_func_1, _cylinder_func_2;
-	cf.fitting_cylinder_linear_least_squares(points_1, _cylinder_func_1);
-	cf.fitting_cylinder_linear_least_squares(points_2, _cylinder_func_2);
+	cf.fitting_cylinder_linear_least_squares(shape_1.points, _cylinder_func_1);
+	cf.fitting_cylinder_linear_least_squares(shape_2.points, _cylinder_func_2);
 
 	// angle
 	angle_between_two_vector_3d(_cylinder_func_1.axis.get_direction_point_3d(), _cylinder_func_2.axis.get_direction_point_3d(), mc.angle);

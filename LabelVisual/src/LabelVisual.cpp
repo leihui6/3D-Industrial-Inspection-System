@@ -105,17 +105,23 @@ void LabelVisual::read_labelfile(const std::string & filename, std::vector<point
 			skip = false;
 			continue;
 		}
-		if (line == ">points")
+
+		if (line.empty()) continue;
+
+		if (line.find(">points") != std::string::npos)
 		{
 			continue;
 		}
-		if (line == ">values")
+		else if (line.find(">values") != std::string::npos)
 		{
 			skip = true;
 			continue;
 		}
-
-		if (line.empty()) continue;
+		else if (line.find(">property") != std::string::npos)
+		{
+			skip = true;
+			continue;
+		}
 
 		if (line[0] == '#')
 		{

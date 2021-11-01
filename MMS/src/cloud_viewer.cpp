@@ -544,34 +544,7 @@ osg::ref_ptr<PickHandler> cloud_viewer::get_pick_handler()
 
 void cloud_viewer::export_data()
 {
-	LocalFile local_file;
-
-	if (!check_file(m_export_file_name + "/marked_points.txt", std::ios::out, local_file)) return;
-
-	std::fstream & ofile = local_file.m_fileobject;
-
-	std::map <std::string, point_shape>::iterator it;
-
-	for (it = m_marked_points_map.begin(); it != m_marked_points_map.end(); it++)
-	{
-		ofile << ">property\n";
-		for (auto &v : it->second.shape_property)
-		{
-			ofile << v[0] << " " << v[1] << " " << v[2] << "\n";
-		}
-		
-		ofile << ">points\n";
-		std::vector<point_3d> &ps = it->second.points;
-
-		for (size_t j = 0; j < ps.size(); j++)
-		{
-			ofile << ps[j].x << " " << ps[j].y << " " << ps[j].z << "\n";
-		}
-		// # label-name
-		ofile << "#" << it->first << "\n";
-	}
-
-	ofile.close();
+	export_marked_points(m_marked_points_map,m_export_file_name + "/marked_points.txt");
 }
 
 void cloud_viewer::initialize_parameters()

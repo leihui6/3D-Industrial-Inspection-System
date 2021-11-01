@@ -92,34 +92,45 @@ void read_points(std::map<std::string, std::vector<point_3d>> & points_map, cons
 
 		points.push_back(point_3d(value[0], value[1], value[2]));
 	}
-
+	
 	ifile.close();
 }
 
-void read_points(std::map<std::string, point_shape> & point_shape_map, const std::string & file_name)
+void read_marked_points(std::map<std::string, point_shape> & point_shape_map, const std::string & filename)
 {
 	LocalFile local_file;
 
-	if (!check_file(file_name, std::ios::in, local_file)) return;
+	if (!check_file(filename, std::ios::in, local_file)) return;
 
 	std::fstream & ifile = local_file.m_fileobject;
 
-	std::string line;
-	std::vector<point_3d> points;
-
 	point_shape_map.clear();
+
+	point_shape ps;
+	std::string line;
+	bool flag_points = false, flag_property = false;
 
 	while (std::getline(ifile, line))
 	{
-		if (line.size() < 1)
-			continue;
-
-		if (line[0] == '#' && line.size() > 2)
+		if (line.empty()) continue;
+		
+		if (line.find(">points") != std::string::npos)
 		{
-			point_shape_map[line.substr(1, line.size() - 1)].points = points;
-
-			points.clear();
-
+			flag_points = true;
+			flag_property = false;
+			continue;
+		}
+		else if (line.find(">property") != std::string::npos)
+		{
+			flag_property = true;
+			flag_points = false;
+			continue;
+		}
+		else if (line[0] == '#' && line.size() > 2)
+		{
+			point_shape_map[line.substr(1, line.size() - 1)] = ps;
+			ps.points.clear();
+			ps.shape_property.clear();
 			continue;
 		}
 
@@ -127,37 +138,47 @@ void read_points(std::map<std::string, point_shape> & point_shape_map, const std
 
 		float value[3] = { 0,0,0 };
 
-		for (size_t i = 0; i < 3; i++)
-			s >> value[i];
+		for (size_t i = 0; i < 3; i++) s >> value[i];
 
-		points.push_back(point_3d(value[0], value[1], value[2]));
+		if (flag_points)
+			ps.points.push_back(point_3d(value[0], value[1], value[2]));
+		if(flag_property)
+			ps.shape_property.push_back(Eigen::Vector3f(value[0], value[1], value[2]));
 	}
 
 	ifile.close();
 }
 
-void export_marked_points(std::map<std::string, std::vector<point_3d>>& marked_points, const std::string & export_file_name)
+void export_marked_points(std::map<std::string, point_shape>& marked_points, const std::string & export_file_name)
 {
 	LocalFile local_file;
 
 	if (!check_file(export_file_name, std::ios::out, local_file)) return;
 
-	std::fstream & point_file = local_file.m_fileobject;
+	std::fstream & ofile = local_file.m_fileobject;
 
-	std::map <std::string, std::vector<point_3d>>::iterator it;
+	std::map <std::string, point_shape>::iterator it;
 
 	for (it = marked_points.begin(); it != marked_points.end(); it++)
 	{
-		std::vector<point_3d> &ps = it->second;
+		ofile << ">property\n";
+		for (auto &v : it->second.shape_property)
+		{
+			ofile << v[0] << " " << v[1] << " " << v[2] << "\n";
+		}
+
+		ofile << ">points\n";
+		std::vector<point_3d> &ps = it->second.points;
 
 		for (size_t j = 0; j < ps.size(); j++)
 		{
-			point_file << ps[j].x << " " << ps[j].y << " " << ps[j].z << "\n";
+			ofile << ps[j].x << " " << ps[j].y << " " << ps[j].z << "\n";
 		}
-		point_file << "#" << it->first << "\n";
+		// # label-name
+		ofile << "#" << it->first << "\n";
 	}
 
-	point_file.close();
+	ofile.close();
 }
 
 void transform_marked_points(std::map<std::string, std::vector<point_3d>>& marked_points, Eigen::Matrix4f & m)

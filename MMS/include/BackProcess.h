@@ -55,7 +55,7 @@ private:
 
 	// Searching
 	std::vector<point_3d> m_transformed_point_cloud;
-	std::map<std::string, std::vector<point_3d>>
+	std::map<std::string, point_shape>
 		m_marked_points_map, m_searched_mark_points_map;
 
 

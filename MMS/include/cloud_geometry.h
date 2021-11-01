@@ -50,15 +50,16 @@ struct point_3d : public basic_shape
 	Eigen::Vector3f get_vector3f();
 
 	// execute transformation to the other point
-	void do_transform(const Eigen::Matrix4f & t, point_3d & p);
+	void do_transform(const Eigen::Matrix4f & m, point_3d & p);
 
 	// execute transformation to itself
-	void do_transform(const Eigen::Matrix4f & t);
+	void do_transform(const Eigen::Matrix4f & m);
 
 	friend std::ostream & operator << (std::ostream & os, const point_3d & p);
 
 	point_3d & operator = (const point_3d & p);
 	point_3d operator + (const point_3d & p);
+	point_3d operator - (const point_3d & p);
 	point_3d operator / (const float num);
 	bool operator == (const point_3d & rp);
 

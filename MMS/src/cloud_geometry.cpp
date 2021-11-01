@@ -47,13 +47,16 @@ Eigen::Vector3f point_3d::get_vector3f()
 	return Eigen::Vector3f(this->x, this->y, this->z);
 }
 
-void point_3d::do_transform(const Eigen::Matrix4f & t, point_3d & p)
+void point_3d::do_transform(const Eigen::Matrix4f & m, point_3d & p)
 {
-	Eigen::Vector4f tmp(x, y, z, 1);
+	Eigen::Vector4f t_p(x, y, z, 1);
+	Eigen::Vector3f t_n(nx, ny, nz);
 
-	tmp = t * tmp;
+	t_p = m * t_p;
+	t_n = m.block<3, 3>(0, 0).inverse().transpose() * t_n;
 
-	p.set_xyz(tmp(0, 0), tmp(1, 0), tmp(2, 0));
+	p.set_xyz(t_p[0], t_p[1], t_p[2]);
+	p.set_nxyz(t_n[0], t_n[1], t_n[2]);
 }
 
 void point_3d::do_transform(const Eigen::Matrix4f & m)
@@ -64,8 +67,8 @@ void point_3d::do_transform(const Eigen::Matrix4f & m)
 	p = m * p;
 	n = m.block<3, 3>(0, 0).inverse().transpose() * n;
 
-	this->set_xyz(p[0], p[1], p[2]);
-	this->set_nxyz(n[0], n[1], n[2]);
+	set_xyz(p[0], p[1], p[2]);
+	set_nxyz(n[0], n[1], n[2]);
 }
 
 point_3d & point_3d::operator=(const point_3d & p)
@@ -84,6 +87,15 @@ point_3d point_3d::operator+(const point_3d & p)
 	point_3d tp;
 
 	tp.set_xyz(this->x + p.x, this->y + p.y, this->z + p.z);
+
+	return tp;
+}
+
+point_3d point_3d::operator-(const point_3d & p)
+{
+	point_3d tp;
+
+	tp.set_xyz(this->x - p.x, this->y - p.y, this->z - p.z);
 
 	return tp;
 }
@@ -146,6 +158,7 @@ point_3d line_func_3d::get_direction_point_3d()
 {
 	return point_3d(direction[0], direction[1], direction[2]);
 }
+
 
 //Eigen::Vector3f line_func_3d::direction()
 //{

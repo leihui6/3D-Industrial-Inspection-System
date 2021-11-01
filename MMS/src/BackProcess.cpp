@@ -111,7 +111,7 @@ int BackProcess::searching()
 {
 	clock_t beg_t = clock();
 	
-	read_points(m_marked_points_map, m_parameters["output_folder"] + m_parameters["marked_points_result"]);
+	read_marked_points(m_marked_points_map, m_parameters["output_folder"] + m_parameters["marked_points_result"]);
 
 	if (m_marked_points_map.empty()) return 1;
 
@@ -119,7 +119,7 @@ int BackProcess::searching()
 
 	kd_tree kt(m_transformed_point_cloud);
 
-	std::map<std::string, std::vector<point_3d>>::iterator it;
+	std::map<std::string, point_shape>::iterator it;
 
 	for (it = m_marked_points_map.begin(); it != m_marked_points_map.end(); it++)
 	{
@@ -130,12 +130,13 @@ int BackProcess::searching()
 			continue;
 		}
 
-		std::vector<point_3d> correspondence;
+		point_shape ps;
 
-		kt.search_points_correspondence(it->second, correspondence);
+		kt.search_points_correspondence(it->second.points, ps.points);
+		ps.shape_property = it->second.shape_property;
 
 		//it->second = correspondence;
-		m_searched_mark_points_map.insert(std::pair< std::string, std::vector<point_3d>>(it->first, correspondence));
+		m_searched_mark_points_map.insert(std::pair< std::string, point_shape>(it->first, ps));
 	}
 
 	export_marked_points(m_searched_mark_points_map, m_parameters["output_folder"] + m_parameters["marked_points_searched_result"]);
@@ -183,9 +184,11 @@ int BackProcess::evaluation()
 	std::vector<point_3d> original_points, new_points;
 	for (auto & item : m_marked_points_map)
 	{
-		original_points.insert(original_points.end(), item.second.begin(), item.second.end());
+		original_points.insert(original_points.end(), item.second.points.begin(), item.second.points.end());
 
-		new_points.insert(new_points.end(), m_searched_mark_points_map[item.first].begin(), m_searched_mark_points_map[item.first].end());
+		new_points.insert(new_points.end(), 
+			m_searched_mark_points_map[item.first].points.begin(), 
+			m_searched_mark_points_map[item.first].points.end());
 	}
 	evaluation_results =
 		ce.mean_distance_points(original_points, new_points, m_searching_er);

@@ -95,8 +95,8 @@ void MainWindow::initialize_dll()
 {
     // add more dll files
     std::vector<std::string> handle_filename_vec;
-    handle_filename_vec.push_back("label_visual.dll");
-    handle_filename_vec.push_back("back_process.dll");
+    handle_filename_vec.push_back("LabelVisual.dll");
+    handle_filename_vec.push_back("CloudProcess.dll");
 
 
 
