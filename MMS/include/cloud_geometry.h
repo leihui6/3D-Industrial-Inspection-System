@@ -238,8 +238,8 @@ void save_points(const std::vector<point_3d>& points, const std::string & filena
 
 void make_points_ordered_by_distance(std::vector<point_3d>& points, std::vector<point_3d>& ordered_points);
 
-void point_along_with_vector_within_dis(point_3d & point, Eigen::Vector3f & line_dir, point_3d & result_p, float distance);
-void point_along_with_vector_within_dis(point_3d & point, Eigen::Vector3f & line_dir, point_3d & result_p1, point_3d & result_p2, float distance);
+void point_along_with_vector_within_dis(point_3d & point, const Eigen::Vector3f & line_dir, point_3d & result_p, float length);
+//void point_along_with_vector_within_dis(point_3d & point, Eigen::Vector3f & line_dir, point_3d & result_p1, point_3d & result_p2, float distance);
 
 bool is_parallel_vector(const Eigen::Vector3f & v1, const Eigen::Vector3f & v2);
 
@@ -292,9 +292,11 @@ void mean_distance_from_point_to_points(std::vector<point_3d>& points, point_3d 
 
 void longgest_distance_from_point_to_points(std::vector<point_3d>& points, point_3d & point, float & longgest_distance);
 
-void angle_between_two_vector_3d(Eigen::Vector3f p1, Eigen::Vector3f p2, float & angle);
+float vector_cos(const Eigen::Vector3f & v1, const Eigen::Vector3f &v2);
 
-void angle_between_two_vector_3d(point_3d p1, point_3d p2, float & angle);
+float angle_between_two_vector_3d(const Eigen::Vector3f & v1, const Eigen::Vector3f &v2);
+float angle_between_two_point_3d(const point_3d & p1, const point_3d & p2);
+float radian_two_vector_3d(const Eigen::Vector3f & v1, const Eigen::Vector3f & v2);
 
 bool is_in_range_of_two_points(point_3d &p, point_3d &p1, point_3d &p2);
 
@@ -303,8 +305,6 @@ bool equal_float(double v1, double v2, double th = 1e-6);
 float radian2degree(float radian);
 
 float degree2radian(float angle);
-
-float radian_two_vector_3d(const Eigen::Vector3f & v1, const Eigen::Vector3f & v2);
 
 void project_points_onto_line(std::vector<point_3d>& points, line_func_3d & line, std::vector<point_3d>& projected_points);
 

@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cloud_evaluation.h" />
     <ClInclude Include="include\BackProcess.h" />
     <ClInclude Include="include\BackProcessCom.h" />
     <ClInclude Include="include\BackProcessExp.h" />

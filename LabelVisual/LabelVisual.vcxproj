@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.dll</TargetExt>
-    <IncludePath>$(MS3D)\OSG 3.6.4\include;$(ProjectDir)\inc;$(IncludePath)</IncludePath>
+    <IncludePath>$(MS3D)\OSG 3.6.4\include;$(ProjectDir)\inc;$(MS3D)\Eigen;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

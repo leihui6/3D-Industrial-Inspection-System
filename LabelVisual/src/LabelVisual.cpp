@@ -17,9 +17,15 @@ void LabelVisual::initial_label_info(const std::string & config_filename)
 
 	for (size_t i = 0; i < filename_vec.size(); i++)
 	{
-		std::vector<point_3d> point_cloud; std::map<std::string, point_3d > label_points_map;
+		std::vector<point_3d> point_cloud;
+		// [0] position [2] normal
+		std::vector<point_3d> normal_position;
+
+		std::map<std::string, point_3d > label_points_map;
 		
-		read_labelfile(filename_vec[i], point_cloud, label_points_map, ((display_step_vec[i] == 1) ? true : false));
+		read_labelfile(filename_vec[i],
+			point_cloud, label_points_map, normal_position,
+			((display_step_vec[i] == 1) ? true : false));
 
 		std::cout << "point cloud:" << i << " size:" << point_cloud.size() << std::endl;
 
@@ -27,9 +33,14 @@ void LabelVisual::initial_label_info(const std::string & config_filename)
 		parameters.set_point_color(cloud_color_vec[i]);
 		parameters.set_point_size(cloud_size_vec[i]);
 		
+		// add normals
+		osg::ref_ptr<osg::Geode> geode_normal = new osg::Geode();
+		make_normals_node(normal_position, geode_normal, parameters);
+		geode->addChild(geode_normal.get());
+
 		// add points
 		osg::ref_ptr<osg::Geometry> geode_point_cloud = new osg::Geometry();
-		make_geometry_node(point_cloud, geode_point_cloud, parameters);
+		make_points_node(point_cloud, geode_point_cloud, parameters);
 		geode->addDrawable(geode_point_cloud.get());
 
 		// add its labels
@@ -81,7 +92,9 @@ void LabelVisual::cal_centroid_point(std::vector<point_3d> & points, point_3d & 
 	centroid_point.z = t_z / points.size();
 }
 
-void LabelVisual::read_labelfile(const std::string & filename, std::vector<point_3d> & all_points, std::map<std::string, point_3d > & label_points, bool step_subpoints)
+void LabelVisual::read_labelfile(const std::string & filename,
+	std::vector<point_3d> & all_points, std::map<std::string, point_3d > & label_points,
+	std::vector<point_3d> & property_content, bool step_subpoints)
 {
 	std::ifstream ifile(filename);
 
@@ -94,36 +107,30 @@ void LabelVisual::read_labelfile(const std::string & filename, std::vector<point
 
 	point_3d centroid_point;
 	std::vector<point_3d> points;
-	std::vector<std::vector<point_3d>> step_points_unorder;
+	point_3d normal;
+	bool has_pro = false;
+	//std::vector<std::vector<point_3d>> step_points_unorder;
 
-	bool skip = false;
+	bool flag_points = false, flag_property = false;
 
 	while (std::getline(ifile, line))
 	{
-		if (skip)
-		{
-			skip = false;
-			continue;
-		}
-
 		if (line.empty()) continue;
 
 		if (line.find(">points") != std::string::npos)
 		{
-			continue;
-		}
-		else if (line.find(">values") != std::string::npos)
-		{
-			skip = true;
+			flag_points = true;
+			flag_property = false;
 			continue;
 		}
 		else if (line.find(">property") != std::string::npos)
 		{
-			skip = true;
+			flag_property = true;
+			flag_points = false;
 			continue;
 		}
 
-		if (line[0] == '#')
+		else if (line[0] == '#' && line.size() > 2)
 		{
 			// get the centroid point among points
 			cal_centroid_point(points, centroid_point);
@@ -132,12 +139,19 @@ void LabelVisual::read_labelfile(const std::string & filename, std::vector<point
 			std::string label = line.substr(1, line.size() - 1);
 
 			label_points.insert(std::pair<std::string, point_3d>(label, centroid_point));
-			
+
 			all_points.insert(all_points.end(), points.begin(), points.end());
+
+			if (has_pro)
+			{
+				property_content.push_back(normal);
+				property_content.push_back(centroid_point);
+				has_pro = false;
+			}
 
 			if (step_subpoints)
 			{
-				step_points_unorder.push_back(points);
+				//step_points_unorder.push_back(points);
 			}
 
 			points.clear();
@@ -150,29 +164,38 @@ void LabelVisual::read_labelfile(const std::string & filename, std::vector<point
 
 		for (size_t i = 0; i < 3; i++) s >> value[i];
 
-		points.push_back(point_3d(value[0], value[1], value[2]));
-	}
+		if (flag_points)
+			points.push_back(point_3d(value[0], value[1], value[2]));
 
-	// do not forget the rest points that have no label
-	if (!points.empty())
-	{
-		std::string label = "unknown-points";
-
-		cal_centroid_point(points, centroid_point);
-		label_points.insert(std::pair<std::string, point_3d>(label, centroid_point));
-
-		all_points.insert(all_points.end(), points.begin(), points.end());
-
-		if (step_subpoints)
+		if (flag_property)
 		{
-			step_points_unorder.push_back(points);
+			has_pro = true;
+			normal.x = value[0];
+			normal.y = value[1];
+			normal.z = value[2];
 		}
-
-		points.clear();
 	}
+
+	//// do not forget the rest points that have no label
+	//if (!points.empty())
+	//{
+	//	std::string label = "unknown-points";
+
+	//	cal_centroid_point(points, centroid_point);
+	//	label_points.insert(std::pair<std::string, point_3d>(label, centroid_point));
+
+	//	all_points.insert(all_points.end(), points.begin(), points.end());
+
+	//	if (step_subpoints)
+	//	{
+	//		//step_points_unorder.push_back(points);
+	//	}
+
+	//	points.clear();
+	//}
 
 	ifile.close();
-	make_order(step_points_unorder);
+	//make_order(step_points_unorder);
 }
 
 void LabelVisual::window_initilization(osg::ref_ptr<timeViewer> & viewer, osg::ref_ptr<osg::Group> & root)

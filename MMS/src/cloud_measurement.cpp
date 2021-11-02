@@ -397,7 +397,8 @@ void cloud_measurement::line_to_line(point_shape & shape_1, point_shape & shape_
 	cf.fitting_line_3d_linear_least_squares(shape_1.points, line_func_2);
 
 	// angle
-	angle_between_two_vector_3d(line_func_1.direction, line_func_2.direction, mc.angle);
+	mc.angle =
+		angle_between_two_vector_3d(line_func_1.direction, line_func_2.direction);
 	if (mc.angle > 90)
 		mc.angle = 180 - mc.angle;
 
@@ -443,7 +444,8 @@ void cloud_measurement::line_to_cylinder(point_shape & shape_1, point_shape & sh
 	cf.fitting_cylinder_linear_least_squares(shape_2.points, _cylinder_func);
 
 	// angle
-	angle_between_two_vector_3d(line_func.get_direction_point_3d(), _cylinder_func.axis.get_direction_point_3d(), mc.angle);
+	mc.angle =
+		angle_between_two_point_3d(line_func.get_direction_point_3d(), _cylinder_func.axis.get_direction_point_3d());
 	if (mc.angle > 90)
 		mc.angle = 180 - mc.angle;
 
@@ -690,7 +692,9 @@ void cloud_measurement::cylinder_to_cylinder(point_shape & shape_1, point_shape 
 	cf.fitting_cylinder_linear_least_squares(shape_2.points, _cylinder_func_2);
 
 	// angle
-	angle_between_two_vector_3d(_cylinder_func_1.axis.get_direction_point_3d(), _cylinder_func_2.axis.get_direction_point_3d(), mc.angle);
+	mc.angle =
+		angle_between_two_point_3d(_cylinder_func_1.axis.get_direction_point_3d(), _cylinder_func_2.axis.get_direction_point_3d());
+
 	if (mc.angle > 90)
 		mc.angle = 180 - mc.angle;
 	

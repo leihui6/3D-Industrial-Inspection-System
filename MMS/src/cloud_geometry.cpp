@@ -664,103 +664,91 @@ void make_points_ordered_by_distance(std::vector<point_3d>& points, std::vector<
 	//std::cout << std::endl;
 }
 
-void point_along_with_vector_within_dis(point_3d & point, Eigen::Vector3f & line_dir, point_3d & result_p1, point_3d & result_p2, float distance)
+//void point_along_with_vector_within_dis(point_3d & point, Eigen::Vector3f & line_dir, point_3d & result_p1, point_3d & result_p2, float length)
+//{
+	
+//	point_along_with_vector_within_dis(point, line_dir, result_p1, length);
+
+//	point_along_with_vector_within_dis(point, -1 * line_dir, result_p2, length);
+
+	//if (distance == 0)
+	//{
+	//	result_p1 = point;
+
+	//	result_p2 = point;
+	//	return;
+	//}
+	//double m, n, l;
+	//m = line_dir[0];
+	//n = line_dir[1];
+	//l = line_dir[2];
+
+	//double
+	//	M = sqrt((distance*distance*m*m) / (m*m + n * n + l * l)),
+	//	N = sqrt((distance*distance*n*n) / (m*m + n * n + l * l)),
+	//	L = sqrt((distance*distance*l*l) / (m*m + n * n + l * l));
+
+	//double x[2], y[2], z[2];
+
+	//x[0] = point.x + M;
+	//x[1] = point.x - M;
+	//y[0] = point.y + N;
+	//y[1] = point.y - N;
+	//z[0] = point.z + L;
+	//z[1] = point.z - L;
+
+	//Eigen::Vector3f v;
+
+	//std::vector<point_3d> tmp_p;
+	//line_dir.normalize();
+
+	//double std = 1.0f;
+
+	////! 筛选出两个平行于方向向量的点
+	//for (size_t i = 0; i < 2; i++)
+	//{
+	//	for (size_t j = 0; j < 2; j++)
+	//	{
+	//		for (size_t k = 0; k < 2; k++)
+	//		{
+	//			v[0] = x[i] - point.x;
+	//			v[1] = y[j] - point.y;
+	//			v[2] = z[k] - point.z;
+
+	//			v.normalize();
+
+	//			double res = abs((double)line_dir.dot(v));
+	//			if (equal_float(std, res))
+	//				tmp_p.push_back(point_3d(x[i], y[j], z[k]));
+	//			if (equal_float(x[0], x[1])) ++i;
+	//			if (equal_float(y[0], y[1])) ++j;
+	//			if (equal_float(z[0], z[1])) ++k;
+	//		}
+	//	}
+	//}
+	//// std::cout << "----------" << std::endl;
+	//if (tmp_p.size() == 2)
+	//{
+	//	result_p1 = tmp_p[0];
+	//	result_p2 = tmp_p[1];
+	//}
+	//else if (tmp_p.size() > 2)
+	//{
+	//	std::cout << "[warning] point_along_with_vector_within_dis" << std::endl;
+	//	result_p1 = tmp_p[0];
+	//	result_p2 = tmp_p[1];
+	//}
+	//else
+	//{
+	//	std::cout << "[error] point_along_with_vector_within_dis" << std::endl;
+	//}
+//}
+
+void point_along_with_vector_within_dis(point_3d & point, const Eigen::Vector3f & line_dir, point_3d & result_p, float length)
 {
-	if (distance == 0)
-	{
-		result_p1 = point;
-
-		result_p2 = point;
-		return;
-	}
-	double m, n, l;
-	m = line_dir[0];
-	n = line_dir[1];
-	l = line_dir[2];
-
-	double
-		M = sqrt((distance*distance*m*m) / (m*m + n * n + l * l)),
-		N = sqrt((distance*distance*n*n) / (m*m + n * n + l * l)),
-		L = sqrt((distance*distance*l*l) / (m*m + n * n + l * l));
-
-	double x[2], y[2], z[2];
-
-	x[0] = point.x + M;
-	x[1] = point.x - M;
-	y[0] = point.y + N;
-	y[1] = point.y - N;
-	z[0] = point.z + L;
-	z[1] = point.z - L;
-
-	Eigen::Vector3f v;
-
-	std::vector<point_3d> tmp_p;
-	line_dir.normalize();
-
-	double std = 1.0f;
-
-	//! 筛选出两个平行于方向向量的点
-	for (size_t i = 0; i < 2; i++)
-	{
-		for (size_t j = 0; j < 2; j++)
-		{
-			for (size_t k = 0; k < 2; k++)
-			{
-				v[0] = x[i] - point.x;
-				v[1] = y[j] - point.y;
-				v[2] = z[k] - point.z;
-
-				v.normalize();
-
-				double res = abs((double)line_dir.dot(v));
-				if (equal_float(std, res))
-					tmp_p.push_back(point_3d(x[i], y[j], z[k]));
-				if (equal_float(x[0], x[1])) ++i;
-				if (equal_float(y[0], y[1])) ++j;
-				if (equal_float(z[0], z[1])) ++k;
-			}
-		}
-	}
-	// std::cout << "----------" << std::endl;
-	if (tmp_p.size() == 2)
-	{
-		result_p1 = tmp_p[0];
-		result_p2 = tmp_p[1];
-	}
-	else if (tmp_p.size() > 2)
-	{
-		std::cout << "[warning] point_along_with_vector_within_dis" << std::endl;
-		result_p1 = tmp_p[0];
-		result_p2 = tmp_p[1];
-	}
-	else
-	{
-		std::cout << "[error] point_along_with_vector_within_dis" << std::endl;
-	}
-}
-
-void point_along_with_vector_within_dis(point_3d & point, Eigen::Vector3f & line_dir, point_3d & result_p, float distance)
-{
-	point_3d p1, p2;
-
-	point_along_with_vector_within_dis(point, line_dir, p1, p2, distance);
-
-	Eigen::Vector3f v1, v2;
-	v1[0] = p1.x - point.x;
-	v1[1] = p1.y - point.y;
-	v1[2] = p1.z - point.z;
-
-	v2[0] = p2.x - point.x;
-	v2[1] = p2.y - point.y;
-	v2[2] = p2.z - point.z;
-
-
-	if (v1.dot(line_dir) > 0)
-		result_p.set_xyz(p1.x, p1.y, p1.z);
-	else if (v1.dot(line_dir) > 0)
-		result_p.set_xyz(p2.x, p2.y, p2.z);
-	else
-		result_p.set_xyz(p2.x, p2.y, p2.z);
+	result_p.x = length * vector_cos(Eigen::Vector3f::UnitX(), line_dir) + point.x;
+	result_p.y = length * vector_cos(Eigen::Vector3f::UnitY(), line_dir) + point.y;
+	result_p.z = length * vector_cos(Eigen::Vector3f::UnitZ(), line_dir) + point.z;
 }
 
 bool is_parallel_vector(const Eigen::Vector3f & v1, const Eigen::Vector3f & v2)
@@ -804,7 +792,9 @@ void intersection_line_to_sphere(line_func_3d & line_func, point_3d & sphere_cen
 
 	float distance_on_line = sqrt(sphere_r * sphere_r - distance_to_center * distance_to_center);
 
-	point_along_with_vector_within_dis(pedal_point_on_line, line_func.direction, res_p1, res_p2, distance_on_line);
+	point_along_with_vector_within_dis(pedal_point_on_line, line_func.direction, res_p1, distance_on_line);
+
+	point_along_with_vector_within_dis(pedal_point_on_line, -1 * line_func.direction, res_p2, distance_on_line);
 }
 
 void intersection_line_to_plane(line_func_3d & line_func, plane_func_3d & plane_func, point_3d & inter_p)
@@ -1284,17 +1274,7 @@ void longgest_distance_from_point_to_points(std::vector<point_3d>& points, point
 	}
 }
 
-void angle_between_two_vector_3d(point_3d p1, point_3d p2, float & angle)
-{
-	Eigen::Vector3f ep1(p1.x, p1.y, p1.z), ep2(p2.x, p2.y, p2.z);
 
-	float
-		dot_value = ep1.dot(ep2),
-		lenSq1 = ep1.norm(),
-		lenSq2 = ep2.norm();
-
-	angle = acos(dot_value / sqrt(lenSq1 * lenSq2));
-}
 
 bool is_in_range_of_two_points(point_3d & p, point_3d & p1, point_3d & p2)
 {
@@ -1337,14 +1317,28 @@ bool equal_float(double v1, double v2, double th)
 	return false;
 }
 
-void angle_between_two_vector_3d(Eigen::Vector3f p1, Eigen::Vector3f p2, float & angle)
+float vector_cos(const Eigen::Vector3f & v1, const Eigen::Vector3f &v2)
 {
 	float
-		dot_value = p1.dot(p2),
-		lenSq1 = p1.norm(),
-		lenSq2 = p2.norm();
+		dot_value = v1.dot(v2),
+		lenSq1 = v1.norm(),
+		lenSq2 = v2.norm();
 
-	angle = acosf(dot_value / (lenSq1 * lenSq2))* 180.0 / M_PI;
+	return dot_value / (lenSq1 * lenSq2);
+}
+
+float angle_between_two_vector_3d(const Eigen::Vector3f & v1, const Eigen::Vector3f &v2)
+{
+	float radian = acosf(vector_cos(v1,v2));
+
+	return radian2degree(radian);
+}
+
+float angle_between_two_point_3d(const point_3d & p1, const point_3d & p2)
+{
+	Eigen::Vector3f ep1(p1.x, p1.y, p1.z), ep2(p2.x, p2.y, p2.z);
+
+	return angle_between_two_vector_3d(ep1, ep2);
 }
 
 void point_cloud::load_points(std::vector<point_3d> & points)
@@ -1356,6 +1350,7 @@ float radian2degree(float radian)
 {
 	return radian * (180 / M_PI);
 }
+
 float degree2radian(float angle)
 {
 	return M_PI * (angle / 180);

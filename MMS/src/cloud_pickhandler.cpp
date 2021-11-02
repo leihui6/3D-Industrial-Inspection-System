@@ -381,7 +381,8 @@ void PickHandler::process_plane(plane_func_3d & plane_func)
 		mid_point = point_3d((min_p.x + max_p.x) / 2, (min_p.y + max_p.y) / 2, (min_p.z + max_p.z) / 2);
 		float half_dis = diagonal.norm() / 2;
 
-		point_along_with_vector_within_dis(mid_point, line_direction, corner_p1, corner_p2, half_dis);
+		point_along_with_vector_within_dis(mid_point, line_direction, corner_p1, half_dis);
+		point_along_with_vector_within_dis(mid_point, -1 * line_direction, corner_p2, half_dis);
 
 		// auto update plane with more points
 		if (m_cloud_viewer->m_viewer_parameters.is_auto_pick)
@@ -454,8 +455,8 @@ void PickHandler::process_cylinder(cylinder_func & cylinder_func)
 
 	Eigen::Vector3f  rotated_axis = z_axis.cross(cylinder_func.axis.direction);
 
-	float rotated_angle = 0.0;
-	angle_between_two_vector_3d(z_axis, cylinder_func.axis.direction, rotated_angle);
+	float rotated_angle = 
+		angle_between_two_vector_3d(z_axis, cylinder_func.axis.direction);
 
 	//std::cout << "rotated_angle=" << rotated_angle << std::endl;
 

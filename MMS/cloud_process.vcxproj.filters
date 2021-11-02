@@ -54,9 +54,6 @@
     <ClInclude Include="include\BackProcessExp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cloud_evaluation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\cloud_evaluation.h">
       <Filter>Header Files</Filter>
     </ClInclude>

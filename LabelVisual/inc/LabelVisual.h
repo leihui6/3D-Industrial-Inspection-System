@@ -23,7 +23,9 @@ private:
 
 	void cal_centroid_point(std::vector<point_3d> & points, point_3d & centroid_point);
 
-	void read_labelfile(const std::string & filename, std::vector<point_3d> & all_points, std::map<std::string, point_3d > & label_points, bool step_subpoints);
+	void read_labelfile(const std::string & filename,
+		std::vector<point_3d> & all_points, std::map<std::string, point_3d > & label_points,
+		std::vector<point_3d> & property_content, bool step_subpoints);
 
 	void window_initilization(osg::ref_ptr<timeViewer> & viewer, osg::ref_ptr<osg::Group> & root);
 

@@ -57,7 +57,7 @@ void timeViewer::update_node()
 		if (m_index_vec.at(i) >= m_points_vec.at(i).size())
 			m_index_vec.at(i) = 0;
 		//std::cout << m_index_vec.at(i) << std::endl;
-		make_geometry_node(point, geode_point_cloud, parameters);
+		make_points_node(point, geode_point_cloud, parameters);
 
 		// will be deleted and empty
 		m_point_cloud_vec.push_back(geode_point_cloud);
