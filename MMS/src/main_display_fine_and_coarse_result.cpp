@@ -12,6 +12,46 @@
 #include "cloud_viewer.h"
 #include "common_use.h"
 
+void display_point_cloud_from_transformation_vec(cloud_viewer & cv, std::vector<point_3d>& reading_point_cloud, std::vector<Eigen::Matrix4f>& transformation_vec)
+{
+	// transformation_vec[1] is a identify matrix
+	std::swap(transformation_vec[0], transformation_vec[1]);
+
+	std::vector<std::vector<point_3d>> transformed_points;
+
+	for (size_t i = 2; i < transformation_vec.size(); ++i)
+	{
+		transformation_vec[i] = transformation_vec[i] * transformation_vec[1];
+	}
+
+	for (size_t i = 0; i < transformation_vec.size(); ++i)
+	{
+		std::vector<point_3d> t_points;
+
+		transform_points(reading_point_cloud, transformation_vec[i], t_points);
+
+		transformed_points.push_back(t_points);
+	}
+
+	size_t i = 0;
+
+	while (true)
+	{
+		cv.update_reading_point_cloud(transformed_points[i], 0, 255, 0, 4.0);
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(400));
+
+		if (i + 1 == transformation_vec.size())
+		{
+			i = 0;
+
+			continue;
+		}
+
+		i++;
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc < 2) return 1;

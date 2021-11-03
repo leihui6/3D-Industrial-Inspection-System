@@ -14,9 +14,18 @@ public:
 
 	~LabelVisual();
 
-	virtual void initial_label_info(const std::string & config_filename);
+	/*
+	flag:
+		0: visualize the labeled points "marked_points.txt" and "standard points"
+		1: visualize the measurement result "measurement_result.txt" and "original points"
+	*/
+	virtual void initial(
+		const std::string & file_1, // it usually is the standard or original points
+		const std::string & file_2, // it usually is the marked or measurement points
+		int flag
+	);
 
-	virtual void visual_label();
+	virtual void visual();
 
 private:
 	std::vector<std::vector<point_3d>> step_points_vec;
@@ -29,9 +38,9 @@ private:
 
 	void window_initilization(osg::ref_ptr<timeViewer> & viewer, osg::ref_ptr<osg::Group> & root);
 
-	void setupProperties(osgText::Text& textObject, osgText::Font* font, float size, const osg::Vec3& pos);
+	void text_setupProperties(osgText::Text& textObject, osgText::Font* font, float size, const osg::Vec3& pos);
 
-	void createContent(osgText::Text& textObject, const std::string & text/*char* string*/);
+	void text_createContent(osgText::Text& textObject, const std::string & text/*char* string*/);
 
 	rgb rgbstr2rgb(std::string rgbstr);
 
@@ -45,9 +54,18 @@ private:
 
 	void make_order(std::vector<std::vector<point_3d>> & step_points_vec);
 
+	void make_text_node(point_3d & position, osg::ref_ptr<osg::Geode> geode_label_points, const std::string & text);
+
+	void make_points_node(std::vector<point_3d> & points, osg::ref_ptr<osg::Geode> & geode, point_render_parameters & parameters);
+
+	void make_normals_node(point_3d & point, Eigen::Vector3f &v, osg::ref_ptr<osg::Geode> &geode, point_render_parameters & parameters);
+
 private:
-	osg::ref_ptr<osg::Group> root;
-	osg::ref_ptr<osg::Geode> geode;
+	osg::ref_ptr<osg::Group> m_root;
+	// all points are added on this node
+	osg::ref_ptr<osg::Geode> m_geode;
+
+	osg::ref_ptr < osgText::Font> m_fontKai;
 
 	std::vector<std::string> filename_vec;
 	std::vector <rgb> cloud_color_vec;

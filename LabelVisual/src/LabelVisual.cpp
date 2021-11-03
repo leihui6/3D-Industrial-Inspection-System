@@ -1,8 +1,11 @@
 #include"LabelVisual.h"
 
 LabelVisual::LabelVisual()
-	: root(new osg::Group()), geode(new osg::Geode())
+	: m_root(new osg::Group()),
+	m_geode(new osg::Geode())
 {
+
+	m_fontKai = osgText::readFontFile("C:\\WINDOWS\\Fonts\\simkai.ttf");
 
 }
 
@@ -11,65 +14,84 @@ LabelVisual::~LabelVisual()
 
 }
 
-void LabelVisual::initial_label_info(const std::string & config_filename)
+void LabelVisual::initial(const std::string & file_1, const std::string & file_2, int flag)
 {
-	read_config(config_filename);
+	point_render_parameters parameters;
+	parameters.color = osg::Vec4(255, 255, 255, 1);
 
-	for (size_t i = 0; i < filename_vec.size(); i++)
+	std::map<std::string, std::vector<point_3d>> points_map;
+	read_points(points_map, file_1);
+	for (auto &pv : points_map)
 	{
-		std::vector<point_3d> point_cloud;
-		// [0] position [2] normal
-		std::vector<point_3d> normal_position;
-
-		std::map<std::string, point_3d > label_points_map;
-		
-		read_labelfile(filename_vec[i],
-			point_cloud, label_points_map, normal_position,
-			((display_step_vec[i] == 1) ? true : false));
-
-		std::cout << "point cloud:" << i << " size:" << point_cloud.size() << std::endl;
-
-		point_render_parameters parameters;
-		parameters.set_point_color(cloud_color_vec[i]);
-		parameters.set_point_size(cloud_size_vec[i]);
-		
-		// add normals
-		osg::ref_ptr<osg::Geode> geode_normal = new osg::Geode();
-		make_normals_node(normal_position, geode_normal, parameters);
-		geode->addChild(geode_normal.get());
-
-		// add points
-		osg::ref_ptr<osg::Geometry> geode_point_cloud = new osg::Geometry();
-		make_points_node(point_cloud, geode_point_cloud, parameters);
-		geode->addDrawable(geode_point_cloud.get());
-
-		// add its labels
-		if (label_points_map.empty()) continue;
-		osg::ref_ptr<osg::Geometry> geode_label_points = new osg::Geometry();
-		osgText::Font* fontKai = osgText::readFontFile("C:\\WINDOWS\\Fonts\\simkai.ttf");
-		std::vector< osg::ref_ptr<osgText::Text> > title_vec;
-		title_vec.resize(label_points_map.size());
-		size_t j = 0;
-		for (auto & item : label_points_map)
-		{	// string : position
-			title_vec[j] = new osgText::Text;
-			setupProperties(*title_vec[j], fontKai, 2, osg::Vec3(item.second.x, item.second.y, item.second.z));
-			createContent(*title_vec[j], item.first);
-			j++;
-		}
-		for (auto & text : title_vec) geode->addDrawable(text.get());
+		osg::ref_ptr<osg::Geode> geode_points = new osg::Geode();
+		make_points_node(pv.second, geode_points, parameters);
+		this->m_geode->addChild(geode_points);
 	}
+
+	// show marked points
+	if (flag == 0)
+	{
+		std::map<std::string, point_shape> marked_points_vec;
+
+		read_marked_points(marked_points_vec, file_2);
+
+		std::cout << "read " << marked_points_vec.size() << " marked point group" << std::endl;
+
+		for (auto &ps : marked_points_vec)
+		{
+			point_3d centroid_point;
+			cal_centroid_point(ps.second.points, centroid_point);
+
+			std::vector<int> random_color(3);
+			obtain_random(0, 255, random_color);
+			parameters.color = osg::Vec4(
+				random_color[0] / 255.0,
+				random_color[1] / 255.0,
+				random_color[2] / 255.0, 1.0);
+
+			if (!ps.second.shape_property.empty())
+			{
+				Eigen::Vector3f v = ps.second.shape_property[0];
+
+				// add normal
+				osg::ref_ptr<osg::Geode> geode_normal = new osg::Geode();
+				parameters.point_size = 3;
+				make_normals_node(centroid_point, v, geode_normal, parameters);
+				m_geode->addChild(geode_normal);
+			}
+
+			// add marked points
+			osg::ref_ptr<osg::Geode> geode_marked_points = new osg::Geode();
+			parameters.point_size = 8;
+			make_points_node(ps.second.points, geode_marked_points, parameters);
+			this->m_geode->addChild(geode_marked_points);
+
+			// add label-name
+			osg::ref_ptr<osg::Geode> geode_text = new osg::Geode();
+			make_text_node(centroid_point, geode_text, ps.first);
+			this->m_geode->addChild(geode_text);
+		}
+	}
+
+	// show result points
+	else if (flag == 1)
+	{
+		//std::vector<point_3d> measurement_points_vec;
+		//read_measurement_points(file_2, measurement_points_vec);
+	}
+
+	return;
 }
 
-void LabelVisual::visual_label()
+void LabelVisual::visual()
 {
-	root->addChild(geode.get());
+	m_root->addChild(m_geode.get());
 
 	// preparation for visualization
 	osg::ref_ptr<timeViewer> viewer = new timeViewer;
 
 	//dynamic_cast<Derived*>
-	window_initilization(viewer, root);
+	window_initilization(viewer, m_root);
 
 	viewer->initial(step_points_vec);
 
@@ -198,6 +220,8 @@ void LabelVisual::read_labelfile(const std::string & filename,
 	//make_order(step_points_unorder);
 }
 
+
+
 void LabelVisual::window_initilization(osg::ref_ptr<timeViewer> & viewer, osg::ref_ptr<osg::Group> & root)
 {
 	viewer->addEventHandler(new osgGA::StateSetManipulator(viewer->getCamera()->getOrCreateStateSet()));
@@ -229,7 +253,62 @@ void LabelVisual::window_initilization(osg::ref_ptr<timeViewer> & viewer, osg::r
 	viewer->setSceneData(root.get());
 }
 
-void LabelVisual::setupProperties(osgText::Text& textObject, osgText::Font* font, float size, const osg::Vec3& pos)
+
+void LabelVisual::make_points_node(std::vector<point_3d> & points, osg::ref_ptr<osg::Geode> & geode, point_render_parameters & parameters)
+{
+	osg::ref_ptr<osg::Geometry> geometry(new osg::Geometry);
+
+	osg::ref_ptr<osg::Vec3Array> coords = new osg::Vec3Array();
+	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array();
+	osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array();
+
+	colors->push_back(parameters.color);
+	normals->push_back(parameters.normal);
+
+	for (auto & p : points) coords->push_back(osg::Vec3(p.x, p.y, p.z));
+
+	geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, points.size()));
+
+	geometry->setVertexArray(coords.get());
+
+	geometry->setColorArray(colors);
+	geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+
+	geometry->setNormalArray(normals);
+	geometry->setNormalBinding(osg::Geometry::BIND_OVERALL);
+
+	geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+	osg::StateSet* stateSet = geometry->getOrCreateStateSet();
+	osg::Point* state_point_size = new osg::Point;
+	state_point_size->setSize(parameters.point_size);
+	stateSet->setAttribute(state_point_size);
+
+	geode->addChild(geometry);
+}
+
+void LabelVisual::make_normals_node(point_3d & point, Eigen::Vector3f &v, osg::ref_ptr<osg::Geode> &geode, point_render_parameters & parameters)
+{
+	point_3d r_p;
+	v.normalize();
+	point_along_with_vector_within_dis(point, v, r_p, 5);
+
+	std::vector<point_3d> normals{ point, r_p };
+
+	geode->addChild(add_arrow(normals, parameters.color[0], parameters.color[1], parameters.color[2]));
+}
+
+void LabelVisual::make_text_node(point_3d & position, osg::ref_ptr<osg::Geode> geode_label_points, const std::string & text)
+{
+	osg::ref_ptr<osgText::Text> text_osg(new osgText::Text);
+	text_setupProperties(*text_osg, m_fontKai, 2, osg::Vec3(position.x, position.y, position.z));
+	text_createContent(*text_osg, text);
+	geode_label_points->addChild(text_osg);
+}
+
+void LabelVisual::text_setupProperties(
+	osgText::Text& textObject, osgText::Font* font,
+	float size, const osg::Vec3& pos)
 {
 	textObject.setFont(font);
 	textObject.setCharacterSize(size);
@@ -245,7 +324,7 @@ void LabelVisual::setupProperties(osgText::Text& textObject, osgText::Font* font
 	//textObject.setAxisAlignment(osgText::Text::XZ_PLANE);//获取文字对称成方式
 }
 
-void LabelVisual::createContent(osgText::Text& textObject, const std::string & text/*char* string*/)
+void LabelVisual::text_createContent(osgText::Text& textObject, const std::string & text/*char* string*/)
 {
 	//int requiredSize = mbstowcs(NULL, string, 0);//如果mbstowcs第一参数为NULL那么返回字符串的数目
 	//wchar_t* wText = new wchar_t[requiredSize + 1];

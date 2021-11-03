@@ -86,13 +86,13 @@ int cloud_evaluation::export_result(const std::string filename, evaluation_resul
 
 	if (!check_file(filename, std::ios::out | std::ios::app, local_file)) return 1;
 
-	std::fstream & op_file = local_file.m_fileobject;
+	std::fstream & ofile = *local_file.m_fileobject;
 
 	std::string ctime = current_date_time(true, true);
 
-	op_file << "RootMeamSquare:" << er.rms_val << std::endl;
+	ofile << "RootMeamSquare:" << er.rms_val << std::endl;
 
-	op_file.close();
+	ofile.close();
 
 	return 0;
 }

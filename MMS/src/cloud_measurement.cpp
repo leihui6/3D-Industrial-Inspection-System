@@ -22,7 +22,7 @@ size_t cloud_measurement::read_pair_file(const std::string & filename)
 
 	if (!check_file(filename, std::ios::in, local_file)) return 1;
 
-	std::fstream & ifile = local_file.m_fileobject;
+	std::fstream & ifile = *local_file.m_fileobject;
 
 	m_pair_vec.clear();
 
@@ -274,7 +274,7 @@ size_t cloud_measurement::export_measured_data(const std::string & output_filena
 
 	if (!check_file(output_filename, std::ios::out, local_file)) return 1;
 
-	std::fstream & ofile = local_file.m_fileobject;
+	std::fstream & ofile = *local_file.m_fileobject;
 
 	size_t i = 0;
 	for (auto & mc : m_mc_vec)

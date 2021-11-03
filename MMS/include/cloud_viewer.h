@@ -226,6 +226,7 @@ public:
 	viewer_parameters m_viewer_parameters;
 
 private:
+	osg::Vec4 str_to_vec4(const std::string & s);
 	// load parameters from file
 	void load_parameters(std::map<std::string, std::string> & parameters);
 };

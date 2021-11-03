@@ -10,7 +10,7 @@ bool load_point_cloud_txt(const std::string & filename, std::vector<point_3d>& p
 
 	if (!check_file(filename, std::ios::in, local_file)) return false;
 
-	std::fstream & ifile = local_file.m_fileobject;
+	std::fstream & ifile = *local_file.m_fileobject;
 
 	points.clear();
 
@@ -70,7 +70,7 @@ bool load_point_cloud_vtk(const std::string & filename, std::vector<point_3d>& p
 
 	if (!check_file(filename, std::ios::in, local_file)) return false;
 
-	std::fstream & ifile = local_file.m_fileobject;
+	std::fstream & ifile = *local_file.m_fileobject;
 	
 	points.clear();
 

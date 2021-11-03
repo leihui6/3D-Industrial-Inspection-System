@@ -45,7 +45,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -70,8 +70,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetExt>.dll</TargetExt>
-    <IncludePath>$(MS3D)\OSG 3.6.4\include;$(ProjectDir)\inc;$(MS3D)\Eigen;$(IncludePath)</IncludePath>
+    <TargetExt>.exe</TargetExt>
+    <IncludePath>$(MS3D)\OSG 3.6.4\include;$(ProjectDir)\inc;$(MS3D)\Eigen;$(MS3D)\Boost_1_72_0\include;$(ProjectDir)\..\MMS\include;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -82,6 +82,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -128,6 +130,7 @@
     <ClInclude Include="inc\timeViewer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\MMS\src\common_use.cpp" />
     <ClCompile Include="LocalTest.cpp" />
     <ClCompile Include="src\header.cpp" />
     <ClCompile Include="src\LabelVisual.cpp" />

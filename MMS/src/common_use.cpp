@@ -1,5 +1,222 @@
 #include "common_use.h"
 
+
+point_3d::point_3d(const point_3d & p)
+{
+	this->set_xyz(p.x, p.y, p.z);
+	this->set_nxyz(p.nx, p.ny, p.nz);
+	this->set_rgb(p.r, p.g, p.b);
+}
+
+point_3d::point_3d()
+	:x(0), y(0), z(0),
+	nx(0), ny(0), nz(0),
+	r(0), g(0), b(0)
+{
+}
+
+point_3d::point_3d(float x, float y, float z)
+{
+	this->set_xyz(x, y, z);
+	this->set_nxyz(0, 0, 0);
+	this->set_rgb(0, 0, 0);
+}
+
+void point_3d::set_xyz(float x, float y, float z)
+{
+	this->x = x;
+	this->y = y;
+	this->z = z;
+}
+
+void point_3d::set_nxyz(float nx, float ny, float nz)
+{
+	this->nx = nx;
+	this->ny = ny;
+	this->nz = nz;
+}
+
+void point_3d::set_rgb(float r, float g, float b)
+{
+	this->r = r;
+	this->g = g;
+	this->b = b;
+}
+
+Eigen::Vector3f point_3d::get_vector3f()
+{
+	return Eigen::Vector3f(this->x, this->y, this->z);
+}
+
+void point_3d::do_transform(const Eigen::Matrix4f & m, point_3d & p)
+{
+	Eigen::Vector4f t_p(x, y, z, 1);
+	Eigen::Vector3f t_n(nx, ny, nz);
+
+	t_p = m * t_p;
+	t_n = m.block<3, 3>(0, 0).inverse().transpose() * t_n;
+
+	p.set_xyz(t_p[0], t_p[1], t_p[2]);
+	p.set_nxyz(t_n[0], t_n[1], t_n[2]);
+}
+
+void point_3d::do_transform(const Eigen::Matrix4f & m)
+{
+	Eigen::Vector4f p(x, y, z, 1);
+	Eigen::Vector3f n(nx, ny, nz);
+
+	p = m * p;
+	n = m.block<3, 3>(0, 0).inverse().transpose() * n;
+
+	set_xyz(p[0], p[1], p[2]);
+	set_nxyz(n[0], n[1], n[2]);
+}
+
+point_3d & point_3d::operator=(const point_3d & p)
+{
+	if (this != &p)
+	{
+		this->set_xyz(p.x, p.y, p.z);
+		this->set_nxyz(p.nx, p.ny, p.nz);
+		this->set_rgb(p.r, p.g, p.b);
+	}
+	return *this;
+}
+
+point_3d point_3d::operator+(const point_3d & p)
+{
+	point_3d tp;
+
+	tp.set_xyz(this->x + p.x, this->y + p.y, this->z + p.z);
+
+	return tp;
+}
+
+point_3d point_3d::operator-(const point_3d & p)
+{
+	point_3d tp;
+
+	tp.set_xyz(this->x - p.x, this->y - p.y, this->z - p.z);
+
+	return tp;
+}
+
+point_3d point_3d::operator/(const float num)
+{
+	point_3d tp;
+
+	tp.set_xyz(this->x / num, this->y / num, this->z / num);
+
+	return tp;
+}
+
+bool point_3d::operator==(const point_3d & rp)
+{
+	if (this->x == rp.x &&
+		this->y == rp.y &&
+		this->z == rp.z)
+		return true;
+	return false;
+}
+
+std::ostream & operator << (std::ostream & os, const point_3d & p)
+{
+	os
+		<< "(x,y,z,nx,ny,nz,r,g,b)="
+		<< p.x << " " << p.y << " " << p.z << " "
+		<< p.nx << " " << p.ny << " " << p.nz << " "
+		<< p.r << " " << p.g << " " << p.b << " ";
+	return os;
+}
+
+line_func_3d::line_func_3d()
+	:origin(),
+	direction()
+{
+
+}
+
+void line_func_3d::set_xyz(float x, float y, float z)
+{
+	this->origin[0] = x;
+	this->origin[1] = y;
+	this->origin[2] = z;
+}
+
+void line_func_3d::set_nml(float n, float m, float l)
+{
+	this->direction[0] = n;
+	this->direction[1] = m;
+	this->direction[2] = l;
+}
+
+point_3d line_func_3d::get_origin_point_3d()
+{
+	return point_3d(origin[0], origin[1], origin[2]);
+}
+
+point_3d line_func_3d::get_direction_point_3d()
+{
+	return point_3d(direction[0], direction[1], direction[2]);
+}
+
+
+//Eigen::Vector3f line_func_3d::direction()
+//{
+//	return Eigen::Vector3f(this->n, this->m, this->l);
+//}
+//
+//Eigen::Vector3f line_func_3d::origin_point()
+//{
+//	return Eigen::Vector3f(this->x, this->y, this->z);
+//}
+
+plane_func_3d::plane_func_3d()
+	: a(0), b(0), c(0), d(0)
+{
+
+}
+
+plane_func_3d::plane_func_3d(float _a, float _b, float _c, float _d)
+{
+	this->set_abcd(_a, _b, _c, _d);
+}
+
+void plane_func_3d::set_abcd(float _a, float _b, float _c, float _d)
+{
+	a = _a;
+	b = _b;
+	c = _c;
+	d = _d;
+}
+
+void plane_func_3d::set_abcd(float _a, float _b, float _c, point_3d & p)
+{
+	a = _a;
+	b = _b;
+	c = _c;
+	d = -(a*p.x + b * p.y + c * p.z);
+}
+
+void plane_func_3d::reverse()
+{
+	set_abcd(-1 * a, -1 * b, -1 * c, -1 * d);
+}
+
+
+//Eigen::Vector3f plane_func_3d::direction()
+//{
+//	return Eigen::Vector3f(this->a, this->b, this->c);
+//}
+
+cylinder_func::cylinder_func()
+	: radius(0),
+	height(0),
+	axis()
+{
+
+}
+
 std::string file_name_without_postfix(std::string & file_name)
 {
 	size_t first_pos = file_name.find('/', 0), second_pos = file_name.find('.', 0);
@@ -16,53 +233,13 @@ bool is_exist(const std::string & file_name)
 	return std::filesystem::exists(file_name);;
 }
 
-void display_point_cloud_from_transformation_vec(cloud_viewer & cv, std::vector<point_3d>& reading_point_cloud, std::vector<Eigen::Matrix4f>& transformation_vec)
-{
-	// transformation_vec[1] is a identify matrix
-	std::swap(transformation_vec[0], transformation_vec[1]);
-
-	std::vector<std::vector<point_3d>> transformed_points;
-
-	for (size_t i = 2; i < transformation_vec.size(); ++i)
-	{
-		transformation_vec[i] = transformation_vec[i] * transformation_vec[1];
-	}
-
-	for (size_t i = 0; i < transformation_vec.size(); ++i)
-	{
-		std::vector<point_3d> t_points;
-
-		transform_points(reading_point_cloud, transformation_vec[i], t_points);
-
-		transformed_points.push_back(t_points);
-	}
-
-	size_t i = 0;
-
-	while (true)
-	{
-		cv.update_reading_point_cloud(transformed_points[i], 0, 255, 0, 4.0);
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(400));
-
-		if (i + 1 == transformation_vec.size())
-		{
-			i = 0;
-
-			continue;
-		}
-
-		i++;
-	}
-}
-
-void read_points(std::map<std::string, std::vector<point_3d>> & points_map, const std::string & file_name)
+void read_points(std::map<std::string, std::vector<point_3d>> & points_map, const std::string & filename)
 {
 	LocalFile local_file;
 
-	if (!check_file(file_name, std::ios::in, local_file)) return;
+	if (!check_file(filename, std::ios::in, local_file)) return;
 
-	std::fstream & ifile = local_file.m_fileobject;
+	std::fstream & ifile = *local_file.m_fileobject;
 
 	std::string line;
 	std::vector<point_3d> points;
@@ -71,8 +248,7 @@ void read_points(std::map<std::string, std::vector<point_3d>> & points_map, cons
 
 	while (std::getline(ifile, line))
 	{
-		if (line.size() < 1)
-			continue;
+		if (line.empty()) continue;
 
 		if (line[0] == '#' && line.size() > 2)
 		{
@@ -92,6 +268,9 @@ void read_points(std::map<std::string, std::vector<point_3d>> & points_map, cons
 
 		points.push_back(point_3d(value[0], value[1], value[2]));
 	}
+
+	if (!points.empty())
+		points_map["unknown-points"] = points;
 	
 	ifile.close();
 }
@@ -102,7 +281,7 @@ void read_marked_points(std::map<std::string, point_shape> & point_shape_map, co
 
 	if (!check_file(filename, std::ios::in, local_file)) return;
 
-	std::fstream & ifile = local_file.m_fileobject;
+	std::fstream & ifile = *local_file.m_fileobject;
 
 	point_shape_map.clear();
 
@@ -155,7 +334,7 @@ void export_marked_points(std::map<std::string, point_shape>& marked_points, con
 
 	if (!check_file(export_file_name, std::ios::out, local_file)) return;
 
-	std::fstream & ofile = local_file.m_fileobject;
+	std::fstream & ofile = *local_file.m_fileobject;
 
 	std::map <std::string, point_shape>::iterator it;
 
@@ -225,7 +404,7 @@ void read_file_as_map(const std::string & file_name, std::map<std::string, std::
 
 	if (!check_file(file_name, std::ios::in, local_file)) return;
 
-	std::fstream & ifile = local_file.m_fileobject;
+	std::fstream & ifile = *local_file.m_fileobject;
 
 	std::string line;
 
@@ -256,7 +435,7 @@ void read_file_as_map(const std::string & file_name, std::multimap<std::string, 
 
 	if (!check_file(file_name, std::ios::in, local_file)) return;
 
-	std::fstream & ifile = local_file.m_fileobject;
+	std::fstream & ifile = *local_file.m_fileobject;
 
 	std::string line;
 
@@ -278,22 +457,6 @@ void read_file_as_map(const std::string & file_name, std::multimap<std::string, 
 
 		str_flt_map.insert(std::pair<std::string, std::string>(key_, value_));
 	}
-}
-
-osg::Vec4 str_to_vec4(const std::string & s)
-{
-	std::stringstream ss(s);
-	
-	osg::Vec4 vec4;
-	
-	float tmp; size_t i = 0;
-	
-	while (ss >> tmp) vec4[i++] = tmp;
-	
-	if (i != 4)	
-		return osg::Vec4();
-	else	
-		return vec4;
 }
 
 std::string current_date_time(bool need_date, bool need_time)
@@ -327,9 +490,9 @@ std::string current_date_time(bool need_date, bool need_time)
 
 bool check_file(const std::string filename, std::ios_base::openmode mode, LocalFile & local_file)
 {
-	local_file.m_fileobject.open(filename, mode);
+	local_file.m_fileobject->open(filename, mode);
 
-	if (!local_file.m_fileobject.is_open())
+	if (!local_file.m_fileobject->is_open())
 	{
 		std::cerr << "file (" << filename << ") doesn't exist\n";
 		return false;
@@ -344,7 +507,7 @@ void save_matrix(Eigen::Matrix4f & matrix, const std::string & file_name)
 
 	if (!check_file(file_name, std::ios::out, local_file)) return;
 
-	std::fstream & of = local_file.m_fileobject;
+	std::fstream & of = *local_file.m_fileobject;
 
 	of << matrix << "\n#\n";
 
@@ -357,7 +520,7 @@ void read_matrix(const std::string & file_name, std::vector<Eigen::Matrix4f> & m
 
 	if (!check_file(file_name, std::ios::in, local_file)) return;
 
-	std::fstream & ifile = local_file.m_fileobject;
+	std::fstream & ifile = *local_file.m_fileobject;
 
 	std::string line;
 
@@ -398,4 +561,23 @@ void read_matrix(const std::string & file_name, std::vector<Eigen::Matrix4f> & m
 	}
 
 	ifile.close();
+}
+
+int obtain_random(int range_min, int range_max)
+{
+	std::random_device dev;
+	std::mt19937 rng(dev());
+
+	std::uniform_int_distribution<std::mt19937::result_type> dist6(range_min, range_max); 
+
+	return dist6(rng);
+}
+
+
+void obtain_random(int range_min, int range_max, std::vector<int> &random_vec)
+{
+	for (auto & i : random_vec)
+	{
+		i = obtain_random(range_min, range_max);
+	}
 }

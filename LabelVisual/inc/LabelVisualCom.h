@@ -10,9 +10,9 @@ public:
 
 	virtual ~LabelVisualCom() {}
 
-	virtual void initial_label_info(const std::string & config_filename) = 0;
+	virtual void initial(const std::string & file_1, const std::string & file_2, int flag) = 0;
 
-	virtual void visual_label() = 0;
+	virtual void visual() = 0;
 };
 
 #endif

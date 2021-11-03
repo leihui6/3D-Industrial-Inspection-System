@@ -17,7 +17,7 @@ int process_report::export_report(const std::string & filename, const report_dat
 
 	if (!check_file(filename, std::ios::out | std::ios::app, local_file)) return 1;
 
-	std::fstream & ofile = local_file.m_fileobject;
+	std::fstream & ofile = *local_file.m_fileobject;
 
 	std::vector<std::string> content;
 

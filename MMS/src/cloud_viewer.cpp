@@ -619,6 +619,22 @@ osg::ref_ptr<osg::Node> cloud_viewer::cretate_bounding_box(osg::Node * node)
 	return geode;
 }
 
+osg::Vec4 cloud_viewer::str_to_vec4(const std::string & s)
+{
+	std::stringstream ss(s);
+
+	osg::Vec4 vec4;
+
+	float tmp; size_t i = 0;
+
+	while (ss >> tmp) vec4[i++] = tmp;
+
+	if (i != 4)
+		return osg::Vec4();
+	else
+		return vec4;
+}
+
 void cloud_viewer::load_parameters(std::map<std::string, std::string>& parameters)
 {
 	if (parameters.empty()) return;
