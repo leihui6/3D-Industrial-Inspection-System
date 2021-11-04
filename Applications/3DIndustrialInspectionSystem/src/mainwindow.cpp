@@ -83,7 +83,7 @@ bool MainWindow::initialize_parameters()
 
     //ui->label_config_name->setText(QString(m_configuration_file.data()));
 
-    std::string measurement_pairs_filename = m_str_str_map["measurement_pairs"];
+    std::string measurement_pairs_filename = m_str_str_map["input_folder"]+m_str_str_map["measurement_pairs"];
     ui->label_measurement_info->setText(QString(measurement_pairs_filename.data()));
 
     write_log(output_log);
@@ -125,7 +125,7 @@ void MainWindow::initialize_dll()
     }
 }
 
-void MainWindow::visual_thread(const std::string & filename)
+void MainWindow::visual_thread(const std::string & file1, const std::string & file2, int flag)
 {
     typedef LabelVisualCom*(*LabelVisualComfunc)();
 
@@ -133,13 +133,12 @@ void MainWindow::visual_thread(const std::string & filename)
 
     LabelVisualComfunc dllFunc = (LabelVisualComfunc)GetProcAddress(hDll, "getLabelVisualCom");
 
-    // const std::string filename = "visual_config_labeling.txt";
     LabelVisualCom * label_visual_p;
     label_visual_p = (LabelVisualCom*)(dllFunc());
 
-    label_visual_p->initial_label_info(filename);
+    label_visual_p->initial(file1,file2,flag);
 
-    label_visual_p->visual_label();
+    label_visual_p->visual();
 
     delete label_visual_p;
 }
@@ -730,15 +729,21 @@ void MainWindow::on_actionStart_triggered()
 
 void MainWindow::on_actionShow_Label_Result_triggered()
 {
-    std::string labeling_filename = "data/visual_config_labeling.txt";
-    QFuture<void> future = QtConcurrent::run(this, &MainWindow::visual_thread,labeling_filename);
+    std::string
+            standard_filename = m_str_str_map["input_folder"]+m_str_str_map["reference_data"],
+            labeling_filename = m_str_str_map["output_folder"]+m_str_str_map["marked_points_result"];
+
+    QFuture<void> future = QtConcurrent::run(this, &MainWindow::visual_thread,standard_filename,labeling_filename,0);
     //future.waitForFinished();
 }
 
 void MainWindow::on_actionShow_Measurement_Result_triggered()
 {
-    std::string measurement_filename = "data/visual_config_measurement.txt";
-    QFuture<void> future = QtConcurrent::run(this, &MainWindow::visual_thread,measurement_filename);
+    std::string
+            scanned_filename = m_str_str_map["input_folder"]+m_str_str_map["reading_data"],
+            measurement_filename = m_str_str_map["output_folder"]+m_str_str_map["measurement_result"];
+
+    QFuture<void> future = QtConcurrent::run(this, &MainWindow::visual_thread,scanned_filename,measurement_filename,1);
 }
 
 void MainWindow::on_actionClean_triggered()

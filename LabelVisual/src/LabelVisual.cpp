@@ -6,7 +6,7 @@ LabelVisual::LabelVisual()
 {
 
 	m_fontKai = osgText::readFontFile("C:\\WINDOWS\\Fonts\\simkai.ttf");
-
+	//test_i = 0;
 }
 
 LabelVisual::~LabelVisual()
@@ -14,70 +14,127 @@ LabelVisual::~LabelVisual()
 
 }
 
-void LabelVisual::initial(const std::string & file_1, const std::string & file_2, int flag)
+void LabelVisual::add_points(std::map<std::string, std::vector<point_3d>> &points_map, bool show_normals)
 {
 	point_render_parameters parameters;
 	parameters.color = osg::Vec4(255, 255, 255, 1);
 
-	std::map<std::string, std::vector<point_3d>> points_map;
-	read_points(points_map, file_1);
-	for (auto &pv : points_map)
+	if (!show_normals)
 	{
-		osg::ref_ptr<osg::Geode> geode_points = new osg::Geode();
-		make_points_node(pv.second, geode_points, parameters);
-		this->m_geode->addChild(geode_points);
+		for (auto &pv : points_map)
+		{
+			osg::ref_ptr<osg::Geode> geode_points = new osg::Geode();
+			make_points_node(pv.second, geode_points, parameters);
+			this->m_geode->addChild(geode_points);
+		}
 	}
+	else
+	{
+		add_points(points_map, false);
+
+		for (auto & item : points_map)
+		{
+			for (auto & p : item.second)
+			{
+				Eigen::Vector3f v(p.nx, p.ny, p.nz);
+				osg::ref_ptr<osg::Geode> geode_normal = new osg::Geode();
+				parameters.color = osg::Vec4(0, 0, 255, 1);
+				make_normals_node(p, v, geode_normal, parameters);
+				this->m_geode->addChild(geode_normal);
+			}
+		}
+	}
+}
+
+void LabelVisual::add_marked_points(std::map<std::string, point_shape> & marked_points_map)
+{
+	if (marked_points_map.empty()) return;
+
+	point_render_parameters parameters;
+	parameters.color = osg::Vec4(255, 255, 255, 1);
+
+	for (auto &ps : marked_points_map)
+	{
+		point_3d centroid_point;
+		cal_centroid_point(ps.second.points, centroid_point);
+
+		std::vector<int> random_color(3);
+		obtain_random(0, 255, random_color);
+		parameters.color = osg::Vec4(
+			random_color[0] / 255.0,
+			random_color[1] / 255.0,
+			random_color[2] / 255.0, 1.0);
+
+		// add normal
+		if (!ps.second.shape_property.empty())
+		{
+			Eigen::Vector3f v = ps.second.shape_property[0];
+			osg::ref_ptr<osg::Geode> geode_normal = new osg::Geode();
+			parameters.point_size = 3;
+			make_normals_node(centroid_point, v, geode_normal, parameters);
+			m_geode->addChild(geode_normal);
+		}
+
+		// add marked points
+		osg::ref_ptr<osg::Geode> geode_marked_points = new osg::Geode();
+		parameters.point_size = 8;
+		make_points_node(ps.second.points, geode_marked_points, parameters);
+		this->m_geode->addChild(geode_marked_points);
+
+		// add label-name
+		osg::ref_ptr<osg::Geode> geode_text = new osg::Geode();
+		make_text_node(centroid_point, geode_text, ps.first);
+		this->m_geode->addChild(geode_text);
+	}
+}
+
+void LabelVisual::add_measurement_points(std::map<std::string, std::vector<point_3d>> &measurement_points_map)
+{
+	add_points(measurement_points_map, true);
+
+	point_render_parameters parameters;
+	parameters.color = osg::Vec4(255, 255, 255, 1);
+
+	for (auto & item : measurement_points_map)
+	{
+		point_3d centroid_point;
+		cal_centroid_point(item.second, centroid_point);
+
+		osg::ref_ptr<osg::Geode> geode_text = new osg::Geode();
+		make_text_node(centroid_point, geode_text, item.first);
+		this->m_geode->addChild(geode_text);
+	}
+}
+
+void LabelVisual::initial(const std::string & file_1, const std::string & file_2, int flag)
+{
+	
+
+	std::map<std::string, std::vector<point_3d>> points_map;
+	
+	read_points(points_map, file_1);
+	
+	add_points(points_map, false);
 
 	// show marked points
 	if (flag == 0)
 	{
-		std::map<std::string, point_shape> marked_points_vec;
-
-		read_marked_points(marked_points_vec, file_2);
-
-		std::cout << "read " << marked_points_vec.size() << " marked point group" << std::endl;
-
-		for (auto &ps : marked_points_vec)
-		{
-			point_3d centroid_point;
-			cal_centroid_point(ps.second.points, centroid_point);
-
-			std::vector<int> random_color(3);
-			obtain_random(0, 255, random_color);
-			parameters.color = osg::Vec4(
-				random_color[0] / 255.0,
-				random_color[1] / 255.0,
-				random_color[2] / 255.0, 1.0);
-
-			if (!ps.second.shape_property.empty())
-			{
-				Eigen::Vector3f v = ps.second.shape_property[0];
-
-				// add normal
-				osg::ref_ptr<osg::Geode> geode_normal = new osg::Geode();
-				parameters.point_size = 3;
-				make_normals_node(centroid_point, v, geode_normal, parameters);
-				m_geode->addChild(geode_normal);
-			}
-
-			// add marked points
-			osg::ref_ptr<osg::Geode> geode_marked_points = new osg::Geode();
-			parameters.point_size = 8;
-			make_points_node(ps.second.points, geode_marked_points, parameters);
-			this->m_geode->addChild(geode_marked_points);
-
-			// add label-name
-			osg::ref_ptr<osg::Geode> geode_text = new osg::Geode();
-			make_text_node(centroid_point, geode_text, ps.first);
-			this->m_geode->addChild(geode_text);
-		}
+		std::map<std::string, point_shape> marked_points_map;
+		
+		read_marked_points(marked_points_map, file_2);
+		//std::cout << "read " << marked_points_vec.size() << " marked point group" << std::endl;
+		
+		add_marked_points(marked_points_map);
 	}
 
 	// show result points
 	else if (flag == 1)
 	{
-		//std::vector<point_3d> measurement_points_vec;
-		//read_measurement_points(file_2, measurement_points_vec);
+		std::map<std::string, std::vector<point_3d>> measurement_points_map;
+		
+		read_points(measurement_points_map, file_2);
+		
+		add_measurement_points(measurement_points_map);
 	}
 
 	return;
@@ -93,7 +150,7 @@ void LabelVisual::visual()
 	//dynamic_cast<Derived*>
 	window_initilization(viewer, m_root);
 
-	viewer->initial(step_points_vec);
+	//viewer->initial(step_points_vec);
 
 	viewer->realize();
 	
@@ -113,114 +170,112 @@ void LabelVisual::cal_centroid_point(std::vector<point_3d> & points, point_3d & 
 	centroid_point.y = t_y / points.size();
 	centroid_point.z = t_z / points.size();
 }
-
-void LabelVisual::read_labelfile(const std::string & filename,
-	std::vector<point_3d> & all_points, std::map<std::string, point_3d > & label_points,
-	std::vector<point_3d> & property_content, bool step_subpoints)
-{
-	std::ifstream ifile(filename);
-
-	if (!ifile.is_open())
-	{
-		std::cout << "Opening " + filename + " failed." << std::endl;
-		return;
-	}
-	std::string line;
-
-	point_3d centroid_point;
-	std::vector<point_3d> points;
-	point_3d normal;
-	bool has_pro = false;
-	//std::vector<std::vector<point_3d>> step_points_unorder;
-
-	bool flag_points = false, flag_property = false;
-
-	while (std::getline(ifile, line))
-	{
-		if (line.empty()) continue;
-
-		if (line.find(">points") != std::string::npos)
-		{
-			flag_points = true;
-			flag_property = false;
-			continue;
-		}
-		else if (line.find(">property") != std::string::npos)
-		{
-			flag_property = true;
-			flag_points = false;
-			continue;
-		}
-
-		else if (line[0] == '#' && line.size() > 2)
-		{
-			// get the centroid point among points
-			cal_centroid_point(points, centroid_point);
-
-			// get the label
-			std::string label = line.substr(1, line.size() - 1);
-
-			label_points.insert(std::pair<std::string, point_3d>(label, centroid_point));
-
-			all_points.insert(all_points.end(), points.begin(), points.end());
-
-			if (has_pro)
-			{
-				property_content.push_back(normal);
-				property_content.push_back(centroid_point);
-				has_pro = false;
-			}
-
-			if (step_subpoints)
-			{
-				//step_points_unorder.push_back(points);
-			}
-
-			points.clear();
-			continue;
-		}
-
-		std::stringstream s(line);
-
-		float value[3] = { 0,0,0 };
-
-		for (size_t i = 0; i < 3; i++) s >> value[i];
-
-		if (flag_points)
-			points.push_back(point_3d(value[0], value[1], value[2]));
-
-		if (flag_property)
-		{
-			has_pro = true;
-			normal.x = value[0];
-			normal.y = value[1];
-			normal.z = value[2];
-		}
-	}
-
-	//// do not forget the rest points that have no label
-	//if (!points.empty())
-	//{
-	//	std::string label = "unknown-points";
-
-	//	cal_centroid_point(points, centroid_point);
-	//	label_points.insert(std::pair<std::string, point_3d>(label, centroid_point));
-
-	//	all_points.insert(all_points.end(), points.begin(), points.end());
-
-	//	if (step_subpoints)
-	//	{
-	//		//step_points_unorder.push_back(points);
-	//	}
-
-	//	points.clear();
-	//}
-
-	ifile.close();
-	//make_order(step_points_unorder);
-}
-
-
+//
+//void LabelVisual::read_labelfile(const std::string & filename,
+//	std::vector<point_3d> & all_points, std::map<std::string, point_3d > & label_points,
+//	std::vector<point_3d> & property_content, bool step_subpoints)
+//{
+//	std::ifstream ifile(filename);
+//
+//	if (!ifile.is_open())
+//	{
+//		std::cout << "Opening " + filename + " failed." << std::endl;
+//		return;
+//	}
+//	std::string line;
+//
+//	point_3d centroid_point;
+//	std::vector<point_3d> points;
+//	point_3d normal;
+//	bool has_pro = false;
+//	//std::vector<std::vector<point_3d>> step_points_unorder;
+//
+//	bool flag_points = false, flag_property = false;
+//
+//	while (std::getline(ifile, line))
+//	{
+//		if (line.empty()) continue;
+//
+//		if (line.find(">points") != std::string::npos)
+//		{
+//			flag_points = true;
+//			flag_property = false;
+//			continue;
+//		}
+//		else if (line.find(">property") != std::string::npos)
+//		{
+//			flag_property = true;
+//			flag_points = false;
+//			continue;
+//		}
+//
+//		else if (line[0] == '#' && line.size() > 2)
+//		{
+//			// get the centroid point among points
+//			cal_centroid_point(points, centroid_point);
+//
+//			// get the label
+//			std::string label = line.substr(1, line.size() - 1);
+//
+//			label_points.insert(std::pair<std::string, point_3d>(label, centroid_point));
+//
+//			all_points.insert(all_points.end(), points.begin(), points.end());
+//
+//			if (has_pro)
+//			{
+//				property_content.push_back(normal);
+//				property_content.push_back(centroid_point);
+//				has_pro = false;
+//			}
+//
+//			if (step_subpoints)
+//			{
+//				//step_points_unorder.push_back(points);
+//			}
+//
+//			points.clear();
+//			continue;
+//		}
+//
+//		std::stringstream s(line);
+//
+//		float value[3] = { 0,0,0 };
+//
+//		for (size_t i = 0; i < 3; i++) s >> value[i];
+//
+//		if (flag_points)
+//			points.push_back(point_3d(value[0], value[1], value[2]));
+//
+//		if (flag_property)
+//		{
+//			has_pro = true;
+//			normal.x = value[0];
+//			normal.y = value[1];
+//			normal.z = value[2];
+//		}
+//	}
+//
+//	//// do not forget the rest points that have no label
+//	//if (!points.empty())
+//	//{
+//	//	std::string label = "unknown-points";
+//
+//	//	cal_centroid_point(points, centroid_point);
+//	//	label_points.insert(std::pair<std::string, point_3d>(label, centroid_point));
+//
+//	//	all_points.insert(all_points.end(), points.begin(), points.end());
+//
+//	//	if (step_subpoints)
+//	//	{
+//	//		//step_points_unorder.push_back(points);
+//	//	}
+//
+//	//	points.clear();
+//	//}
+//
+//	ifile.close();
+//	//make_order(step_points_unorder);
+//}
 
 void LabelVisual::window_initilization(osg::ref_ptr<timeViewer> & viewer, osg::ref_ptr<osg::Group> & root)
 {
@@ -252,7 +307,6 @@ void LabelVisual::window_initilization(osg::ref_ptr<timeViewer> & viewer, osg::r
 	optimizer.optimize(root.get());
 	viewer->setSceneData(root.get());
 }
-
 
 void LabelVisual::make_points_node(std::vector<point_3d> & points, osg::ref_ptr<osg::Geode> & geode, point_render_parameters & parameters)
 {
@@ -298,6 +352,14 @@ void LabelVisual::make_normals_node(point_3d & point, Eigen::Vector3f &v, osg::r
 	geode->addChild(add_arrow(normals, parameters.color[0], parameters.color[1], parameters.color[2]));
 }
 
+void LabelVisual::clear()
+{
+	m_root = new osg::Group;
+
+	m_geode = new osg::Geode;
+}
+
+
 void LabelVisual::make_text_node(point_3d & position, osg::ref_ptr<osg::Geode> geode_label_points, const std::string & text)
 {
 	osg::ref_ptr<osgText::Text> text_osg(new osgText::Text);
@@ -334,149 +396,149 @@ void LabelVisual::text_createContent(osgText::Text& textObject, const std::strin
 	textObject.setText(text);
 }
 
-rgb LabelVisual::rgbstr2rgb(std::string rgbstr)
-{
-	std::stringstream stream(rgbstr);
+//rgb LabelVisual::rgbstr2rgb(std::string rgbstr)
+//{
+//	std::stringstream stream(rgbstr);
+//
+//	float rgb_[3] = { 0,0,0 };
+//	for (size_t i = 0; i < 3; i++)
+//		stream >> rgb_[i];
+//
+//	return rgb(rgb_[0], rgb_[1], rgb_[2]);
+//}
 
-	float rgb_[3] = { 0,0,0 };
-	for (size_t i = 0; i < 3; i++)
-		stream >> rgb_[i];
+//float LabelVisual::str2float(std::string num)
+//{
+//	float res;
+//	std::stringstream stream(num);
+//	stream >> res;
+//	return res;
+//}
+//
+//float LabelVisual::str2int(std::string num)
+//{
+//	int res;
+//	std::stringstream stream(num);
+//	stream >> res;
+//	return res;
+//}
 
-	return rgb(rgb_[0], rgb_[1], rgb_[2]);
-}
-
-float LabelVisual::str2float(std::string num)
-{
-	float res;
-	std::stringstream stream(num);
-	stream >> res;
-	return res;
-}
-
-float LabelVisual::str2int(std::string num)
-{
-	int res;
-	std::stringstream stream(num);
-	stream >> res;
-	return res;
-}
-
-void LabelVisual::read_config(const std::string config_filename)
-{
+//void LabelVisual::read_config(const std::string config_filename)
+//{
 	// filename r g b point_size step?
-	std::ifstream ifile(config_filename);
+	//std::ifstream ifile(config_filename);
 
-	if (!ifile.is_open())
-	{
-		std::cout << "Opening " + config_filename + " failed." << std::endl;
-		return;
-	}
+	//if (!ifile.is_open())
+	//{
+	//	std::cout << "Opening " + config_filename + " failed." << std::endl;
+	//	return;
+	//}
 
-	std::string line;
+	//std::string line;
 
-	while (std::getline(ifile, line))
-	{
-		if (line.front() == '#') 
-			continue;
-		else if (line.empty()) 
-			continue;
+	//while (std::getline(ifile, line))
+	//{
+	//	if (line.front() == '#') 
+	//		continue;
+	//	else if (line.empty()) 
+	//		continue;
 
-		std::vector<size_t> blank_index;
-		for (size_t i = 0; i < line.size(); i++)
-		{
-			if (line[i] == ' ')
-				blank_index.push_back(i);
-		}
+	//	std::vector<size_t> blank_index;
+	//	for (size_t i = 0; i < line.size(); i++)
+	//	{
+	//		if (line[i] == ' ')
+	//			blank_index.push_back(i);
+	//	}
 
-		//std::cout << line << std::endl;
-		if (blank_index.size() == 5)
-		{
-			filename_vec.push_back(line.substr(0, blank_index[0]));
-			cloud_color_vec.push_back(rgbstr2rgb(line.substr(blank_index[0] + 1, blank_index[3] - blank_index[0])));
-			cloud_size_vec.push_back(str2float(line.substr(blank_index[3] + 1, blank_index[4] - blank_index[3])));
-			display_step_vec.push_back(str2int(line.substr(blank_index[4] + 1, line.size() - blank_index[4])));
-		}
-	}
-	ifile.close();
-}
+	//	//std::cout << line << std::endl;
+	//	if (blank_index.size() == 5)
+	//	{
+	//		filename_vec.push_back(line.substr(0, blank_index[0]));
+	//		cloud_color_vec.push_back(rgbstr2rgb(line.substr(blank_index[0] + 1, blank_index[3] - blank_index[0])));
+	//		cloud_size_vec.push_back(str2float(line.substr(blank_index[3] + 1, blank_index[4] - blank_index[3])));
+	//		display_step_vec.push_back(str2int(line.substr(blank_index[4] + 1, line.size() - blank_index[4])));
+	//	}
+	//}
+	//ifile.close();
+//}
 
-float LabelVisual::distance(point_3d & p1, point_3d & p2)
-{
-	return sqrtf(
-		(p1.x - p2.x) * (p1.x - p2.x) +
-		(p1.y - p2.y) * (p1.y - p2.y) +
-		(p1.z - p2.z) * (p1.z - p2.z));
-}
+//float LabelVisual::distance(point_3d & p1, point_3d & p2)
+//{
+//	return sqrtf(
+//		(p1.x - p2.x) * (p1.x - p2.x) +
+//		(p1.y - p2.y) * (p1.y - p2.y) +
+//		(p1.z - p2.z) * (p1.z - p2.z));
+//}
 
-void LabelVisual::make_order(std::vector<std::vector<point_3d>>& step_points_unorder)
-{
-	if (step_points_unorder.empty()) return;
-
-	std::vector<point_3d> beg_end_vec;
-	for (auto & v : step_points_unorder)
-	{
-		beg_end_vec.push_back(v.front());
-		beg_end_vec.push_back(v.back());
-	}
-
-	// add the first one
-	step_points_vec.push_back(step_points_unorder.front());
-
-	std::vector<bool> step_used_vec(step_points_unorder.size(), 0);
-	step_used_vec[0] = 1;
-
-	for (size_t k = 0; k < step_points_vec.size(); k++)
-	{
-		point_3d fix_p;
-		fix_p = step_points_vec[k].back();
-
-		float d_1 = 0, d_2 = 0, min_distance = FLT_MAX;
-		point_3d s_beg_p, s_end_p;
-		size_t min_index = 0;
-
-		// find the min distance one
-		for (size_t i = 0; i < beg_end_vec.size(); i += 2)
-		{
-			if (step_used_vec[i / 2] == 0)
-			{
-				s_beg_p = beg_end_vec[i]; s_end_p = beg_end_vec[i + 1];
-
-				d_1 = distance(fix_p, s_beg_p); d_2 = distance(fix_p, s_end_p);
-
-				if (d_1 < min_distance)
-				{
-					min_distance = d_1;
-					min_index = i;
-				}
-				else if (d_2 < min_distance)
-				{
-					min_distance = d_2;
-					min_index = i + 1;
-				}
-			}
-		}// end for find
-
-		size_t main_i = min_index / 2;
-		if (step_used_vec[main_i] == 0)
-		{
-			if (min_index % 2 == 1)
-			{
-				std::vector<point_3d> tmp(step_points_unorder[main_i].rbegin(), step_points_unorder[main_i].rend());
-				step_points_vec.push_back(tmp);
-			}
-			else
-			{
-				step_points_vec.push_back(step_points_unorder[main_i]);
-			}
-
-			step_used_vec[main_i] = 1;
-		}// end if
-	}// end for
-
-	std::vector<point_3d> step_vec;
-	for (auto &v : step_points_vec)
-		for (auto &p : v)
-			step_vec.push_back(p);
-	step_points_vec.clear();
-	step_points_vec.push_back(step_vec);
-}
+//void LabelVisual::make_order(std::vector<std::vector<point_3d>>& step_points_unorder)
+//{
+//	if (step_points_unorder.empty()) return;
+//
+//	std::vector<point_3d> beg_end_vec;
+//	for (auto & v : step_points_unorder)
+//	{
+//		beg_end_vec.push_back(v.front());
+//		beg_end_vec.push_back(v.back());
+//	}
+//
+//	// add the first one
+//	step_points_vec.push_back(step_points_unorder.front());
+//
+//	std::vector<bool> step_used_vec(step_points_unorder.size(), 0);
+//	step_used_vec[0] = 1;
+//
+//	for (size_t k = 0; k < step_points_vec.size(); k++)
+//	{
+//		point_3d fix_p;
+//		fix_p = step_points_vec[k].back();
+//
+//		float d_1 = 0, d_2 = 0, min_distance = FLT_MAX;
+//		point_3d s_beg_p, s_end_p;
+//		size_t min_index = 0;
+//
+//		// find the min distance one
+//		for (size_t i = 0; i < beg_end_vec.size(); i += 2)
+//		{
+//			if (step_used_vec[i / 2] == 0)
+//			{
+//				s_beg_p = beg_end_vec[i]; s_end_p = beg_end_vec[i + 1];
+//
+//				d_1 = distance(fix_p, s_beg_p); d_2 = distance(fix_p, s_end_p);
+//
+//				if (d_1 < min_distance)
+//				{
+//					min_distance = d_1;
+//					min_index = i;
+//				}
+//				else if (d_2 < min_distance)
+//				{
+//					min_distance = d_2;
+//					min_index = i + 1;
+//				}
+//			}
+//		}// end for find
+//
+//		size_t main_i = min_index / 2;
+//		if (step_used_vec[main_i] == 0)
+//		{
+//			if (min_index % 2 == 1)
+//			{
+//				std::vector<point_3d> tmp(step_points_unorder[main_i].rbegin(), step_points_unorder[main_i].rend());
+//				step_points_vec.push_back(tmp);
+//			}
+//			else
+//			{
+//				step_points_vec.push_back(step_points_unorder[main_i]);
+//			}
+//
+//			step_used_vec[main_i] = 1;
+//		}// end if
+//	}// end for
+//
+//	std::vector<point_3d> step_vec;
+//	for (auto &v : step_points_vec)
+//		for (auto &p : v)
+//			step_vec.push_back(p);
+//	step_points_vec.clear();
+//	step_points_vec.push_back(step_vec);
+//}

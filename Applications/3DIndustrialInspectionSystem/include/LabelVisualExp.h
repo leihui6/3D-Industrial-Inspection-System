@@ -31,4 +31,4 @@ extern "C" LABELVISUALCOM_EXPORT LabelVisualCom *getLabelVisualCom();
 // 导出方法
 extern "C" LABELVISUALCOM_EXPORT const char *getVersion();
 
-#endif // VIMSPIECE_EXPORT_H
+#endif //LABELVISUAL_EXPORT_H

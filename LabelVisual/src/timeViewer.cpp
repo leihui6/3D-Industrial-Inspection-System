@@ -11,19 +11,19 @@ timeViewer::~timeViewer()
 {
 }
 
-void timeViewer::advance(double simulationTime)
-{
-	Viewer::advance();
-	m_tend = clock();
-	if (m_tend - m_tstart < m_trigger_interval) return;
-
-	for (auto &node : m_point_cloud_vec)
-		m_root->removeChild(node);
-
-	update_node();
-
-	m_tstart = clock();
-}
+//void timeViewer::advance(double simulationTime)
+//{
+//	Viewer::advance();
+//	m_tend = clock();
+//	if (m_tend - m_tstart < m_trigger_interval) return;
+//
+//	for (auto &node : m_point_cloud_vec)
+//		m_root->removeChild(node);
+//
+//	update_node();
+//
+//	m_tstart = clock();
+//}
 
 void timeViewer::initial(std::vector<std::vector<point_3d>> & points_vec)
 {

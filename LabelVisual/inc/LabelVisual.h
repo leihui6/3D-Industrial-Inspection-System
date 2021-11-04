@@ -28,13 +28,19 @@ public:
 	virtual void visual();
 
 private:
-	std::vector<std::vector<point_3d>> step_points_vec;
+	//std::vector<std::vector<point_3d>> step_points_vec;
 
 	void cal_centroid_point(std::vector<point_3d> & points, point_3d & centroid_point);
 
-	void read_labelfile(const std::string & filename,
-		std::vector<point_3d> & all_points, std::map<std::string, point_3d > & label_points,
-		std::vector<point_3d> & property_content, bool step_subpoints);
+	//void read_labelfile(const std::string & filename,
+	//	std::vector<point_3d> & all_points, std::map<std::string, point_3d > & label_points,
+	//	std::vector<point_3d> & property_content, bool step_subpoints);
+
+	void add_points(std::map<std::string, std::vector<point_3d>> &points_map, bool show_normals = false);
+
+	void add_marked_points(std::map<std::string, point_shape> & point_shape_map);
+
+	void add_measurement_points(std::map<std::string, std::vector<point_3d>> &measurement_points_map);
 
 	void window_initilization(osg::ref_ptr<timeViewer> & viewer, osg::ref_ptr<osg::Group> & root);
 
@@ -42,17 +48,17 @@ private:
 
 	void text_createContent(osgText::Text& textObject, const std::string & text/*char* string*/);
 
-	rgb rgbstr2rgb(std::string rgbstr);
+	//rgb rgbstr2rgb(std::string rgbstr);
 
-	float str2float(std::string num);
+	//float str2float(std::string num);
 
-	float str2int(std::string num);
+	//float str2int(std::string num);
 
-	void read_config(const std::string config_filename);
+	//void read_config(const std::string config_filename);
 
-	float distance(point_3d & p1, point_3d & p2);
+	//float distance(point_3d & p1, point_3d & p2);
 
-	void make_order(std::vector<std::vector<point_3d>> & step_points_vec);
+	//void make_order(std::vector<std::vector<point_3d>> & step_points_vec);
 
 	void make_text_node(point_3d & position, osg::ref_ptr<osg::Geode> geode_label_points, const std::string & text);
 
@@ -60,17 +66,19 @@ private:
 
 	void make_normals_node(point_3d & point, Eigen::Vector3f &v, osg::ref_ptr<osg::Geode> &geode, point_render_parameters & parameters);
 
+	void clear();
+
 private:
 	osg::ref_ptr<osg::Group> m_root;
 	// all points are added on this node
 	osg::ref_ptr<osg::Geode> m_geode;
 
-	osg::ref_ptr < osgText::Font> m_fontKai;
+	osg::ref_ptr <osgText::Font> m_fontKai;
 
-	std::vector<std::string> filename_vec;
-	std::vector <rgb> cloud_color_vec;
-	std::vector<float> cloud_size_vec;
-	std::vector<int> display_step_vec;
+	//std::vector<std::string> filename_vec;
+	//std::vector<rgb> cloud_color_vec;
+	//std::vector<float> cloud_size_vec;
+	//std::vector<int> display_step_vec;
 };
 
 #endif // !LABELVISUAL_H

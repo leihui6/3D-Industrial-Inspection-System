@@ -9,7 +9,7 @@ public:
 	~timeViewer();
 
 	// will be called every frame
-	virtual void advance(double simulationTime = USE_REFERENCE_TIME);
+	//virtual void advance(double simulationTime = USE_REFERENCE_TIME);
 
 public:
 	void initial(std::vector<std::vector<point_3d>> & gnode_vec);

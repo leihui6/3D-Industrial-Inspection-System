@@ -26,7 +26,7 @@ osg::ref_ptr<osg::Geode> add_arrow(std::vector<point_3d> & arrow_points, float r
 
 	//cone 
 	osg::ref_ptr<osg::ShapeDrawable> sc = new osg::ShapeDrawable;
-	sc->setShape(new osg::Cone(osg::Vec3(0.0f, 0.0f, 0.0), 0.8, 2));
+	sc->setShape(new osg::Cone(osg::Vec3(0.0f, 0.0f, 0.0), 0.5, 1));
 	sc->setColor(osg::Vec4(r, g, b, 1.0f));
 
 	osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform(osg::Matrix::identity());

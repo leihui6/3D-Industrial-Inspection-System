@@ -59,7 +59,7 @@ private:
 
     void initialize_dll();
 
-    void visual_thread(const std::string & filename);
+    void visual_thread(const std::string & file1, const std::string & file2, int flag);
 
     int all_process_thread();
 

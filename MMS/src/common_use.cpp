@@ -246,13 +246,20 @@ void read_points(std::map<std::string, std::vector<point_3d>> & points_map, cons
 
 	points_map.clear();
 
+	float value[6] = { 0,0,0,0,0,0 };
+	point_3d current_p;
+
 	while (std::getline(ifile, line))
 	{
 		if (line.empty()) continue;
 
+		if (line[0] == '>') continue;
+
 		if (line[0] == '#' && line.size() > 2)
 		{
-			points_map[line.substr(1, line.size() - 1)] = points;
+			std::string label_name = line.substr(1, line.size() - 1);
+			//std::cout << label_name << std::endl;
+			points_map[label_name] = points;
 
 			points.clear();
 
@@ -261,17 +268,19 @@ void read_points(std::map<std::string, std::vector<point_3d>> & points_map, cons
 
 		std::stringstream s(line);
 
-		float value[3] = { 0,0,0 };
+		for (size_t i = 0; i < 6; i++)	s >> value[i];
 
-		for (size_t i = 0; i < 3; i++)
-			s >> value[i];
-
-		points.push_back(point_3d(value[0], value[1], value[2]));
+		current_p.set_xyz(value[0], value[1], value[2]);
+		current_p.set_nxyz(value[3], value[4], value[5]);
+		
+		points.push_back(current_p);
 	}
 
 	if (!points.empty())
+	{
 		points_map["unknown-points"] = points;
-	
+	}
+
 	ifile.close();
 }
 
