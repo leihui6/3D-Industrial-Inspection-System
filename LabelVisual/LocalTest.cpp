@@ -1,4 +1,4 @@
-//#define LOCALTEST
+#define LOCALTEST
 #ifdef LOCALTEST
 
 #include "inc/LabelVisual.h"

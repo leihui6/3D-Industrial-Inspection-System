@@ -63,6 +63,9 @@
     <ClInclude Include="include\process_report.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\app_welding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\cloud_fitting.cpp">
@@ -126,6 +129,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\process_report.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\app_welding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

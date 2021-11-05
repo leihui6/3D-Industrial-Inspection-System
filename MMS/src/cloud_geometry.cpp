@@ -795,14 +795,16 @@ void produce_line_points(line_func_3d & line_func, point_3d & endpoint_a, point_
 	float min_t = t_vec.front(), max_t = t_vec.back(), inc_t = 0.0;
 	inc_t = (max_t - min_t) / point_number;
 
-	for (float t = min_t; t < max_t; t += inc_t)
+
+	float t = min_t;
+	for (size_t i = 0; i < point_number; i++)
 	{
 		line_points.push_back(point_3d(
 			x0 + n * t,
 			y0 + m * t,
 			z0 + l * t));
+		t += inc_t;
 	}
-	
 }
 
 void segment_point_from_points(point_3d & p_A, point_3d & p_B, std::vector<point_3d>& points, line_func_3d & line_func)

@@ -63,6 +63,8 @@ struct line_func_3d : public basic_shape
 {
 	line_func_3d();
 
+	line_func_3d(const line_func_3d & lf);
+
 	void set_xyz(float x, float y, float z);
 
 	void set_nml(float n, float m, float l);
@@ -70,6 +72,8 @@ struct line_func_3d : public basic_shape
 	point_3d get_origin_point_3d();
 
 	point_3d get_direction_point_3d();
+
+	line_func_3d & operator = (const line_func_3d & p);
 
 	//float x, y, z;
 	Eigen::Vector3f origin;
@@ -178,7 +182,38 @@ struct LocalFile
 	std::string m_filename;
 };
 
-class cloud_viewer;
+//class cloud_viewer;
+
+#define INVALIDVALUE -1.0f
+
+enum measurement_methods
+{
+	// calculate distance and angle
+	MM_VALUES,
+	// create points
+	MM_POINTS
+};
+
+struct measurement_content
+{
+	// INVALIDVALUE -> -1
+	measurement_content() : distance_geometrical(INVALIDVALUE), distance_scattered(INVALIDVALUE), angle(INVALIDVALUE) {}
+
+	// 1. values
+	// distance based on geometry(function)
+	float distance_geometrical;
+	// distance based on scattered points
+	float distance_scattered;
+	// angle in degree 
+	float angle;
+
+	// 2. points representing the relationship
+	std::vector<point_3d> drawable_points;
+
+	// 3. measurement method
+	measurement_methods m_method;
+
+};
 
 /*
 LocalFile local_file;

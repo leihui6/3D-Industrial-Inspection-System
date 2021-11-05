@@ -5,36 +5,8 @@
 #include "cloud_fitting.h"
 #include "cloud_search.h"
 
-#define INVALIDVALUE -1.0f
-
-enum measurement_methods
-{
-	// calculate distance and angle
-	MM_VALUES, 
-	// create points
-	MM_POINTS
-};
-
-struct measurement_content
-{
-	// INVALIDVALUE -> -1
-	measurement_content() : distance_geometrical(INVALIDVALUE), distance_scattered(INVALIDVALUE), angle(INVALIDVALUE) {}
-
-	// 1. values
-	// distance based on geometry(function)
-	float distance_geometrical;
-	// distance based on scattered points
-	float distance_scattered;
-	// angle in degree 
-	float angle;
-
-	// 2. points representing the relationship
-	std::vector<point_3d> drawable_points;
-
-	// 3. measurement method
-	measurement_methods m_method;
-
-};
+// welding application
+#include "app_welding.h"
 
 struct pair_content
 {
@@ -81,6 +53,9 @@ private:
 	void correct_normals(std::vector<point_3d> & points, const Eigen::Vector3f * v1 = nullptr, const Eigen::Vector3f * v2 = nullptr);
 
 	cloud_fitting cf;
+
+	size_t m_measured_point_number;
+	float m_deviation_length;
 
 private:
 	// the first points belongs to the type of point

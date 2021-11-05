@@ -136,6 +136,12 @@ line_func_3d::line_func_3d()
 
 }
 
+line_func_3d::line_func_3d(const line_func_3d & lf)
+{
+	this->origin = lf.origin;
+	this->direction = lf.direction;
+}
+
 void line_func_3d::set_xyz(float x, float y, float z)
 {
 	this->origin[0] = x;
@@ -158,6 +164,16 @@ point_3d line_func_3d::get_origin_point_3d()
 point_3d line_func_3d::get_direction_point_3d()
 {
 	return point_3d(direction[0], direction[1], direction[2]);
+}
+
+line_func_3d & line_func_3d::operator=(const line_func_3d & lf)
+{
+	if (this != &lf)
+	{
+		this->origin = lf.origin;
+		this->direction = lf.direction;
+	}
+	return *this;
 }
 
 

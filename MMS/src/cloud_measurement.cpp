@@ -1,14 +1,13 @@
 #include "cloud_measurement.h"
 
-cloud_measurement::cloud_measurement(
-	std::vector<point_3d> & point_cloud,
-	std::map<std::string, point_shape> & searched_mark_points_map)
-	:
-	m_point_cloud_tree(point_cloud),
+cloud_measurement::cloud_measurement(std::vector<point_3d> & point_cloud, std::map<std::string, point_shape> & searched_mark_points_map)
+	: m_point_cloud_tree(point_cloud),
 	m_point_cloud(point_cloud),
 	m_searched_mark_points_map(searched_mark_points_map)
 {
-
+	m_measured_point_number = 100;
+	// every measurement result will be amplified to this value
+	m_deviation_length = 5;
 }
 
 cloud_measurement::~cloud_measurement()
@@ -70,6 +69,9 @@ int cloud_measurement::post_process(Eigen::Matrix4f & matrix)
 	for (auto & pv : m_mc_vec)
 		for (auto &p : pv.drawable_points)
 			p.do_transform(matrix.inverse());
+
+	app_welding welding;
+	welding.process(m_mc_vec);
 
 	return 0;
 }
@@ -484,7 +486,13 @@ void cloud_measurement::plane_to_plane_points(plane_func_3d & plane_func_1, plan
 	endpoints_line(points_on_intersection_line, endpoint_a, endpoint_b);
 
 	// 3. create a line using begin and end point
-	produce_line_points(intersection_lf, endpoint_a, endpoint_b, mc.drawable_points, 100);
+	// C<----A---------------B--->D
+	// |-----|---------------|----|
+	point_3d endpoint_c,endpoint_d;
+	point_along_with_vector_within_dis(endpoint_a, intersection_lf.direction*-1, endpoint_c, m_deviation_length);
+	point_along_with_vector_within_dis(endpoint_b, intersection_lf.direction, endpoint_d, m_deviation_length);
+
+	produce_line_points(intersection_lf, endpoint_c, endpoint_d, mc.drawable_points, m_measured_point_number);
 
 	// 4. add normals
 	correct_normals(mc.drawable_points, &plane_func_1.direction(), &plane_func_2.direction());

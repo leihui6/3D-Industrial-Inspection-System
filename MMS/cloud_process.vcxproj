@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\app_welding.h" />
     <ClInclude Include="include\BackProcess.h" />
     <ClInclude Include="include\BackProcessCom.h" />
     <ClInclude Include="include\BackProcessExp.h" />
@@ -37,6 +38,7 @@
     <ClInclude Include="include\process_report.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\app_welding.cpp" />
     <ClCompile Include="src\BackProcess.cpp" />
     <ClCompile Include="src\BackProcessExp.cpp" />
     <ClCompile Include="src\cloud_evaluation.cpp" />
