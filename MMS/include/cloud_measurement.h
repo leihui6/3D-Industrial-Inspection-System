@@ -53,6 +53,7 @@ private:
 	void correct_normals(std::vector<point_3d> & points, const Eigen::Vector3f * v1 = nullptr, const Eigen::Vector3f * v2 = nullptr);
 
 	cloud_fitting cf;
+	app_welding m_welding;
 
 	size_t m_measured_point_number;
 	float m_deviation_length;

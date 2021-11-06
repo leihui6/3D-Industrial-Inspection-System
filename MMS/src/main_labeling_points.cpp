@@ -1,12 +1,4 @@
-/*
-*	The purpose of this program is to load a standard 
-*	and label the points representing the shapes to be deteced.
-*
-*	Author: leihui.li#outlook.com
-*	Date: 06/06/2020
-*/
-
-#define LABELING_POINTS
+//#define LABELING_POINTS
 #ifdef LABELING_POINTS
 
 #include "cloud_io.h"

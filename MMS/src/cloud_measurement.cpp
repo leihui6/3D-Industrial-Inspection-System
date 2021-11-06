@@ -6,8 +6,9 @@ cloud_measurement::cloud_measurement(std::vector<point_3d> & point_cloud, std::m
 	m_searched_mark_points_map(searched_mark_points_map)
 {
 	m_measured_point_number = 100;
-	// every measurement result will be amplified to this value
-	m_deviation_length = 5;
+
+	// every measurement result will be amplified by this value
+	m_deviation_length = 10;
 }
 
 cloud_measurement::~cloud_measurement()
@@ -30,7 +31,7 @@ size_t cloud_measurement::read_pair_file(const std::string & filename)
 	size_t line_index = 0;
 	while (std::getline(ifile, line))
 	{
-		if (line.empty()) break;
+		if (line.empty()) continue;
 
 		if (line[0] == '#') continue;
 
@@ -70,8 +71,7 @@ int cloud_measurement::post_process(Eigen::Matrix4f & matrix)
 		for (auto &p : pv.drawable_points)
 			p.do_transform(matrix.inverse());
 
-	app_welding welding;
-	welding.process(m_mc_vec);
+	m_welding.process(m_mc_vec);
 
 	return 0;
 }
@@ -488,11 +488,16 @@ void cloud_measurement::plane_to_plane_points(plane_func_3d & plane_func_1, plan
 	// 3. create a line using begin and end point
 	// C<----A---------------B--->D
 	// |-----|---------------|----|
-	point_3d endpoint_c,endpoint_d;
-	point_along_with_vector_within_dis(endpoint_a, intersection_lf.direction*-1, endpoint_c, m_deviation_length);
-	point_along_with_vector_within_dis(endpoint_b, intersection_lf.direction, endpoint_d, m_deviation_length);
 
-	produce_line_points(intersection_lf, endpoint_c, endpoint_d, mc.drawable_points, m_measured_point_number);
+	// v = a->b
+	Eigen::Vector3f
+		v(endpoint_b.x - endpoint_a.x, endpoint_b.y - endpoint_a.y, endpoint_b.z - endpoint_a.z);
+
+	point_3d endpoint_c, endpoint_d;
+	point_along_with_vector_within_dis(endpoint_a, v*-1, endpoint_c, m_deviation_length);
+	point_along_with_vector_within_dis(endpoint_b, v, endpoint_d, m_deviation_length);
+	
+	produce_line_points(v, endpoint_c, endpoint_d, mc.drawable_points, m_measured_point_number);
 
 	// 4. add normals
 	correct_normals(mc.drawable_points, &plane_func_1.direction(), &plane_func_2.direction());
@@ -591,8 +596,17 @@ void cloud_measurement::plane_to_cylinder_points(plane_func_3d & plane_func, cyl
 	t_translate(2, 3) = -inter_line_plane_point.z;
 
 	Eigen::Matrix4f t_whole_point_cloud = t_rotate_ * t_translate;
-	std::vector<point_3d> ref_pts_normalized;
+	std::vector<point_3d> ref_pts_normalized, ref_pts_projected;
 	transform_points(reference_points, t_whole_point_cloud, ref_pts_normalized);
+
+	// make these ranging points more reasonable
+	for (auto &p : ref_pts_normalized)
+	{
+		point_3d projected_p;
+		pedalpoint_point_to_plane(p, new_plane_func, projected_p);
+		ref_pts_projected.push_back(projected_p);
+	}
+	ref_pts_normalized = ref_pts_projected;
 
 #ifdef TEST_MEASUREMENT
 	std::cout << t_whole_point_cloud << std::endl;
@@ -613,16 +627,18 @@ void cloud_measurement::plane_to_cylinder_points(plane_func_3d & plane_func, cyl
 #endif
 	}
 	std::sort(rad_vec.begin(), rad_vec.end());
-	float min_rad = rad_vec.front(), max_rad = rad_vec.back();
-
+	float
+		min_rad = rad_vec.front(), max_rad = rad_vec.back(),
+		deviation_radian = (m_deviation_length / (2 * M_PI*_cylinder_func.radius)) * 2 * M_PI;
+	min_rad -= deviation_radian; max_rad += deviation_radian;
 
 	// 3. create the intersection points
 	// 3.1 set up the parameters 
-	float number_points = 100; // number of generated points
+	//float number_points = 100; // number of generated points
 	float
 		R = _cylinder_func.radius + 1,
 		A = new_plane_func.a, B = new_plane_func.b, C = new_plane_func.c, D = new_plane_func.d,
-		inc_radian = (max_rad - min_rad) / number_points;
+		inc_radian = (max_rad - min_rad) / m_measured_point_number;
 
 	// 3.2 create virtual points near the origin
 	std::vector<point_3d> ineter_points, ineter_points_;

@@ -115,7 +115,9 @@ void points_plane(plane_func_3d & plane_func, std::vector<point_3d>& points, std
 void endpoints_line(std::vector<point_3d>& points, point_3d & point_a, point_3d & point_b);
 
 // produce points based on line function, and you can set the number of points
-void produce_line_points(line_func_3d & line_func, point_3d & endpoint_a, point_3d & endpoint_b, std::vector<point_3d>& line_points, size_t point_number);
+// v = endpoint_b - endpoint_a;
+// the generated line is from endpoint_a to endpoint_b
+void produce_line_points(Eigen::Vector3f &v, point_3d & beg_p, point_3d & end_p, std::vector<point_3d>& line_points, size_t point_number);
 
 // get two points (A and B), which is the begin and end point of line respectively.
 void segment_point_from_points(point_3d& p_A, point_3d & p_B, std::vector<point_3d>& points, line_func_3d & line_func);

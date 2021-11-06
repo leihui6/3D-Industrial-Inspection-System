@@ -152,7 +152,8 @@ int BackProcess::measurement()
 
 	cloud_measurement cm(m_transformed_point_cloud, m_searched_mark_points_map);
 	
-	cm.read_pair_file(m_measurement_pairs_filename);
+	size_t pair_num = cm.read_pair_file(m_measurement_pairs_filename);
+	std::cout << "read" << pair_num << " measurement pairs" << std::endl;
 
 	cm.measure();
 

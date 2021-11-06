@@ -777,9 +777,22 @@ void endpoints_line(std::vector<point_3d>& points, point_3d & point_a, point_3d 
 	}
 }
 
-void produce_line_points(line_func_3d & line_func, point_3d & endpoint_a, point_3d & endpoint_b, std::vector<point_3d>& line_points, size_t point_number)
+void produce_line_points(Eigen::Vector3f &v, point_3d & beg_p, point_3d & end_p, std::vector<point_3d>& line_points, size_t point_number)
 {
-	float
+	line_points.clear();
+
+	float dis = 0.0, unit_dis = 0.0;
+	distance_point_to_point(beg_p, end_p, dis);
+	unit_dis = dis / point_number;
+
+	for (size_t i = 0; i < point_number; i++)
+	{
+		point_3d tmp_p;
+		point_along_with_vector_within_dis(beg_p, v, tmp_p, unit_dis * (i + 1));
+		line_points.push_back(tmp_p);
+	}
+
+	/*float
 		x0 = line_func.origin[0], y0 = line_func.origin[1], z0 = line_func.origin[2],
 		n = line_func.direction[0], m = line_func.direction[1], l = line_func.direction[2];
 
@@ -804,7 +817,7 @@ void produce_line_points(line_func_3d & line_func, point_3d & endpoint_a, point_
 			y0 + m * t,
 			z0 + l * t));
 		t += inc_t;
-	}
+	}*/
 }
 
 void segment_point_from_points(point_3d & p_A, point_3d & p_B, std::vector<point_3d>& points, line_func_3d & line_func)
