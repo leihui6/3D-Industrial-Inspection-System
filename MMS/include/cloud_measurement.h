@@ -22,41 +22,44 @@ public:
 
 	~cloud_measurement();
 
-	void measure();
-
 	size_t read_pair_file(const std::string & filename);
+
+	void measure();
 
 	int post_process(Eigen::Matrix4f & matrix);
 
 	size_t export_measured_data(const std::string & output_filename);
 
-	std::vector<measurement_content> & get_measurement_result();
-
 private:
-	void analyse_defect(std::vector<point_3d>& scanned_points, std::vector<point_3d>& standard_model, std::vector<point_3d> & defect_points);
-	
-	std::vector<measurement_content> m_mc_vec;
+	std::string m_beginning_label;
+	// it should keep order
 	std::vector<pair_content> m_pair_vec;
 
-	std::map<std::string, point_shape> & m_searched_mark_points_map;
-	// transformed point cloud
-	std::vector<point_3d> & m_point_cloud;
-	kd_tree m_point_cloud_tree;
+	std::vector<measurement_content> m_mc_vec;
 
-private:
-	void decide_objects(const std::string & label_1, const std::string & label_2, std::vector<size_t> &upper, std::vector<size_t> & lower);
-
-	void analyze_points(
-		std::vector<size_t> & order_1, std::vector<size_t> & order_2, 
-		pair_content & pc, measurement_content & mc);
-
-	void correct_normals(std::vector<point_3d> & points, const Eigen::Vector3f * v1 = nullptr, const Eigen::Vector3f * v2 = nullptr);
-
+	// default value: 100
+	size_t m_measured_point_number;
+	// default value: 10
+	float m_deviation_length;
+	
 	cloud_fitting cf;
 	app_welding m_welding;
 
-	size_t m_measured_point_number;
-	float m_deviation_length;
+	// transformed point cloud
+	std::vector<point_3d> & m_point_cloud;
+	kd_tree m_point_cloud_tree;
+	std::map<std::string, point_shape> & m_searched_mark_points_map;
+
+private:
+	// using label-name decide objects to be measured
+	void decide_objects(const std::string & label_1, const std::string & label_2, std::vector<size_t> &upper, std::vector<size_t> & lower);
+	
+	// p.v = (v1+v2)/2
+	void correct_normals(std::vector<point_3d> & points, const Eigen::Vector3f * v1 = nullptr, const Eigen::Vector3f * v2 = nullptr);
+
+	void analyse_defect(std::vector<point_3d>& scanned_points, std::vector<point_3d>& standard_model, std::vector<point_3d> & defect_points);
+	
+	void analyze_points(std::vector<size_t> & order_1, std::vector<size_t> & order_2, pair_content & pc, measurement_content & mc);
 
 private:
 	// the first points belongs to the type of point
@@ -103,8 +106,6 @@ private:
 	// process the MM_VALUES and MM_POINTS in plane_to_cylinder
 	void plane_to_cylinder_values(plane_func_3d & plane_func, cylinder_func & _cylinder_func, measurement_content & mc);
 	void plane_to_cylinder_points(plane_func_3d & plane_func, cylinder_func & _cylinder_func, std::vector<point_3d>& reference_points, measurement_content & mc);
-
-
 };
 
 #endif // !CLOUD_MEASUREMENT_H

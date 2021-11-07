@@ -39,26 +39,32 @@ size_t cloud_measurement::read_pair_file(const std::string & filename)
 
 		string_split(line, ':', split_str);
 
-		pair_content pc;
-
-		pc.source_object = split_str[0];
-		pc.target_object = split_str[1];
-
 		if (split_str.size() == 3)
 		{
+			pair_content pc;
+			pc.source_object = split_str[0];
+			pc.target_object = split_str[1];
 			pc.reference_object = split_str[2];
+			m_pair_vec.push_back(pc);
 		}
 		else if (split_str.size() == 2)
 		{
-			pc.reference_object.clear();
+			//pc.reference_object.clear();
+			if (split_str[0] == "begin_point")
+			{
+				m_beginning_label = split_str[1];
+			}
 		}
 		else
 		{
 			std::cerr << "error: the number of measurement pair should be 3 or 2" << std::endl;
 			continue;
 		}
+	}
 
-		m_pair_vec.push_back(pc);
+	if (m_beginning_label.empty())
+	{
+		std::cerr << "error: please specify a begin point label, \"begin_point:xxx\"" << std::endl;
 	}
 
 	return m_pair_vec.size();
@@ -71,7 +77,7 @@ int cloud_measurement::post_process(Eigen::Matrix4f & matrix)
 		for (auto &p : pv.drawable_points)
 			p.do_transform(matrix.inverse());
 
-	m_welding.process(m_mc_vec);
+	m_welding.process(m_mc_vec, m_searched_mark_points_map[m_beginning_label].points);
 
 	return 0;
 }
@@ -259,11 +265,6 @@ void cloud_measurement::correct_normals(std::vector<point_3d>& points, const Eig
 			p.set_nxyz(c_v[0], c_v[1], c_v[2]);
 		}
 	}
-}
-
-std::vector<measurement_content> & cloud_measurement::get_measurement_result()
-{
-	return m_mc_vec;
 }
 
 size_t cloud_measurement::export_measured_data(const std::string & output_filename)
