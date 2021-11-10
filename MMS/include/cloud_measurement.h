@@ -39,7 +39,7 @@ private:
 
 	// default value: 100
 	size_t m_measured_point_number;
-	// default value: 10
+	// default value: 3
 	float m_deviation_length;
 	
 	cloud_fitting cf;

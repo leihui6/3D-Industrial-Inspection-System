@@ -61,7 +61,7 @@ private:
 
 	// Measurement
 	std::vector<std::string> m_pair_order;
-	std::string m_measurement_pairs_filename;
+	std::string m_measurement_requirement_filename;
 
 
 	// Common object

@@ -300,6 +300,38 @@ void read_points(std::map<std::string, std::vector<point_3d>> & points_map, cons
 	ifile.close();
 }
 
+void read_measurement_points(std::vector<point_3d> & measurement_points, const std::string & filename)
+{
+	LocalFile local_file;
+
+	if (!check_file(filename, std::ios::in, local_file)) return;
+
+	std::fstream & ifile = *local_file.m_fileobject;
+
+	std::string line;
+
+	while (std::getline(ifile, line))
+	{
+		if (line.empty()) continue;
+
+		if (line.find(">") != std::string::npos
+			||
+			line.find("#") != std::string::npos)
+		{
+			continue;
+		}
+
+		std::stringstream s(line);
+
+		float value[3] = { 0,0,0 };
+
+		for (size_t i = 0; i < 3; i++) s >> value[i];
+
+		measurement_points.push_back(point_3d(value[0], value[1], value[2]));
+	}
+	ifile.close();
+}
+
 void read_marked_points(std::map<std::string, point_shape> & point_shape_map, const std::string & filename)
 {
 	LocalFile local_file;

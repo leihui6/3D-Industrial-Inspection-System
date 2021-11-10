@@ -62,19 +62,17 @@ private:
 
 	void make_text_node(point_3d & position, osg::ref_ptr<osg::Geode> geode_label_points, const std::string & text);
 
-	void make_points_node(std::vector<point_3d> & points, osg::ref_ptr<osg::Geode> & geode, point_render_parameters & parameters);
-
-	void make_normals_node(point_3d & point, Eigen::Vector3f &v, osg::ref_ptr<osg::Geode> &geode, point_render_parameters & parameters);
-
 	void clear();
 
 private:
+
 	osg::ref_ptr<osg::Group> m_root;
 	// all points are added on this node
 	osg::ref_ptr<osg::Geode> m_geode;
 
 	osg::ref_ptr <osgText::Font> m_fontKai;
-
+	std::vector<point_3d> m_measurement_points;
+	
 	//std::vector<std::string> filename_vec;
 	//std::vector<rgb> cloud_color_vec;
 	//std::vector<float> cloud_size_vec;

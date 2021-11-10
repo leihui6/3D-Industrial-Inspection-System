@@ -1169,6 +1169,18 @@ float radian_two_vector_3d(const Eigen::Vector3f & v1, const Eigen::Vector3f & v
 	return acosf(to_radian);
 }
 
+void radian_two_vector_2d_022PI(const Eigen::Vector3f & v1, const Eigen::Vector3f &v2, float & radian)
+{
+	radian = radian_two_vector_3d(v1, v2);
+
+	Eigen::Vector3f c = v1.cross(v2);
+
+	if (c[2] < 0)
+	{
+		radian = 2 * M_PI - radian;
+	}
+}
+
 void project_points_onto_line(std::vector<point_3d>& points, line_func_3d & line, std::vector<point_3d>& projected_points)
 {
 	projected_points.clear();
@@ -1204,26 +1216,3 @@ void subset_of_point_cloud(std::vector<size_t>& index_vec, std::vector<point_3d>
 	}
 }
 
-
-void radian_two_vector_2d_022PI(const Eigen::Vector3f & v1, const Eigen::Vector3f &v2, float & radian)
-{
-	// [-1,1]
-	float to_radian = v1.dot(v2) / (v1.norm() *v2.norm());
-
-	// process the precision
-	if (equal_float(to_radian, 1.0))
-		to_radian = 1.0;
-	if (equal_float(to_radian, -1.0))
-		to_radian = -1.0;
-
-	// [0 -> Pi]
-	radian = acosf(to_radian);
-
-	Eigen::Vector3f c = v1.cross(v2);
-
-	if (c[2] < 0)
-	{
-		radian = M_PI - radian;
-		radian += M_PI;
-	}
-}

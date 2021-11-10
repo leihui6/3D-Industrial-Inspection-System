@@ -9,14 +9,13 @@ int main()
 
 	while (1)
 	{
-		label_visual_p->initial("data/medical_blade_standard.txt", "output/marked_points.txt", 0);
-		label_visual_p->visual();
+		//label_visual_p->initial("data/medical_blade_standard.txt", "output/marked_points.txt", 0);
+		//label_visual_p->visual();
 
-		label_visual_p->initial("data/medical_blade_01.txt", "output/measurement_result.txt", 1);
+		label_visual_p->initial("data/medical_blade_01_downsample.txt", "output/measurement_result.txt", 1);
 		label_visual_p->visual();
 	}
 	
-
 	return 0;
 }
 

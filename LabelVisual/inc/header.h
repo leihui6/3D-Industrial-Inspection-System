@@ -78,7 +78,11 @@ extern osg::ref_ptr<osg::Geode> add_arrow(std::vector<point_3d> & arrow_points, 
 
 extern void points_to_geometry_node(std::vector<point_3d>& points, osg::ref_ptr<osg::Geometry> geometry, float r, float g, float b, float w=1);
 
-void points_to_osg_structure(std::vector<point_3d>& points, osg::ref_ptr<osg::Vec3Array> coords, osg::ref_ptr<osg::Vec4Array> colors, osg::ref_ptr<osg::Vec3Array> normals, float r, float g, float b, float w);
+extern void points_to_osg_structure(std::vector<point_3d>& points, osg::ref_ptr<osg::Vec3Array> coords, osg::ref_ptr<osg::Vec4Array> colors, osg::ref_ptr<osg::Vec3Array> normals, float r, float g, float b, float w);
+
+extern void make_points_node(std::vector<point_3d> & points, osg::ref_ptr<osg::Geode> & geode, point_render_parameters & parameters);
+
+extern void make_normals_node(point_3d & point, Eigen::Vector3f &v, osg::ref_ptr<osg::Geode> &geode, point_render_parameters & parameters);
 // end
 
 

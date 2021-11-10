@@ -105,3 +105,47 @@ void point_along_with_vector_within_dis(point_3d & point, const Eigen::Vector3f 
 	result_p.y = length * vector_cos(Eigen::Vector3f::UnitY(), line_dir) + point.y;
 	result_p.z = length * vector_cos(Eigen::Vector3f::UnitZ(), line_dir) + point.z;
 }
+
+void make_points_node(std::vector<point_3d> & points, osg::ref_ptr<osg::Geode> & geode, point_render_parameters & parameters)
+{
+	osg::ref_ptr<osg::Geometry> geometry(new osg::Geometry);
+
+	osg::ref_ptr<osg::Vec3Array> coords = new osg::Vec3Array();
+	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array();
+	osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array();
+
+	colors->push_back(parameters.color);
+	normals->push_back(parameters.normal);
+
+	for (auto & p : points) coords->push_back(osg::Vec3(p.x, p.y, p.z));
+
+	geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, points.size()));
+
+	geometry->setVertexArray(coords.get());
+
+	geometry->setColorArray(colors);
+	geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+
+	geometry->setNormalArray(normals);
+	geometry->setNormalBinding(osg::Geometry::BIND_OVERALL);
+
+	geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+	osg::StateSet* stateSet = geometry->getOrCreateStateSet();
+	osg::Point* state_point_size = new osg::Point;
+	state_point_size->setSize(parameters.point_size);
+	stateSet->setAttribute(state_point_size);
+
+	geode->addChild(geometry);
+}
+
+void make_normals_node(point_3d & point, Eigen::Vector3f &v, osg::ref_ptr<osg::Geode> &geode, point_render_parameters & parameters)
+{
+	point_3d r_p;
+	v.normalize();
+	point_along_with_vector_within_dis(point, v, r_p, 5);
+
+	std::vector<point_3d> normals{ point, r_p };
+
+	geode->addChild(add_arrow(normals, parameters.color[0], parameters.color[1], parameters.color[2]));
+}

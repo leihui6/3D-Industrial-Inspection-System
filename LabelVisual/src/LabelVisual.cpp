@@ -108,22 +108,20 @@ void LabelVisual::add_measurement_points(std::map<std::string, std::vector<point
 
 void LabelVisual::initial(const std::string & file_1, const std::string & file_2, int flag)
 {
-	
-
 	std::map<std::string, std::vector<point_3d>> points_map;
-	
+
 	read_points(points_map, file_1);
-	
+
 	add_points(points_map, false);
 
 	// show marked points
 	if (flag == 0)
 	{
 		std::map<std::string, point_shape> marked_points_map;
-		
+
 		read_marked_points(marked_points_map, file_2);
 		//std::cout << "read " << marked_points_vec.size() << " marked point group" << std::endl;
-		
+
 		add_marked_points(marked_points_map);
 	}
 
@@ -131,10 +129,12 @@ void LabelVisual::initial(const std::string & file_1, const std::string & file_2
 	else if (flag == 1)
 	{
 		std::map<std::string, std::vector<point_3d>> measurement_points_map;
-		
+
 		read_points(measurement_points_map, file_2);
-		
+
 		add_measurement_points(measurement_points_map);
+
+		read_measurement_points(m_measurement_points, file_2);
 	}
 
 	return;
@@ -150,10 +150,10 @@ void LabelVisual::visual()
 	//dynamic_cast<Derived*>
 	window_initilization(viewer, m_root);
 
-	//viewer->initial(step_points_vec);
+	viewer->initial(std::vector<std::vector<point_3d>>{m_measurement_points});
 
 	viewer->realize();
-	
+
 	viewer->run();
 }
 
@@ -308,49 +308,7 @@ void LabelVisual::window_initilization(osg::ref_ptr<timeViewer> & viewer, osg::r
 	viewer->setSceneData(root.get());
 }
 
-void LabelVisual::make_points_node(std::vector<point_3d> & points, osg::ref_ptr<osg::Geode> & geode, point_render_parameters & parameters)
-{
-	osg::ref_ptr<osg::Geometry> geometry(new osg::Geometry);
 
-	osg::ref_ptr<osg::Vec3Array> coords = new osg::Vec3Array();
-	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array();
-	osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array();
-
-	colors->push_back(parameters.color);
-	normals->push_back(parameters.normal);
-
-	for (auto & p : points) coords->push_back(osg::Vec3(p.x, p.y, p.z));
-
-	geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, points.size()));
-
-	geometry->setVertexArray(coords.get());
-
-	geometry->setColorArray(colors);
-	geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
-
-	geometry->setNormalArray(normals);
-	geometry->setNormalBinding(osg::Geometry::BIND_OVERALL);
-
-	geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-
-	osg::StateSet* stateSet = geometry->getOrCreateStateSet();
-	osg::Point* state_point_size = new osg::Point;
-	state_point_size->setSize(parameters.point_size);
-	stateSet->setAttribute(state_point_size);
-
-	geode->addChild(geometry);
-}
-
-void LabelVisual::make_normals_node(point_3d & point, Eigen::Vector3f &v, osg::ref_ptr<osg::Geode> &geode, point_render_parameters & parameters)
-{
-	point_3d r_p;
-	v.normalize();
-	point_along_with_vector_within_dis(point, v, r_p, 5);
-
-	std::vector<point_3d> normals{ point, r_p };
-
-	geode->addChild(add_arrow(normals, parameters.color[0], parameters.color[1], parameters.color[2]));
-}
 
 void LabelVisual::clear()
 {

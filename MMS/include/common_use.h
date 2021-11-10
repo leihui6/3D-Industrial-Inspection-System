@@ -243,6 +243,8 @@ extern void read_points(std::map<std::string, std::vector<point_3d>> & points_ma
 // read marked points which is the result of the labeling step
 extern void read_marked_points(std::map<std::string, point_shape> & point_shape_map, const std::string & filename);
 
+extern void read_measurement_points(std::vector<point_3d> & measurement_points, const std::string & filename);
+
 // export marked points which is a map
 extern void export_marked_points(std::map<std::string, point_shape>& marked_points, const std::string & export_file_name);
 

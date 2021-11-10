@@ -150,6 +150,13 @@ float angle_between_two_vector_3d(const Eigen::Vector3f & v1, const Eigen::Vecto
 float angle_between_two_point_3d(const point_3d & p1, const point_3d & p2);
 float radian_two_vector_3d(const Eigen::Vector3f & v1, const Eigen::Vector3f & v2);
 
+/*
+	Return the radian between two 2d vectors that represented by 3d vectors,
+	the radian is antclockwise from v1 to v2
+	Note: the third element should be zero, like v1(1,2,0) and v2(3,6,0)
+*/
+void radian_two_vector_2d_022PI(const Eigen::Vector3f & v1, const Eigen::Vector3f &v2, float & radian);
+
 bool is_in_range_of_two_points(point_3d &p, point_3d &p1, point_3d &p2);
 
 bool equal_float(double v1, double v2, double th = 1e-6);
@@ -159,13 +166,6 @@ float radian2degree(float radian);
 float degree2radian(float angle);
 
 void project_points_onto_line(std::vector<point_3d>& points, line_func_3d & line, std::vector<point_3d>& projected_points);
-
-/*
-	Return the radian between two 2d vectors that represented by 3d vectors,
-	the radian is antclockwise from v1 to v2
-	Note: the third element should be zero, like v1(1,2,0) and v2(3,6,0)
-*/
-void radian_two_vector_2d_022PI(const Eigen::Vector3f & v1, const Eigen::Vector3f &v2, float & radian);
 
 // get rotation transformation, from v1 to v2
 void rotation_transformation(const Eigen::Vector3f & v1, const Eigen::Vector3f & v2, Eigen::Matrix3f & t);

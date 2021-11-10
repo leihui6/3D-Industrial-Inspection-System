@@ -21,15 +21,20 @@ int BackProcess::initial_parameter(const std::string & config_filename)
 	read_file_as_map(config_filename, m_parameters);
 
 	// point cloud files
-	m_reading_point_cloud_filename = m_parameters["input_folder"] + m_parameters["reading_data"];
-	m_reference_point_cloud_filename = m_parameters["input_folder"] + m_parameters["reference_data"];
+	m_reading_point_cloud_filename =
+		m_parameters["input_folder"] + m_parameters["reading_data"];
+	m_reference_point_cloud_filename =
+		m_parameters["input_folder"] + m_parameters["reference_data"];
 
 	// measurement files
-	m_measurement_pairs_filename = m_parameters["input_folder"] + m_parameters["measurement_pairs"];
+	m_measurement_requirement_filename =
+		m_parameters["input_folder"] + m_parameters["measurement_requirement"];
 
 	// registration files
-	m_icp_configuration_filename = m_parameters["input_folder"] + m_parameters["icp_configuration"];
-	m_coarse_configuration_filename = m_parameters["input_folder"] + m_parameters["4pcs_configuration"];
+	m_icp_configuration_filename =
+		m_parameters["input_folder"] + m_parameters["icp_configuration"];
+	m_coarse_configuration_filename =
+		m_parameters["input_folder"] + m_parameters["4pcs_configuration"];
 
 	//m_output_folder = m_parameters["output_folder"];
 
@@ -152,14 +157,32 @@ int BackProcess::measurement()
 
 	cloud_measurement cm(m_transformed_point_cloud, m_searched_mark_points_map);
 	
-	size_t pair_num = cm.read_pair_file(m_measurement_pairs_filename);
-	//std::cout << "read " << pair_num << " measurement pairs" << std::endl;
+	LocalFile local_file;
 
-	cm.measure();
+	if (!check_file(m_measurement_requirement_filename, std::ios::in, local_file)) return 1;;
 
-	cm.post_process(m_final_mat);
+	std::fstream & ifile = *local_file.m_fileobject;
 
-	cm.export_measured_data(m_parameters["output_folder"] + m_parameters["measurement_result"]);
+	while (!ifile.eof())
+	{
+		std::string measurment_pair_filename;
+
+		std::getline(ifile, measurment_pair_filename);
+
+		measurment_pair_filename =
+			m_parameters["input_folder"] + measurment_pair_filename;
+		
+		std::cout << "processing " << measurment_pair_filename << std::endl;
+
+		size_t pair_num = 
+			cm.read_pair_file(measurment_pair_filename);
+
+		cm.measure();
+
+		cm.post_process(m_final_mat);
+
+		cm.export_measured_data(m_parameters["output_folder"] + m_parameters["measurement_result"]);
+	}
 	
 	m_rd.measurement_time = double(clock() - beg_t) / CLOCKS_PER_SEC;
 

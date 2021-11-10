@@ -1,0 +1,13 @@
+# 2 Ordered Number:11
+begin_point:reference_34
+plane_6:plane_7:reference_11
+plane_9:plane_16:reference_15
+plane_6:plane_8:reference_12
+plane_8:cylinder_0:reference_14
+plane_22:cylinder_0:reference_28
+plane_7:cylinder_0:reference_13
+plane_6:cylinder_0:reference_9
+plane_21:cylinder_0:reference_27
+plane_5:cylinder_0:reference_8
+plane_23:cylinder_0:reference_29
+plane_6:cylinder_0:reference_10

@@ -8,7 +8,7 @@ cloud_measurement::cloud_measurement(std::vector<point_3d> & point_cloud, std::m
 	m_measured_point_number = 100;
 
 	// every measurement result will be amplified by this value
-	m_deviation_length = 10;
+	m_deviation_length = 3;
 }
 
 cloud_measurement::~cloud_measurement()
@@ -275,7 +275,7 @@ size_t cloud_measurement::export_measured_data(const std::string & output_filena
 
 	LocalFile local_file;
 
-	if (!check_file(output_filename, std::ios::out, local_file)) return 1;
+	if (!check_file(output_filename, std::ios::out | std::ios::app, local_file)) return 1;;
 
 	std::fstream & ofile = *local_file.m_fileobject;
 
