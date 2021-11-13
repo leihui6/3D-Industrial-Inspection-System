@@ -107,22 +107,10 @@
     <ClCompile Include="src\BackProcessExp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\main_coarse_registration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\main_display_fine_and_coarse_result.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\main_fine_registration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\main_labeling_points.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\main_measurement.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\main_search_points.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\cloud_evaluation.cpp">
@@ -132,6 +120,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\app_welding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

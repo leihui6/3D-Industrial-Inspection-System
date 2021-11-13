@@ -10,7 +10,7 @@ marking_point_color:255 0 0 1
 # data folder
 input_folder:data
 # input data which was scanned
-reading_data:/medical_blade_01_downsample.txt
+reading_data:/medical_blade_03.txt
 # input data which will be used for labeling.
 reference_data:/medical_blade_standard.txt
 measurement_requirement:/measurement_requirement.txt

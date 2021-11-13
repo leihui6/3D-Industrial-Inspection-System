@@ -732,6 +732,7 @@ void MainWindow::on_actionShow_Label_Result_triggered()
     std::string
             standard_filename = m_str_str_map["input_folder"]+m_str_str_map["reference_data"],
             labeling_filename = m_str_str_map["output_folder"]+m_str_str_map["marked_points_result"];
+    std::cout << standard_filename << " "<< labeling_filename<<std::endl;
 
     QFuture<void> future = QtConcurrent::run(this, &MainWindow::visual_thread,standard_filename,labeling_filename,0);
     //future.waitForFinished();

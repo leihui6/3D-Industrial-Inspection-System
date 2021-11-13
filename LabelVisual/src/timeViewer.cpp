@@ -9,6 +9,7 @@ timeViewer::timeViewer()
 
 timeViewer::~timeViewer()
 {
+
 }
 
 void timeViewer::advance(double simulationTime)
@@ -28,6 +29,8 @@ void timeViewer::advance(double simulationTime)
 
 void timeViewer::initial(const std::vector<std::vector<point_3d>> & points_vec)
 {
+	if (points_vec.empty()) return;
+
 	srand((unsigned int)time(0));
 	m_index_vec.resize(points_vec.size(), 0);
 	for (auto &i : m_index_vec) i = rand() % 100;
@@ -43,6 +46,8 @@ void timeViewer::initial(const std::vector<std::vector<point_3d>> & points_vec)
 
 void timeViewer::update_node()
 {
+	if (m_points_vec.empty()) return;
+
 	point_render_parameters parameters;
 	parameters.color = osg::Vec4(255, 255, 0, 1);
 	parameters.point_size = 10;

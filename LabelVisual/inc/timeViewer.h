@@ -12,7 +12,7 @@ public:
 	virtual void advance(double simulationTime = USE_REFERENCE_TIME);
 
 public:
-	void initial(const std::vector<std::vector<point_3d>> & gnode_vec);
+	void initial(const std::vector<std::vector<point_3d>> & gnode_vec = std::vector<std::vector<point_3d>>());
 
 	void update_node();
 

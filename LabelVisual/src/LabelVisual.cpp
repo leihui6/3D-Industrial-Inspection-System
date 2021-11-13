@@ -1,8 +1,7 @@
 #include"LabelVisual.h"
 
 LabelVisual::LabelVisual()
-	: m_root(new osg::Group()),
-	m_geode(new osg::Geode())
+	: m_root(new osg::Group()), m_geode(new osg::Geode()), m_measurement_points()
 {
 
 	m_fontKai = osgText::readFontFile("C:\\WINDOWS\\Fonts\\simkai.ttf");
@@ -150,7 +149,7 @@ void LabelVisual::visual()
 	//dynamic_cast<Derived*>
 	window_initilization(viewer, m_root);
 
-	viewer->initial(std::vector<std::vector<point_3d>>{m_measurement_points});
+	viewer->initial();
 
 	viewer->realize();
 

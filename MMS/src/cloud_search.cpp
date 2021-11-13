@@ -135,17 +135,23 @@ void kd_tree::search_points_correspondence(std::vector<point_3d>& points, std::s
 
 void kd_tree::search_points_correspondence(std::vector<point_3d>& points, std::vector<point_3d>& correspondences_points)
 {
+	if (points.empty()) return;
+
+	correspondences_points.clear();
+
 	for (size_t i = 0; i < points.size(); ++i)
 	{
+		std::vector<float> ret_dis;
 		std::vector<size_t> ret_index;
 
-		std::vector<float> ret_dis;
-		std::vector<std::pair<size_t, float> >match_pair;
+		//std::vector<std::pair<size_t, float> >match_pair;
 
-		this->search_neighbors_knn(10, points[i], ret_index, ret_dis);
+		this->search_neighbors_knn(5, points[i], ret_index, ret_dis);
 		//this->search_neighbors_radius(1.0, points[i], match_pair);
+
 		if (!ret_index.empty())
 		{
+			//std::cout << points[i] << " " << get_point(ret_index.front()) << std::endl;
 			correspondences_points.push_back(get_point(ret_index.front()));
 			//correspondences_points.push_back(get_point(match_pair.front().first));
 		}

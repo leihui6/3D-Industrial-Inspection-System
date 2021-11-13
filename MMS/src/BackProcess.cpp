@@ -115,7 +115,7 @@ int BackProcess::registration()
 int BackProcess::searching()
 {
 	clock_t beg_t = clock();
-	
+
 	read_marked_points(m_marked_points_map, m_parameters["output_folder"] + m_parameters["marked_points_result"]);
 
 	if (m_marked_points_map.empty()) return 1;
@@ -129,7 +129,7 @@ int BackProcess::searching()
 	for (it = m_marked_points_map.begin(); it != m_marked_points_map.end(); it++)
 	{
 		//skip the reference points
-		if (it->first.find("reference"))
+		if (it->first.find("reference") != std::string::npos)
 		{
 			m_searched_mark_points_map.insert(*it);
 			continue;
@@ -138,10 +138,13 @@ int BackProcess::searching()
 		point_shape ps;
 
 		kt.search_points_correspondence(it->second.points, ps.points);
+		// no changing
 		ps.shape_property = it->second.shape_property;
 
 		//it->second = correspondence;
 		m_searched_mark_points_map.insert(std::pair< std::string, point_shape>(it->first, ps));
+
+		//ps.clear();
 	}
 
 	export_marked_points(m_searched_mark_points_map, m_parameters["output_folder"] + m_parameters["marked_points_searched_result"]);

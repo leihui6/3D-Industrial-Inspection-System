@@ -172,6 +172,7 @@ struct point_shape {
 	std::vector<point_3d> points;
 	std::shared_ptr<basic_shape> func;
 	std::vector<Eigen::Vector3f> shape_property;
+	void clear() { points.clear(); this->func.reset(); shape_property.clear(); }
 };
 
 // file management
