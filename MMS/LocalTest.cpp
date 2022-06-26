@@ -1,9 +1,9 @@
-//#define BACK_LOCALTEST
+#define BACK_LOCALTEST
 #ifdef BACK_LOCALTEST
 
 #include "BackProcess.h"
 
-int main()
+int main() 
 {
 	BackProcess * back_process_p = new BackProcess;
 

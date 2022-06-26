@@ -30,6 +30,9 @@
     <ClInclude Include="inc\timeViewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\MMS\include\common_use.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\header.cpp">

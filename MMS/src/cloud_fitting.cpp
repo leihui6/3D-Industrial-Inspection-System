@@ -82,7 +82,7 @@ float cloud_fitting::fitting_cylinder_linear_least_squares(std::vector<point_3d>
 	// Validate the input parameters.
 	if (points.size() < 6)
 	{
-		return std::numeric_limits<float>::max();
+		return (std::numeric_limits<float>::max)();
 	}
 
 	Eigen::Vector3f average;
@@ -116,8 +116,8 @@ float cloud_fitting::fitting_cylinder_linear_least_squares(std::vector<point_3d>
 	for (unsigned int i = 0; i < points.size(); ++i)
 	{
 		float t = _cylinder_func.axis.direction.dot(points[i].get_vector3f() - _cylinder_func.axis.origin);
-		tmin = std::min(t, tmin);
-		tmax = std::max(t, tmax);
+		tmin = (std::min)(t, tmin);
+		tmax = (std::max)(t, tmax);
 	}
 
 	_cylinder_func.axis.origin += ((tmin + tmax) * 0.5f) * _cylinder_func.axis.direction;
@@ -258,7 +258,7 @@ float cloud_fitting::computeMultiThreaded(Eigen::Vector3f & minPC, Eigen::Vector
 
 	for (unsigned int t = 0; t < m_num_threads; ++t)
 	{
-		local[t].error = std::numeric_limits<float>::max();
+		local[t].error = (std::numeric_limits<float>::max)();
 		local[t].rsqr = 0.0f;
 		local[t].W = Eigen::Vector3f::Zero();
 		local[t].PC = Eigen::Vector3f::Zero();

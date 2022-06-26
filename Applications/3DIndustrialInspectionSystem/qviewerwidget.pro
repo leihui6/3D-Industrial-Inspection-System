@@ -1,6 +1,5 @@
 QT += core gui opengl concurrent widgets
 
-
 TARGET = 3DIndustrialInspectionSystem
 TEMPLATE = app
 

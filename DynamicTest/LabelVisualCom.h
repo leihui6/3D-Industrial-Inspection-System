@@ -2,6 +2,7 @@
 #define LABELVISUALCOM_H
 
 #include<vector>
+#include<string>
 
 class LabelVisualCom
 {

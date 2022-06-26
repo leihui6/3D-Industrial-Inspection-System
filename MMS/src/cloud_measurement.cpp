@@ -470,7 +470,7 @@ void cloud_measurement::plane_to_plane_values(std::vector<point_3d>& points_1, s
 	//std::cout << mc.distance_scattered << std::endl;
 }
 
-void cloud_measurement::plane_to_plane_points(plane_func_3d & plane_func_1, plane_func_3d & plane_func_2, std::vector<point_3d>& reference_points, measurement_content & mc)
+void cloud_measurement::plane_to_plane_points(plane_func_3d& plane_func_1, plane_func_3d& plane_func_2, std::vector<point_3d>& reference_points, measurement_content& mc)
 {
 	std::cout << "plane_to_plane with POINTS \n";
 
@@ -495,13 +495,14 @@ void cloud_measurement::plane_to_plane_points(plane_func_3d & plane_func_1, plan
 		v(endpoint_b.x - endpoint_a.x, endpoint_b.y - endpoint_a.y, endpoint_b.z - endpoint_a.z);
 
 	point_3d endpoint_c, endpoint_d;
-	point_along_with_vector_within_dis(endpoint_a, v*-1, endpoint_c, m_deviation_length);
+	point_along_with_vector_within_dis(endpoint_a, v * -1, endpoint_c, m_deviation_length);
 	point_along_with_vector_within_dis(endpoint_b, v, endpoint_d, m_deviation_length);
-	
+
 	produce_line_points(v, endpoint_c, endpoint_d, mc.drawable_points, m_measured_point_number);
 
 	// 4. add normals
-	correct_normals(mc.drawable_points, &plane_func_1.direction(), &plane_func_2.direction());
+	Eigen::Vector3f t_v_1 = plane_func_1.direction(), t_v_2 = plane_func_2.direction();
+	correct_normals(mc.drawable_points, &t_v_1, &t_v_2);
 }
 
 void cloud_measurement::plane_to_plane(point_shape & shape_1, point_shape & shape_2, std::vector<point_3d>& reference_points, measurement_content & mc)

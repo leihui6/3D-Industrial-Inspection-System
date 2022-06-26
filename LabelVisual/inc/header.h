@@ -15,7 +15,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-#include <OSG/Vec3d>
+#include <osg/Vec3d>
 #include <osg/Geometry>
 #include <osg/Geode>
 #include <osg/Point>

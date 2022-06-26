@@ -1,7 +1,8 @@
 #ifndef LABELVISUALCOM_H
 #define LABELVISUALCOM_H
 
-#include<vector>
+#include <vector>
+#include <string>
 
 class LabelVisualCom
 {

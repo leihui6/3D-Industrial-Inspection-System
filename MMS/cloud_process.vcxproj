@@ -62,33 +62,33 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{08117403-27AD-430E-BDB2-B54E3DEE9A5C}</ProjectGuid>
     <RootNamespace>testosg</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>CloudProcess</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -111,7 +111,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(OSG)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(MSBuildProjectDirectory)\include\;$(OSG)\include;$(EIGEN)\;$(CGAL)\include;$(OPENGR)\;$(NANOFLANN)\include;$(PointMatcher)\include;$(BOOST)\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(OSG)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -132,11 +132,14 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>OpenThreads.lib;OpenThreadsd.lib;osg.lib;osgAnimation.lib;osgAnimationd.lib;osgd.lib;osgDB.lib;osgDBd.lib;osgFX.lib;osgFXd.lib;osgGA.lib;osgGAd.lib;osgManipulator.lib;osgManipulatord.lib;osgParticle.lib;osgParticled.lib;osgPresentation.lib;osgPresentationd.lib;osgQOpenGL.lib;osgQOpenGLd.lib;osgQt5.lib;osgQt5d.lib;osgShadow.lib;osgShadowd.lib;osgSim.lib;osgSimd.lib;osgTerrain.lib;osgTerraind.lib;osgText.lib;osgTextd.lib;osgUI.lib;osgUId.lib;osgUtil.lib;osgUtild.lib;osgViewer.lib;osgViewerd.lib;osgVolume.lib;osgVolumed.lib;osgWidget.lib;osgWidgetd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_atomic-vc141-mt-gd-x64-1_72.lib;libboost_chrono-vc141-mt-gd-x64-1_72.lib;libboost_container-vc141-mt-gd-x64-1_72.lib;libboost_context-vc141-mt-gd-x64-1_72.lib;libboost_contract-vc141-mt-gd-x64-1_72.lib;libboost_coroutine-vc141-mt-gd-x64-1_72.lib;libboost_date_time-vc141-mt-gd-x64-1_72.lib;libboost_exception-vc141-mt-gd-x64-1_72.lib;libboost_fiber-vc141-mt-gd-x64-1_72.lib;libboost_filesystem-vc141-mt-gd-x64-1_72.lib;libboost_graph-vc141-mt-gd-x64-1_72.lib;libboost_iostreams-vc141-mt-gd-x64-1_72.lib;libboost_locale-vc141-mt-gd-x64-1_72.lib;libboost_log-vc141-mt-gd-x64-1_72.lib;libboost_log_setup-vc141-mt-gd-x64-1_72.lib;libboost_math_c99-vc141-mt-gd-x64-1_72.lib;libboost_math_c99f-vc141-mt-gd-x64-1_72.lib;libboost_math_c99l-vc141-mt-gd-x64-1_72.lib;libboost_math_tr1-vc141-mt-gd-x64-1_72.lib;libboost_math_tr1f-vc141-mt-gd-x64-1_72.lib;libboost_math_tr1l-vc141-mt-gd-x64-1_72.lib;libboost_numpy36-vc141-mt-gd-x64-1_72.lib;libboost_prg_exec_monitor-vc141-mt-gd-x64-1_72.lib;libboost_program_options-vc141-mt-gd-x64-1_72.lib;libboost_python36-vc141-mt-gd-x64-1_72.lib;libboost_random-vc141-mt-gd-x64-1_72.lib;libboost_regex-vc141-mt-gd-x64-1_72.lib;libboost_serialization-vc141-mt-gd-x64-1_72.lib;libboost_stacktrace_noop-vc141-mt-gd-x64-1_72.lib;libboost_stacktrace_windbg-vc141-mt-gd-x64-1_72.lib;libboost_stacktrace_windbg_cached-vc141-mt-gd-x64-1_72.lib;libboost_system-vc141-mt-gd-x64-1_72.lib;libboost_test_exec_monitor-vc141-mt-gd-x64-1_72.lib;libboost_thread-vc141-mt-gd-x64-1_72.lib;libboost_timer-vc141-mt-gd-x64-1_72.lib;libboost_type_erasure-vc141-mt-gd-x64-1_72.lib;libboost_unit_test_framework-vc141-mt-gd-x64-1_72.lib;libboost_wave-vc141-mt-gd-x64-1_72.lib;libboost_wserialization-vc141-mt-gd-x64-1_72.lib;pointmatcher_1.lib;yaml-cpp-pm.lib;OpenThreadsd.lib;osgAnimationd.lib;osgd.lib;osgDBd.lib;osgFXd.lib;osgGAd.lib;osgManipulatord.lib;osgParticled.lib;osgPresentationd.lib;osgQOpenGLd.lib;osgQt5d.lib;osgShadowd.lib;osgSimd.lib;osgTerraind.lib;osgTextd.lib;osgUId.lib;osgUtild.lib;osgViewerd.lib;osgVolumed.lib;osgWidgetd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST)\lib;$(CGAL)\lib;$(PointMatcher)\lib;$(OSG)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
