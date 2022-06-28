@@ -33,6 +33,8 @@ private:
 
     QViewerWidget *qviewer;
 
+    camera_3d_com * vst3d_camera;
+
     QTimer timer;
 
     void paintEvent(QPaintEvent *);
@@ -54,6 +56,7 @@ private slots:
     void on_actionSet_Background_Color_triggered();
     void on_actionConnect_to_Camera_triggered();
     void on_actionSet_Points_Size_triggered();
+    void on_pushButton_clicked();
 };
 
 #endif // MAINWINDOW_H

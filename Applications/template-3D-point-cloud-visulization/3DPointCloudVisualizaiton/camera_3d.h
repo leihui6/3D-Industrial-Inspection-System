@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+#include "cloud_geometry.h"
+
 class camera_3d_com
 {
 public:
@@ -13,6 +15,8 @@ public:
     virtual ~camera_3d_com() {}
 
     virtual int init(const std::string  & path) = 0;
+
+    virtual int get_point_cloud(std::vector<point_3d> & points) = 0;
 };
 
 #endif // CAMERA_3D_H

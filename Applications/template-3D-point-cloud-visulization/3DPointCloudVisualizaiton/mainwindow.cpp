@@ -31,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
 
     this->setWindowTitle("3D-Point-Cloud-Visualization");
+
+    ui->pushButton->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -64,7 +66,6 @@ void MainWindow::open()
         return;
 
     clean();
-
     std::vector<point_3d> points;
     ci.load_point_cloud_txt(path.toStdString(),points);
     qviewer->add_point_cloud(POINTCLOUD, points);
@@ -117,17 +118,18 @@ void MainWindow::on_actionSet_Background_Color_triggered()
 
 void MainWindow::on_actionConnect_to_Camera_triggered()
 {
-    camera_3d_com * vst3d_camera = new VST3D_Camera;
+    vst3d_camera = new VST3D_Camera;
 
     if (vst3d_camera->init("") == VST3D_RESULT_OK)
     {
         write_log("3D Camera Initialized Successfully");
+        ui->pushButton->setEnabled(true);
     }
     else
     {
         write_log("3D Camera Initialized Failed");
+        ui->pushButton->setEnabled(false);
     }
-
 }
 
 
@@ -141,5 +143,16 @@ void MainWindow::on_actionSet_Points_Size_triggered()
     {
         qviewer->set_points_size(POINTCLOUD, text.toInt());
     }
+}
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    std::vector<point_3d> point_cloud;
+
+    vst3d_camera->get_point_cloud(point_cloud);
+
+    clean();
+    qviewer->add_point_cloud(POINTCLOUD, point_cloud);
 }
 

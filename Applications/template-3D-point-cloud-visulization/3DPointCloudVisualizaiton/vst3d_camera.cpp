@@ -41,7 +41,6 @@ int VST3D_Camera::connect()
 
 int VST3D_Camera::connect_align()
 {
-    // 正常单幅扫描一次，并识别标记点，同时进行点云旋转对齐
     int result = VST3D_Connect_ALIGN();
     if (result != VST3D_RESULT_OK)
     {
@@ -56,7 +55,6 @@ int VST3D_Camera::connect_align()
 
 int VST3D_Camera::del_background(std::vector<float> &plane_func)
 {
-    // 设置扫描基准平面后，调用去除基准面以下的杂点
     float* plane = nullptr;
     int result = VST3D_DelBackground(&plane);
 
@@ -104,7 +102,7 @@ int VST3D_Camera::scan()
     return result;
 }
 
-int VST3D_Camera::get_point_cloud(std::vector<point_3d> &pointcloud)
+int VST3D_Camera::get_point_cloud(std::vector<point_3d> &point_cloud)
 {
     VST3D_PT * p_pointcloud = nullptr;
     int totalNum = 0;
@@ -125,10 +123,20 @@ int VST3D_Camera::get_point_cloud(std::vector<point_3d> &pointcloud)
         VST3D_PT * pt = nullptr;
         point_3d p;
         get_each_point_by_index(i, &pt);
+
         p.x = pt->x;
         p.y = pt->y;
         p.z = pt->z;
-        pointcloud.push_back(p);
+
+        p.r = pt->cr;
+        p.g = pt->cg;
+        p.b = pt->cb;
+
+        p.nx = pt->nx;
+        p.ny = pt->ny;
+        p.nz = pt->nz;
+
+        point_cloud.push_back(p);
     }
 
     return result;

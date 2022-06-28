@@ -2,7 +2,6 @@
 #define VST3D_CAMERA_H
 
 #include "camera_3d.h"
-#include "cloud_geometry.h"
 #include "VisionBooster.h"
 
 class VST3D_Camera : public camera_3d_com
@@ -17,6 +16,8 @@ public:
     \param[in] path VST软件路径
     */
     virtual int init(const std::string  & path);
+
+    virtual int get_point_cloud(std::vector<point_3d> & point_cloud);
 
 private:
     //! 尝试连接
@@ -55,8 +56,7 @@ private:
     \retval VST3D_RESULT_ERROR 成功
     \retval VST3D_RESULT_OK 失败
     */
-    int get_point_cloud(std::vector<point_3d> &pointcloud);
-
+    //int get_point_cloud(std::vector<point_3d> &pointcloud);
 
     //! 清楚点云数据
     /*!
