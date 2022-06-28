@@ -12,7 +12,7 @@ win32 {
 
     OSG_LIB_DIRECTORY = $$(OSG)/lib
     OSG_INCLUDE_DIRECTORY = $$(OSG)/include
-
+    VST3D_SDK_DIRECTORY = $$(VST3D)
 
     CONFIG(debug, debug|release) {
 
@@ -33,23 +33,29 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreads
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
         LIBS += -L$$OSG_LIB_DIRECTORY -losgQt5
+        LIBS += -L$$VST3D_SDK_DIRECTORY/lib -lVisionBooster
     }
 
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
+    INCLUDEPATH += $$VST3D_SDK_DIRECTORY/include
 }
 
 SOURCES += \
+    camera_3d.cpp \
     cloud_geometry.cpp \
     cloud_io.cpp \
     main.cpp \
     mainwindow.cpp \
-    qviewerwidget.cpp
+    qviewerwidget.cpp \
+    vst3d_camera.cpp
 
 HEADERS += \
+    camera_3d.h \
     cloud_geometry.h \
     cloud_io.h \
     mainwindow.h \
-    qviewerwidget.h
+    qviewerwidget.h \
+    vst3d_camera.h
 
 FORMS += \
     mainwindow.ui

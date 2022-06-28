@@ -51,9 +51,49 @@ void QViewerWidget::set_background_color(int r, int g, int b)
     camera->setClearColor(osg::Vec4(r/255.0f,g/255.0f,b/255.0f,1.0));
 }
 
-void QViewerWidget::set_points_color(int r, int g, int b)
+void QViewerWidget::set_points_color(const std::string &point_cloud_name, int r, int g, int b)
 {
-    // ...
+    if (node_map.find(point_cloud_name) == node_map.end()) return;
+
+    osg::ref_ptr<osg::Node> node = node_map[point_cloud_name];
+    osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array();
+    colors->push_back(osg::Vec4(r/255.0f,g/255.0f,b/255.0f,1));
+
+    // set color
+    node->asGeode()->getChild(0)->asGeometry()->setColorArray(colors.get());
+    node->asGeode()->getChild(0)->asGeometry()->setColorBinding(osg::Geometry::BIND_OVERALL);
+}
+
+void QViewerWidget::set_points_size(const std::string &point_cloud_name, int size_number)
+{
+    auto it = node_map.find(point_cloud_name);
+    if (it == node_map.end()) return;
+
+    osg::StateSet* stateSet = it->second->asGeode()->getChild(0)->asGeometry()->getOrCreateStateSet();
+    stateSet->setAttribute(new osg::Point(size_number));
+}
+
+void QViewerWidget::add_point_cloud(const std::string &point_cloud_name, std::vector<point_3d> & points)
+{
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode();
+    osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry();
+
+    points_to_geometry_node(points, geometry, 255,255,255,1);
+    geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, int(points.size())));
+    geode->addDrawable(geometry);
+
+    // add a new one
+    if(node_map.find(point_cloud_name) == node_map.end())
+    {
+       scene->addChild(geode);
+       node_map[point_cloud_name] = geode;
+    }
+    // replace the current one
+    else
+    {
+       scene->replaceChild(node_map[point_cloud_name].get(),geode);
+       node_map[point_cloud_name] = geode;
+    }
 }
 
 osgQt::GraphicsWindowQt *QViewerWidget::createGraphicsWindow(const QRect &geometry)
@@ -89,15 +129,14 @@ void QViewerWidget::initCamera(const QRect &geometry)
 
     const osg::GraphicsContext::Traits *traits = gw->getTraits();
     camera->setClearColor(osg::Vec4(0.7f, 0.7f, 0.7f, 1.0f));
-
     camera->setViewport(0, 0, traits->width, traits->height);
 
     double aspect = static_cast<double>(traits->width) / static_cast<double>(traits->height);
     camera->setProjectionMatrixAsPerspective(30.0, aspect, 1.0, 1000.0);
-    camera->setClearColor(osg::Vec4(53/255.0,81/255.0 ,2/255.0,1));
     GLenum buffer = (traits->doubleBuffer) ? GL_BACK : GL_FRONT;
     camera->setDrawBuffer(buffer);
     camera->setReadBuffer(buffer);
+
     // Solve the problem that one point in geode does not show
     osg::CullStack::CullingMode cullingMode = camera->getCullingMode();
     cullingMode &= ~(osg::CullStack::SMALL_FEATURE_CULLING);

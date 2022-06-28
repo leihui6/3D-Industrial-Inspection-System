@@ -16,8 +16,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     QGridLayout *layout = new QGridLayout;
     qviewer = new QViewerWidget(QRect(0, 0, ui->frame->width(), ui->frame->height()));
+    layout->setSpacing(1);
+    layout->setMargin(1);
     layout->addWidget(qviewer);
     ui->frame->setLayout(layout);
+
     //ui->verticalLayout->addWidget(ui->frame);
 
     connect(&timer, &QTimer::timeout, this, &MainWindow::update);
@@ -40,6 +43,11 @@ void MainWindow::paintEvent(QPaintEvent *)
     ui->frame->update();
 }
 
+void MainWindow::write_log(QString text)
+{
+    ui->label->setText(text);
+}
+
 void MainWindow::update()
 {
     QMainWindow::update(this->geometry());
@@ -47,11 +55,6 @@ void MainWindow::update()
 
 void MainWindow::open()
 {
-    osg::Group *scene = qviewer->getScene();
-
-    if (scene == nullptr)
-        return;
-
     QString path = QFileDialog::getOpenFileName(Q_NULLPTR,
                                                 tr("Open model file"),
                                                 "./",
@@ -60,21 +63,13 @@ void MainWindow::open()
     if (path.isEmpty())
         return;
 
-    scene->removeChildren(0, scene->getNumChildren());
+    clean();
 
     std::vector<point_3d> points;
     ci.load_point_cloud_txt(path.toStdString(),points);
-    std::cout << points.size()<<std::endl;
+    qviewer->add_point_cloud(POINTCLOUD, points);
 
-    osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry();
-
-    points_to_geometry_node(points, geometry, 255,255,255,1);
-    geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, int(points.size())));
-
-    osg::ref_ptr<osg::Node> model = geometry;//osgDB::readNodeFile(path.toStdString());
-    scene->addChild(model.get());
-
-    ui->label->setText(path);
+    write_log(path);
 }
 
 void MainWindow::clean()
@@ -101,7 +96,7 @@ void MainWindow::on_actionSet_Points_Color_triggered()
         r = color.red();
         g = color.green();
         b = color.blue();
-        qviewer->set_points_color(r, g, b);
+        qviewer->set_points_color(POINTCLOUD,r, g, b);
     }
 }
 
@@ -122,6 +117,29 @@ void MainWindow::on_actionSet_Background_Color_triggered()
 
 void MainWindow::on_actionConnect_to_Camera_triggered()
 {
+    camera_3d_com * vst3d_camera = new VST3D_Camera;
 
+    if (vst3d_camera->init("") == VST3D_RESULT_OK)
+    {
+        write_log("3D Camera Initialized Successfully");
+    }
+    else
+    {
+        write_log("3D Camera Initialized Failed");
+    }
+
+}
+
+
+void MainWindow::on_actionSet_Points_Size_triggered()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("QInputDialog::getInt()"),
+                                        tr("New Points Size:"), QLineEdit::Normal,
+                                        "1", &ok);
+    if (ok && !text.isEmpty())
+    {
+        qviewer->set_points_size(POINTCLOUD, text.toInt());
+    }
 }
 

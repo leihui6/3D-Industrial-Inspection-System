@@ -1,13 +1,12 @@
 #ifndef CLOUD_GEOMETRY_H
 #define CLOUD_GEOMETRY_H
 
-#endif // CLOUD_GEOMETRY_H
-
 #include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <sstream>
+
 #include <osg/Geometry>
 #include <osg/Geode>
 
@@ -38,6 +37,8 @@ struct point_3d
     float r, g, b;
 };
 
-void points_to_osg_structure(std::vector<point_3d>& points, osg::ref_ptr<osg::Vec3Array> coords, osg::ref_ptr<osg::Vec4Array> colors, osg::ref_ptr<osg::Vec3Array> normals, float r, float g, float b, float w);
+void points_to_osg_structure(std::vector<point_3d>& points, osg::ref_ptr<osg::Vec3Array> coords, osg::ref_ptr<osg::Vec4Array> colors, float w);
 
 void points_to_geometry_node(std::vector<point_3d>& points, osg::ref_ptr<osg::Geometry> geometry, float r, float g, float b, float w);
+
+#endif
