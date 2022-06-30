@@ -120,7 +120,7 @@ void MainWindow::on_actionConnect_to_Camera_triggered()
 {
     vst3d_camera = new VST3D_Camera;
 
-    if (vst3d_camera->init("") == VST3D_RESULT_OK)
+    if (vst3d_camera->init("C:\\Program Files\\VST\\VisenTOP Studio\\VisenTOP Studio.exe") == VST3D_RESULT_OK)
     {
         write_log("3D Camera Initialized Successfully");
         ui->pushButton->setEnabled(true);
@@ -152,7 +152,8 @@ void MainWindow::on_pushButton_clicked()
 
     vst3d_camera->get_point_cloud(point_cloud);
 
-    clean();
     qviewer->add_point_cloud(POINTCLOUD, point_cloud);
+
+    write_log("Retrieved| Number of points:" + QString::number(point_cloud.size()));
 }
 

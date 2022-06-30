@@ -22,6 +22,11 @@ int VST3D_Camera::init(const std::string &path)
     if (VST3D_RESULT_OK != result)
         return VST3D_RESULT_ERROR;
 
+    std::vector<float> top_plane_func;
+    result = del_background(top_plane_func);
+    if (VST3D_RESULT_OK != result)
+        return VST3D_RESULT_ERROR;
+
     return result;
 }
 
@@ -104,10 +109,18 @@ int VST3D_Camera::scan()
 
 int VST3D_Camera::get_point_cloud(std::vector<point_3d> &point_cloud)
 {
+    // 开始单次扫描
+    int vst3d_status =  scan();
+    if (vst3d_status != VST3D_RESULT_OK)
+    {
+        return VST3D_RESULT_ERROR;
+    }
+
     VST3D_PT * p_pointcloud = nullptr;
     int totalNum = 0;
 
-    int result = get_num_points(totalNum);  // 得到当前单次扫描总点数
+    // 得到当前单次扫描总点数
+    int result = get_num_points(totalNum);
     if (result != 0)
     {
         // 扫描不成功
@@ -138,6 +151,8 @@ int VST3D_Camera::get_point_cloud(std::vector<point_3d> &point_cloud)
 
         point_cloud.push_back(p);
     }
+
+    clear();
 
     return result;
 }
