@@ -115,10 +115,10 @@
     <LibraryPath>$(OSG)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(MS3D)\OSG 3.6.4\include;$(MS3D)\nanoflann\include;$(MS3D)\Eigen;$(MS3D)\CGAL\include;$(MS3D)\OPENGR;$(MS3D)\Boost_1_72_0\include;$(MS3D)\libpointmatcher\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)\include</IncludePath>
+    <IncludePath>$(MS3D)\OSG-3.6.4\include;$(MS3D)\nanoflann\include;$(MS3D)\Eigen;$(MS3D)\CGAL\include;$(MS3D)\OPENGR;$(MS3D)\Boost_1_72_0\include;$(MS3D)\libpointmatcher\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)\include</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
     <ExtensionsToDeleteOnClean>*.obj;*.iobj;*.log;*.tlog;*.pdb;*.ipdb;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
-    <TargetExt>.dll</TargetExt>
+    <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -172,7 +172,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>yaml-cpp-pm.lib;OpenThreads.lib;osg.lib;osgAnimation.lib;osgDB.lib;osgFX.lib;osgFXd.lib;osgGA.lib;osgManipulator.lib;osgParticle.lib;osgPresentation.lib;osgQOpenGL.lib;osgQt5.lib;osgShadow.lib;osgSim.lib;osgTerrain.lib;osgText.lib;osgUI.lib;osgUId.lib;osgUtil.lib;osgViewer.lib;osgVolume.lib;osgWidget.lib;boost_atomic-vc140-mt.lib;boost_chrono-vc140-mt.lib;boost_container-vc140-mt.lib;boost_date_time-vc140-mt.lib;boost_exception-vc140-mt.lib;boost_filesystem-vc140-mt.lib;boost_graph-vc140-mt.lib;boost_iostreams-vc140-mt.lib;boost_locale-vc140-mt.lib;boost_math_c99-vc140-mt.lib;boost_math_c99f-vc140-mt.lib;boost_math_c99l-vc140-mt.lib;boost_math_tr1-vc140-mt.lib;boost_math_tr1f-vc140-mt.lib;boost_math_tr1l-vc140-mt.lib;boost_random-vc140-mt.lib;boost_regex-vc140-mt.lib;boost_serialization-vc140-mt.lib;boost_system-vc140-mt.lib;boost_thread-vc140-mt.lib;boost_unit_test_framework-vc140-mt.lib;boost_wserialization-vc140-mt.lib;bz2.lib;lzma.lib;mpfr.lib;mpir.lib;zlib.lib;zstd.lib;pointmatcher.lib;nabo.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(MS3D)/OSG 3.6.4/lib;$(MS3D)/CGAL/lib;$(MS3D)/Boost_1_72_0/lib;$(MS3D)/libnabo/lib;$(MS3D)/libpointmatcher/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MS3D)/OSG-3.6.4/lib;$(MS3D)/CGAL/lib;$(MS3D)/Boost_1_72_0/lib;$(MS3D)/libnabo/lib;$(MS3D)/libpointmatcher/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

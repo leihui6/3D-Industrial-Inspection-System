@@ -1,0 +1,28 @@
+>Date
+	2022-07-13 17:27:01
+>Data
+	data/medical_blade_03.txt 543041->319629 -0.4114%
+	data/medical_blade_standard.txt 118595->118590 -0.0000%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+-0.393425 -0.653443  0.646706  -422.489
+-0.316858 -0.563958 -0.762596   550.488
+ 0.863028 -0.504938 0.0148266   623.144
+        0         0         0         1
+   0.999691   0.0236021  0.00803703    -3.18014
+ -0.0232335    0.998807   -0.042997     31.1511
+-0.00904174   0.0427965    0.999045     3.55737
+          0           0           0           1
+ -0.393846  -0.670611   0.628626   -407.538
+ -0.344447  -0.526393  -0.777348    564.005
+  0.852201  -0.522683 -0.0236713    653.485
+         0          0          0          1
+>Time Elapsed
+	Data Loading     :	3.5900s
+	Registration(1/2):	0.5760s
+	Registration(2/2):	2.7290s
+	Searching        :	0.1640s
+	Measurement      :	6.4390s
+	Total Time       :	13.498s
+>Root Mean Square(Registration and Searching)
+	0.8255 1.4879
+>End

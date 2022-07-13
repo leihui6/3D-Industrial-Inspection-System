@@ -48,7 +48,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,9">
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="btn_retrieve_point_cloud">
           <property name="text">
            <string>Retrieve  Point Cloud from 3D Camera</string>
           </property>

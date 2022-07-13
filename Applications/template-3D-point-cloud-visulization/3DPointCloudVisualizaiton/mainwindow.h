@@ -2,6 +2,7 @@
 #define     MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QElapsedTimer>
 #include <QTimer>
 #include <QColorDialog>
 #include <QInputDialog>
@@ -56,7 +57,7 @@ private slots:
     void on_actionSet_Background_Color_triggered();
     void on_actionConnect_to_Camera_triggered();
     void on_actionSet_Points_Size_triggered();
-    void on_pushButton_clicked();
+    void on_btn_retrieve_point_cloud_clicked();
 };
 
 #endif // MAINWINDOW_H

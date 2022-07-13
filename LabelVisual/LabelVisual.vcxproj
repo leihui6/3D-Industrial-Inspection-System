@@ -71,8 +71,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.exe</TargetExt>
-    <IncludePath>$(MS3D)\OSG 3.6.4\include;$(ProjectDir)\inc;$(MS3D)\Eigen;$(MS3D)\Boost_1_72_0\include;$(ProjectDir)\..\MMS\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(MS3D)\OSG-3.6.4\include;$(ProjectDir)\inc;$(MS3D)\Eigen;$(MS3D)\Boost_1_72_0\include;$(ProjectDir)\..\MMS\include;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(MSBuildProjectDirectory)\inc;$(EIGEN)\;$(OSG)\include;$(MSBuildProjectDirectory)\..\..\MMS\include;$(IncludePath)</IncludePath>
@@ -91,7 +92,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(MS3D)/OSG 3.6.4/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MS3D)/OSG-3.6.4/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenThreads.lib;osg.lib;osgAnimation.lib;osgDB.lib;osgFX.lib;osgFXd.lib;osgGA.lib;osgManipulator.lib;osgParticle.lib;osgPresentation.lib;osgQOpenGL.lib;osgQt5.lib;osgShadow.lib;osgSim.lib;osgTerrain.lib;osgText.lib;osgUI.lib;osgUId.lib;osgUtil.lib;osgViewer.lib;osgVolume.lib;osgWidget.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

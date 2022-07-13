@@ -141,6 +141,9 @@ void QViewerWidget::initCamera(const QRect &geometry)
     osg::CullStack::CullingMode cullingMode = camera->getCullingMode();
     cullingMode &= ~(osg::CullStack::SMALL_FEATURE_CULLING);
     camera->setCullingMode(cullingMode);
+
+
+
 }
 
 void QViewerWidget::paintEvent(QPaintEvent *)
@@ -151,4 +154,6 @@ void QViewerWidget::paintEvent(QPaintEvent *)
 void QViewerWidget::initial_scene()
 {
     set_background_color(135, 206, 235);
+    //viewer.getCameraManipulator()->computeHomePosition();
+    //viewer.getCameraManipulator()->home(0.0);
 }

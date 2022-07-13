@@ -10,9 +10,9 @@ cloud_viewer::cloud_viewer(osg::ref_ptr<osgViewer::Viewer> viewer)
 
 	// normal point cloud
 	m_point_cloud_size = 1.0f;
-	//m_point_cloud_color = osg::Vec4(0.0,0.0,0.0,1.0);
-	//m_background_color = osg::Vec4(135,206,235,1);
-	//set_background_color(m_background_color);
+    m_point_cloud_color = osg::Vec4(0.0,0.0,0.0,1.0);
+    m_background_color = osg::Vec4(135,206,235,1);
+    set_background_color(m_background_color);
 
 	// hover properties
 	m_hover_size = m_point_cloud_size * 3;

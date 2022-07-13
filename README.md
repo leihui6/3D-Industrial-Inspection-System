@@ -24,3 +24,14 @@ The following instruction only works on Windows, particularly Win10+ platform.
 
 3. Make sure that **C++ 17** is selected because the \<filesystem\> will be used in this project.
 
+## Applications in this project
+
+1. Labeling tool
+
+It was implemented in "*main_labeling_points.cpp*", and you can uncomment `#define LABELING_PONITS` at the first line of code to use it.
+
+2. All-in-one process
+
+The procedure: **registration -> searching -> measurement -> evaluation** can be execuated with one program which is in "*LocalTest.cpp*" under project "*CloudProcess*".
+
+Run it and check the result with the labeling tool mentioned above.

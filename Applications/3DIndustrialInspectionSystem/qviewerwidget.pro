@@ -10,7 +10,7 @@ CONFIG += c++14 c++17
 # DESTDIR = ../../bin
 
 # EIGEN
-INCLUDEPATH = $$(EIGEN)
+INCLUDEPATH = $$(MS3D)/Eigen
 
 # OSG
 win32 {

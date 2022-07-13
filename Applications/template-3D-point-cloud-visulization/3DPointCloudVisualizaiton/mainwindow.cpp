@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setWindowTitle("3D-Point-Cloud-Visualization");
 
-    ui->pushButton->setEnabled(false);
+    ui->btn_retrieve_point_cloud->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -123,12 +123,12 @@ void MainWindow::on_actionConnect_to_Camera_triggered()
     if (vst3d_camera->init("C:\\Program Files\\VST\\VisenTOP Studio\\VisenTOP Studio.exe") == VST3D_RESULT_OK)
     {
         write_log("3D Camera Initialized Successfully");
-        ui->pushButton->setEnabled(true);
+        ui->btn_retrieve_point_cloud->setEnabled(true);
     }
     else
     {
         write_log("3D Camera Initialized Failed");
-        ui->pushButton->setEnabled(false);
+        ui->btn_retrieve_point_cloud->setEnabled(false);
     }
 }
 
@@ -146,14 +146,20 @@ void MainWindow::on_actionSet_Points_Size_triggered()
 }
 
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_btn_retrieve_point_cloud_clicked()
 {
+    ui->btn_retrieve_point_cloud->setEnabled(false);
+    QElapsedTimer timer;
+    timer.start();
+
     std::vector<point_3d> point_cloud;
 
     vst3d_camera->get_point_cloud(point_cloud);
 
     qviewer->add_point_cloud(POINTCLOUD, point_cloud);
 
-    write_log("Retrieved| Number of points:" + QString::number(point_cloud.size()));
+    write_log("Retrieved| N:" + QString::number(point_cloud.size()) + ", T:" + QString::number(timer.elapsed()/1000.0) +"s");
+
+    ui->btn_retrieve_point_cloud->setEnabled(true);
 }
 

@@ -32,7 +32,7 @@ protected:
 
     osg::ref_ptr<osg::Group> scene;
 
-    osgViewer::Viewer   viewer;
+    osgViewer::Viewer viewer;
 
 
     std::map<std::string, osg::ref_ptr<osg::Node>> node_map;

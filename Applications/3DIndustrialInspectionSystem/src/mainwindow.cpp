@@ -98,12 +98,7 @@ void MainWindow::initialize_dll()
     handle_filename_vec.push_back("LabelVisual.dll");
     handle_filename_vec.push_back("CloudProcess.dll");
 
-
-
-
     // end adding
-
-
 
     for(size_t i=0;i<handle_filename_vec.size();++i)
     {
@@ -127,20 +122,20 @@ void MainWindow::initialize_dll()
 
 void MainWindow::visual_thread(const std::string & file1, const std::string & file2, int flag)
 {
-//    typedef LabelVisualCom*(*LabelVisualComfunc)();
+    typedef LabelVisualCom*(*LabelVisualComfunc)();
 
-//    HINSTANCE hDll = m_handle_vec["label_visual"];
+    HINSTANCE hDll = m_handle_vec["label_visual"];
 
-//    LabelVisualComfunc dllFunc = (LabelVisualComfunc)GetProcAddress(hDll, "getLabelVisualCom");
+    LabelVisualComfunc dllFunc = (LabelVisualComfunc)GetProcAddress(hDll, "getLabelVisualCom");
 
-//    LabelVisualCom * label_visual_p;
-//    label_visual_p = (LabelVisualCom*)(dllFunc());
+    LabelVisualCom * label_visual_p;
+    label_visual_p = (LabelVisualCom*)(dllFunc());
 
-//    label_visual_p->initial(file1,file2,flag);
+    label_visual_p->initial(file1,file2,flag);
 
-//    label_visual_p->visual();
+    label_visual_p->visual();
 
-//    delete label_visual_p;
+    delete label_visual_p;
 }
 
 void MainWindow::update()
@@ -150,12 +145,12 @@ void MainWindow::update()
 
 void MainWindow::clean()
 {
-    //osg::Group *scene = qviewer->getScene();
+//    osg::Group *scene = qviewer->getScene();
 
-    //    if (scene == nullptr)
-    //        return;
+//        if (scene == nullptr)
+//            return;
 
-    //    scene->removeChildren(0, scene->getNumChildren());
+//        scene->removeChildren(0, scene->getNumChildren());
 }
 
 void MainWindow::quit()
@@ -523,50 +518,50 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 
 int MainWindow::all_process_thread()
 {
-//    typedef BackProcessCom*(*BackProcessComfunc)();
+    typedef BackProcessCom*(*BackProcessComfunc)();
 
-//    HINSTANCE hDll = m_handle_vec["back_process"];
+    HINSTANCE hDll = m_handle_vec["back_process"];
 
-//    BackProcessComfunc dllFunc = (BackProcessComfunc)GetProcAddress(hDll, "getBackProcessCom");
+    BackProcessComfunc dllFunc = (BackProcessComfunc)GetProcAddress(hDll, "getBackProcessCom");
 
-//    BackProcessCom * back_process_p;
-//    back_process_p = (BackProcessCom*)dllFunc();
-//    back_process_p->initial_parameter(m_configuration_file);
+    BackProcessCom * back_process_p;
+    back_process_p = (BackProcessCom*)dllFunc();
+    back_process_p->initial_parameter(m_configuration_file);
 
-//    clock_t beg_t = clock();
-//    double this_time = 0, total_time = 0;
+    clock_t beg_t = clock();
+    double this_time = 0, total_time = 0;
 
-//    write_log("starting registration...");
-//    // registration
-//    back_process_p->registration();
-//    this_time = (clock() - beg_t)/CLOCKS_PER_SECOND;
-//    total_time += this_time;
-//    write_log("registration done! time elapsed:"+ std::to_string(this_time).substr(0,6) + "s");
-//    beg_t = clock();
+    write_log("starting registration...");
+    // registration
+    back_process_p->registration();
+    this_time = (clock() - beg_t)/CLOCKS_PER_SECOND;
+    total_time += this_time;
+    write_log("registration done! time elapsed:"+ std::to_string(this_time).substr(0,6) + "s");
+    beg_t = clock();
 
-//    // searching all labeled points
-//    write_log("starting searching...");
-//    back_process_p->searching();
-//    this_time = (clock() - beg_t)/CLOCKS_PER_SECOND;
-//    total_time += this_time;
-//    write_log("searching done! time elapsed:"+ std::to_string(this_time).substr(0,6) + "s");
-//    beg_t = clock();
+    // searching all labeled points
+    write_log("starting searching...");
+    back_process_p->searching();
+    this_time = (clock() - beg_t)/CLOCKS_PER_SECOND;
+    total_time += this_time;
+    write_log("searching done! time elapsed:"+ std::to_string(this_time).substr(0,6) + "s");
+    beg_t = clock();
 
-//    // measurement
-//    write_log("starting measurement...");
-//    back_process_p->measurement();
-//    this_time = (clock() - beg_t)/CLOCKS_PER_SECOND;
-//    total_time += this_time;
-//    write_log("measurement done! time elapsed:"+ std::to_string(this_time).substr(0,6) + "s");
+    // measurement
+    write_log("starting measurement...");
+    back_process_p->measurement();
+    this_time = (clock() - beg_t)/CLOCKS_PER_SECOND;
+    total_time += this_time;
+    write_log("measurement done! time elapsed:"+ std::to_string(this_time).substr(0,6) + "s");
 
-//    write_log("total time elapsed:"+ std::to_string(total_time).substr(0,6) + "s");
+    write_log("total time elapsed:"+ std::to_string(total_time).substr(0,6) + "s");
 
-//    // Evaluation
-//    write_log("starting evaluation...");
-//    back_process_p->evaluation();
-//    write_log("evaluation done!");
+    // Evaluation
+    write_log("starting evaluation...");
+    back_process_p->evaluation();
+    write_log("evaluation done!");
 
-//    delete back_process_p;
+    delete back_process_p;
 
     return 1;
 }
@@ -574,6 +569,8 @@ int MainWindow::all_process_thread()
 void MainWindow::on_btn_measurement_read_clicked()
 {
     std::string measurement_pairs_filename = m_str_str_map["input_folder"]+m_str_str_map["measurement_pairs"];
+
+    std::cout << measurement_pairs_filename <<std::endl;
 
     write_log("reading "+measurement_pairs_filename);
 

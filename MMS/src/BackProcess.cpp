@@ -171,6 +171,11 @@ int BackProcess::measurement()
 		std::string measurment_pair_filename;
 
 		std::getline(ifile, measurment_pair_filename);
+		
+		if (measurment_pair_filename.find("#") != std::string::npos)
+		{
+			continue;
+		}
 
 		measurment_pair_filename =
 			m_parameters["input_folder"] + measurment_pair_filename;
