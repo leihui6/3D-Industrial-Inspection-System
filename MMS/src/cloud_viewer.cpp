@@ -427,7 +427,7 @@ void cloud_viewer::add_model(const std::string & filename)
 
 void cloud_viewer::display()
 {
-	std::cout << m_root->getNumChildren() << " node hooked on root." << std::endl;;
+	std::cout << m_root->getNumChildren() << " node hooked on root.(ignored)" << std::endl;;
 
 	m_viewer->addEventHandler(m_selector.get());
 

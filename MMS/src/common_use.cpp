@@ -483,7 +483,7 @@ void read_file_as_map(const std::string & file_name, std::map<std::string, std::
 
 		str_flt_map[key_] = value_;
 	}
-	std::cout << "read " << str_flt_map.size() << " parameters from local file.\n";
+	std::cout << "read " << str_flt_map.size() << " parameters from " << file_name << "\n";
 }
 
 void read_file_as_map(const std::string & file_name, std::multimap<std::string, std::string> & str_flt_map)

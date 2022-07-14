@@ -42,7 +42,7 @@ int cloud_evaluation::mean_distance_point_clouds(std::vector<point_3d>& pc1, std
 	}
 
 	const std::vector<point_3d> & pc = *searched_points;
-	std::cout << pc.size() << "  " << correspondences.size() << std::endl;
+	std::cout << "point size:" << pc.size() << "  " << "searched point(for evaluation):" << correspondences.size() << std::endl;
 
 	for (size_t i = 0; i < pc.size(); ++i)
 	{

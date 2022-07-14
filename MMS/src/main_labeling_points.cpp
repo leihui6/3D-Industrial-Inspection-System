@@ -1,4 +1,4 @@
-//#define LABELING_POINTS
+#define LABELING_POINTS
 #ifdef LABELING_POINTS
 
 #include "cloud_io.h"
