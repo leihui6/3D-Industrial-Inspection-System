@@ -12,7 +12,7 @@ input_folder:data
 # input data which was scanned
 reading_data:/medical_blade_03.txt
 # input data which will be used for labeling.
-reference_data:/medical_blade_standard.txt
+reference_data:/grindingTool_0_standard.txt
 measurement_requirement:/measurement_requirement.txt
 icp_configuration:/icp_configuration.yaml
 4pcs_configuration:/4pcs_configuration.txt

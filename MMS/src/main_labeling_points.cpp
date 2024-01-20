@@ -17,15 +17,12 @@ int main(int argc, char *argv[])
 
 	read_file_as_map(configuration_file_name, parameters);
 
-	point_cloud_file_name = parameters["input_folder"];
-	point_cloud_file_name = point_cloud_file_name + parameters["reference_data"];
+	point_cloud_file_name = parameters["input_folder"] + parameters["reference_data"];
 	output_folder_name = parameters["output_folder"];
 
 	std::cout
 		<< "file information:\n"
-
 		<< "standard point cloud:\n\t" << point_cloud_file_name << "\n"
-
 		<< "output folder:\n\t" << output_folder_name << "\n";
 
 	cloud_viewer m_cloud_viewer("labeling points(shapes) to be detected", parameters);

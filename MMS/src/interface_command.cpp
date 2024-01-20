@@ -36,12 +36,10 @@ void interface_command::run_itself()
 		if (i_c == 'q')
 		{
 			std::cout << "exited labeling process manually" << std::endl;
-
 			m_cs = CS_QUIT;
-
 			m_dt = DT_EMPTY;
 
-			break;
+			exit(0);
 		}
 		// points
 		else if (i_c == 'a')
@@ -245,6 +243,8 @@ void interface_command::process_specific_type(detected_type _dt)
 
 			if (_dt == DT_POINT)
 			{
+				if (m_cloud_view_ptr->m_point.points.empty()) break;
+
 				input_marked_name(marked_name, "point_" + std::to_string(marked_points_count[0]++));
 
 				m_cloud_view_ptr->m_marked_points_map[marked_name] = m_cloud_view_ptr->m_point;
