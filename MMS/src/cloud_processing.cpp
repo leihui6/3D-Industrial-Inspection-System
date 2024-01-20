@@ -107,7 +107,7 @@ void cloud_processing::filter_remove_outliers(std::vector<point_3d>& points, siz
 	convert_to_CGAL_points(points, cgal_points);
 
 	std::vector<CGAL::Simple_cartesian<float>::Point_3>::iterator first_to_remove
-		= CGAL::remove_outliers
+		= CGAL::remove_outliers<CGAL::Parallel_if_available_tag>
 		(cgal_points,
 			k,
 			CGAL::parameters::threshold_percent(100.).threshold_distance(threshold_distance));
