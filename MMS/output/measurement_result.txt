@@ -22,3 +22,9 @@
 >values (distance_geometrical/distance_scattered/angle)
 16.0605 16.0605 -1 
 #point_0-point_1-
+>values (distance_geometrical/distance_scattered/angle)
+-1 -1 62.5273 
+#plane_0-plane_1-
+>values (distance_geometrical/distance_scattered/angle)
+16.0605 16.0605 -1 
+#point_0-point_1-
