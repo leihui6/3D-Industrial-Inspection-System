@@ -523,12 +523,14 @@ void cloud_viewer::print_marked_info()
 	}
 
 	std::cout
-		<< "here are information on marked shapes:\n"
+		<< "######## Marked Points ########\n"
+		<< "Here are information on marked shapes:\n"
 		<< "point shapes:" << point_count << "\n"
 		<< "line shapes:" << line_count << "\n"
 		<< "plane shapes:" << plane_count << "\n"
 		<< "cylinder shapes:" << cylinder_count << "\n"
-		<< "reference pointset:" << reference_count << "\n";
+		<< "reference pointset:" << reference_count << "\n"
+		<< "######## END ########\n";
 }
 
 
@@ -544,7 +546,9 @@ osg::ref_ptr<PickHandler> cloud_viewer::get_pick_handler()
 
 void cloud_viewer::export_data()
 {
-	export_marked_points(m_marked_points_map,m_export_file_name + "/marked_points.txt");
+	std::string ofilename = m_export_file_name + "/marked_points.txt";
+	std::cout << "Marked points were exported to \""<< ofilename <<"\"" << std::endl;
+	export_marked_points(m_marked_points_map, ofilename);
 }
 
 void cloud_viewer::initialize_parameters()

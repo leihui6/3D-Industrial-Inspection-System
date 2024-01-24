@@ -1,4 +1,4 @@
-//#define BACK_LOCALTEST
+#define BACK_LOCALTEST
 #ifdef BACK_LOCALTEST
 
 #include "BackProcess.h"
@@ -27,6 +27,8 @@ int main(int argc, char* argv[])
 
 	back_process_p->evaluation();
 	//}
+
+	delete back_process_p;
 
 	return 0;
 }

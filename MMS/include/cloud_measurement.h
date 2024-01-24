@@ -31,7 +31,7 @@ public:
 	size_t export_measured_data(const std::string & output_filename);
 
 private:
-	std::string m_beginning_label;
+	//std::string m_beginning_label;
 	// it should keep order
 	std::vector<pair_content> m_pair_vec;
 
@@ -43,7 +43,7 @@ private:
 	float m_deviation_length;
 	
 	cloud_fitting cf;
-	app_welding m_welding;
+	//app_welding m_welding;
 
 	// transformed point cloud
 	std::vector<point_3d> & m_point_cloud;

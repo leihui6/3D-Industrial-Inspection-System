@@ -84,8 +84,6 @@ void interface_command::run_itself()
 		else if (i_c == 'e')
 		{
 			m_cloud_view_ptr->export_data();
-
-			std::cout << "exported done!\n";
 		}
 	}
 }
@@ -93,6 +91,7 @@ void interface_command::run_itself()
 void interface_command::print_menu()
 {
 	std::cout
+		<< "######## MENU ########\n"
 		<< "please choice the shape that you want to detect, press \"q\" to quit" << "\n"
 		<< "a) 3d point" << "\n"
 		<< "b) 3d line" << "\n"
@@ -253,6 +252,8 @@ void interface_command::process_specific_type(detected_type _dt)
 			}
 			else if (_dt == DT_LINE)
 			{
+				if (m_cloud_view_ptr->m_line.points.empty()) break;
+
 				input_marked_name(marked_name, "line_" + std::to_string(marked_points_count[1]++));
 
 				m_cloud_view_ptr->m_marked_points_map[marked_name] = m_cloud_view_ptr->m_line;
@@ -261,6 +262,8 @@ void interface_command::process_specific_type(detected_type _dt)
 			}
 			else if (_dt == DT_PLANE)
 			{
+				if (m_cloud_view_ptr->m_plane.points.empty()) break;
+
 				input_marked_name(marked_name, "plane_" + std::to_string(marked_points_count[2]++));
 
 				m_cloud_view_ptr->m_marked_points_map[marked_name] = m_cloud_view_ptr->m_plane;
@@ -269,6 +272,8 @@ void interface_command::process_specific_type(detected_type _dt)
 			}
 			else if (_dt == DT_CYLINDER)
 			{
+				if (m_cloud_view_ptr->m_cylinder.points.empty()) break;
+
 				input_marked_name(marked_name, "cylinder_" + std::to_string(marked_points_count[3]++));
 
 				m_cloud_view_ptr->m_marked_points_map[marked_name] = m_cloud_view_ptr->m_cylinder;
@@ -277,6 +282,8 @@ void interface_command::process_specific_type(detected_type _dt)
 			}
 			else if (_dt == DT_REFER)
 			{
+				if (m_cloud_view_ptr->m_reference_point.points.empty()) break;
+
 				input_marked_name(marked_name, "reference_" + std::to_string(marked_points_count[4]++));
 
 				m_cloud_view_ptr->m_marked_points_map[marked_name] = m_cloud_view_ptr->m_reference_point;

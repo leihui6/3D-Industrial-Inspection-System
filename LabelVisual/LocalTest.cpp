@@ -1,3 +1,5 @@
+// TODO: This function is planned to be replaced by Open3D
+// Ref: https://github.com/isl-org/Open3D/issues/3894
 #define LOCALTEST
 #ifdef LOCALTEST
 

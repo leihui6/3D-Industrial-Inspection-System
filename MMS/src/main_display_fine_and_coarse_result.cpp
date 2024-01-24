@@ -1,6 +1,6 @@
 /*
 *	The purpose of this program is to visualize the process of coarse-to-fine stage.
-*
+*	Note: 24/01/2024 This module is planned to be replaced by Open3D
 *	Author: leihui.li#outlook.com
 *	Date: 06/06/2020
 */

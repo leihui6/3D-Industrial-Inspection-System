@@ -47,25 +47,30 @@ size_t cloud_measurement::read_pair_file(const std::string & filename)
 			pc.reference_object = split_str[2];
 			m_pair_vec.push_back(pc);
 		}
-		else if (split_str.size() == 2)
-		{
-			//pc.reference_object.clear();
-			if (split_str[0] == "begin_point")
-			{
-				m_beginning_label = split_str[1];
-			}
-		}
+		//else if (split_str.size() == 2)
+		//{
+		//	//pc.reference_object.clear();
+		//	if (split_str[0] == "begin_point")
+		//	{
+		//		m_beginning_label = split_str[1];
+		//	}
+		//}
+		//else
+		//{
+		//	std::cerr << "error: the number of measurement pair should be 3 or 2" << std::endl;
+		//	continue;
+		//}
 		else
 		{
-			std::cerr << "error: the number of measurement pair should be 3 or 2" << std::endl;
+			std::cerr << "error: the number of measurement pair should be 3" << std::endl;
 			continue;
 		}
 	}
 
-	if (m_beginning_label.empty())
-	{
-		std::cerr << "error: please specify a begin point label, \"begin_point:xxx\"" << std::endl;
-	}
+	//if (m_beginning_label.empty())
+	//{
+	//	std::cerr << "error: please specify a begin point label, \"begin_point:xxx\"" << std::endl;
+	//}
 
 	return m_pair_vec.size();
 }
@@ -77,7 +82,7 @@ int cloud_measurement::post_process(Eigen::Matrix4f & matrix)
 		for (auto &p : pv.drawable_points)
 			p.do_transform(matrix.inverse());
 
-	m_welding.process(m_mc_vec, m_searched_mark_points_map[m_beginning_label].points);
+	//m_welding.process(m_mc_vec, m_searched_mark_points_map[m_beginning_label].points);
 
 	return 0;
 }
@@ -90,6 +95,8 @@ void cloud_measurement::measure()
 	{
 		measurement_content mc;
 
+		// use fitting shape to calcualte 
+		// when reference points are not given
 		if (pair.reference_object.empty())
 		{
 			mc.m_method = MM_VALUES;
@@ -177,7 +184,6 @@ void cloud_measurement::analyze_points(
 	{
 		reference_points = & m_searched_mark_points_map[pc.reference_object].points;
 	}
-
 
 	// point
 	if (first_type == 0 && second_type == 0)
@@ -284,7 +290,7 @@ size_t cloud_measurement::export_measured_data(const std::string & output_filena
 	{
 		if (mc.m_method == MM_VALUES)
 		{
-			ofile << ">values" << "\n";
+			ofile << ">values (distance_geometrical/distance_scattered/angle)" << "\n";
 			if (mc.distance_geometrical == INVALIDVALUE)
 				ofile << INVALIDVALUE << " ";
 			else
@@ -336,7 +342,7 @@ void cloud_measurement::point_to_point(point_shape & shape_1, point_shape & shap
 	distance_point_to_point(centroid_point_1, centroid_point_2, mc.distance_geometrical);
 	
 	// scattered distance
-	distance_scattered_points(shape_2.points, shape_2.points, mc.distance_scattered);
+	distance_scattered_points(shape_1.points, shape_2.points, mc.distance_scattered);
 }
 
 void cloud_measurement::point_to_line(point_shape & shape_1, point_shape & shape_2, measurement_content & mc)
@@ -466,7 +472,7 @@ void cloud_measurement::plane_to_plane_values(std::vector<point_3d>& points_1, s
 	mc.angle = radian2degree(radian);
 
 	// scattered distance
-	distance_scattered_points(points_1, plane_func_1, points_2, plane_func_2, mc.distance_scattered);
+	//distance_scattered_points(points_1, plane_func_1, points_2, plane_func_2, mc.distance_scattered);
 	//std::cout << mc.distance_scattered << std::endl;
 }
 

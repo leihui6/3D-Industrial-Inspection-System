@@ -81,7 +81,7 @@ int BackProcess::registration()
 	cloud_registration.coarse_registration(m_reading_point_cloud, m_reference_point_cloud, m_coarse_ret_mat, m_coarse_configuration_filename);
 
 	// matrix transforming reading point cloud to reference point cloud
-	//std::cout << "coarse registration matrix is:\n" << coarse_ret_mat << "\n";
+	std::cout << "coarse registration matrix is:\n" << m_coarse_ret_mat << "\n";
 
 	m_rd.registration_coarse_time = double((clock() - begin)) / CLOCKS_PER_SEC;
 	begin = clock();
@@ -99,7 +99,7 @@ int BackProcess::registration()
 	cloud_registration.fine_registration(m_coarse_transformed_point_cloud, m_reference_point_cloud, m_icp_configuration_filename, m_fine_ret_mat);
 
 	// matrix transforming reading point cloud to reference point cloud
-	//std::cout << "fine registration matrix is:\n" << fine_ret_mat << "\n";
+	std::cout << "fine registration matrix is:\n" << m_fine_ret_mat << "\n";
 
 	// save matrix to file
 	//save_matrix(m_fine_ret_mat, m_parameters["output_folder"] + m_parameters["fine_registration_result"]);
@@ -180,7 +180,7 @@ int BackProcess::measurement()
 		measurment_pair_filename =
 			m_parameters["input_folder"] + measurment_pair_filename;
 		
-		std::cout << "processing " << measurment_pair_filename << std::endl;
+		std::cout << "processing \" " << measurment_pair_filename << "\"\n";
 
 		size_t pair_num = 
 			cm.read_pair_file(measurment_pair_filename);

@@ -54,7 +54,6 @@
     <ClCompile Include="src\common_use.cpp" />
     <ClCompile Include="src\interface_command.cpp" />
     <ClCompile Include="src\cloud_measurement.cpp" />
-    <ClCompile Include="src\main_display_fine_and_coarse_result.cpp" />
     <ClCompile Include="src\main_labeling_points.cpp" />
     <ClCompile Include="src\process_report.cpp" />
   </ItemGroup>

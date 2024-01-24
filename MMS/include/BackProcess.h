@@ -21,8 +21,17 @@ public:
 
 	virtual int initial_parameter(const std::string & config_filename);
 
+	/*
+	* Align two point cloud, i.e., reading_data and reference_data stated in '3d_measurement_configuration.txt'
+	* 
+	* @m_final_mat will be calculated at the end
+	*/
 	virtual int registration();
 
+	/*
+	* search marked point in the scanned point cloud (reading_data)
+	* @m_searched_mark_points_map will be utilized at the end
+	*/
 	virtual int searching();
 
 	virtual int measurement();

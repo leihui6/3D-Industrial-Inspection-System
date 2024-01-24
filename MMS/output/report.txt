@@ -26,3 +26,451 @@
 >Root Mean Square(Registration and Searching)
 	0.8255 1.4879
 >End
+>Date
+	2024-01-24 16:44:20
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7050s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0380s
+	Searching        :	0.0170s
+	Measurement      :	0.0430s
+	Total Time       :	0.8080s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.4138
+>End
+>Date
+	2024-01-24 16:45:40
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7070s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0380s
+	Searching        :	0.0150s
+	Measurement      :	0.0420s
+	Total Time       :	0.8070s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.4138
+>End
+>Date
+	2024-01-24 16:51:03
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.6910s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0390s
+	Searching        :	0.0160s
+	Measurement      :	0.0430s
+	Total Time       :	0.7940s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.4138
+>End
+>Date
+	2024-01-24 16:58:34
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7230s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0380s
+	Searching        :	0.0160s
+	Measurement      :	0.0460s
+	Total Time       :	0.8280s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.4138
+>End
+>Date
+	2024-01-24 16:58:59
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.6960s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0310s
+	Searching        :	0.0150s
+	Measurement      :	0.0420s
+	Total Time       :	0.7890s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.4138
+>End
+>Date
+	2024-01-24 17:05:06
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7230s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0460s
+	Searching        :	0.0150s
+	Measurement      :	0.0440s
+	Total Time       :	0.8330s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.0010
+>End
+>Date
+	2024-01-24 17:05:45
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7630s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0420s
+	Searching        :	0.0170s
+	Measurement      :	0.0450s
+	Total Time       :	0.8720s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.0010
+>End
+>Date
+	2024-01-24 17:06:04
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7250s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0400s
+	Searching        :	0.0180s
+	Measurement      :	0.0470s
+	Total Time       :	0.8350s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.0010
+>End
+>Date
+	2024-01-24 17:12:23
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7550s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0380s
+	Searching        :	0.0160s
+	Measurement      :	0.0540s
+	Total Time       :	0.8680s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.0010
+>End
+>Date
+	2024-01-24 17:24:05
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7380s
+	Registration(1/2):	0.0060s
+	Registration(2/2):	0.0420s
+	Searching        :	0.0170s
+	Measurement      :	2.2820s
+	Total Time       :	3.0850s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.0010
+>End
+>Date
+	2024-01-24 17:26:09
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7850s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0460s
+	Searching        :	0.0160s
+	Measurement      :	0.0130s
+	Total Time       :	0.8650s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.0010
+>End
+>Date
+	2024-01-24 17:29:43
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7660s
+	Registration(1/2):	0.0060s
+	Registration(2/2):	0.0410s
+	Searching        :	0.0170s
+	Measurement      :	0.0130s
+	Total Time       :	0.8430s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.0010
+>End
+>Date
+	2024-01-24 17:34:59
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.6960s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0370s
+	Searching        :	0.0160s
+	Measurement      :	0.0140s
+	Total Time       :	0.7680s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.0010
+>End
+>Date
+	2024-01-24 17:36:16
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7200s
+	Registration(1/2):	0.0040s
+	Registration(2/2):	0.0440s
+	Searching        :	0.0150s
+	Measurement      :	0.0140s
+	Total Time       :	0.7970s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.0010
+>End
+>Date
+	2024-01-24 17:38:26
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7100s
+	Registration(1/2):	0.0060s
+	Registration(2/2):	0.0380s
+	Searching        :	0.0150s
+	Measurement      :	0.0130s
+	Total Time       :	0.7820s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.0010
+>End
+>Date
+	2024-01-24 17:40:22
+>Data
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+	data/grindingTool_0_standard.txt 134865->28421 -0.7892%
+>Transformation 4x4 (Coarse, Coarse->Fine, and Final Matrix)
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+           1  4.09782e-08 -2.68221e-07  0.000230193
+-4.09782e-08            1  1.11759e-08            0
+-2.68221e-07  2.23517e-08            1  0.000183105
+           0            0            0            1
+>Time Elapsed
+	Data Loading     :	0.7160s
+	Registration(1/2):	0.0050s
+	Registration(2/2):	0.0380s
+	Searching        :	0.0150s
+	Measurement      :	0.0130s
+	Total Time       :	0.7870s
+>Root Mean Square(Registration and Searching)
+	0.0022 0.0010
+>End

@@ -1,7 +1,5 @@
 #include "process_report.h"
 
-
-
 process_report::process_report()
 {
 }

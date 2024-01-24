@@ -107,9 +107,6 @@
     <ClCompile Include="src\BackProcessExp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\main_display_fine_and_coarse_result.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\main_labeling_points.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
